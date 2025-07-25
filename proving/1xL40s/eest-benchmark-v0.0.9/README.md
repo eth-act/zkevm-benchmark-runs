@@ -16,6 +16,8 @@ it will crash at all higher gas limits as well -- so the crash is only listed on
 gas limit where it occurs.
 
 
+### SP1
 | Name | Lowest Gas Limit | Error |
 | ---- | --------- | ----- |
-| `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_408_gas_base_heavy].json` | 10M | Host machine OOM |
+| `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_408_gas_base_heavy].json` | 10M | Prover process OOM |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_867_gas_base_heavy] | 10M | Prover process OOM |
