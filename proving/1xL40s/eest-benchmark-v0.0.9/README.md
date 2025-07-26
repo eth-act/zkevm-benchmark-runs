@@ -11,9 +11,12 @@
 
 
 ## Crashes
-Note that if a test crashes at X gas limit,
-it will crash at all higher gas limits as well -- so the crash is only listed once at the lowest
-gas limit where it occurs.
+
+This section lists the host prover (host) crashes, thus a report for the fixture couldn't be generated. There are other fixtures 
+which also can crash but at the zkVM level, which *do* generate a report but with the `crash` status.
+
+Note that if a test crashes at X gas limit, it will crash at all higher gas limits as well -- so the crash is only 
+listed once at the lowest gas limit where it occurs.
 
 
 ### SP1
