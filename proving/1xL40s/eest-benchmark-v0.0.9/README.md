@@ -25,3 +25,4 @@ listed once at the lowest gas limit where it occurs.
 | `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_408_gas_base_heavy]` | 10M | Prover process OOM |
 | `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_867_gas_base_heavy]` | 10M | Prover process OOM |
 | `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_1045_gas_base_heavy]` | 10M | Prover process OOM |
+| `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_800_gas_base_heavy]` | 10M | Prover process OOM |
