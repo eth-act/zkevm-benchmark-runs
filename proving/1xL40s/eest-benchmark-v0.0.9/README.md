@@ -1,21 +1,21 @@
 # EEST Benchmark v0.0.9 (1xL40s)
 
+Used [`zkevm-benchmark-workload` commit](https://github.com/eth-act/zkevm-benchmark-workload/tree/d2bbf1e8750064a3deae32eb61434bccfbd11ee8).
+
 ## Run status
-- [X] 1M gas limit
-- [X] 10M gas limit
+- [ ] 10M gas limit (in progress)
 - [ ] 45M gas limit
 - [ ] 60M gas limit
 - [ ] 90M gas limit
 - [ ] 120M gas limit
 
 
-## Crashes
+## Proving failures
 
-This section lists the host prover (host) crashes, thus a report for the fixture couldn't be generated. There are other fixtures 
-which also can crash but at the zkVM level, which *do* generate a report but with the `crash` status.
+This section lists the proving failures encountered during the benchmark runs. Note that when the prover process 
+crashes, there won't be a corresponding `.json` output file. For crashes that are reported by the SDK, the `.json` 
+file will be present but result will have a `crashed` field with the error message.
 
-Note that if a test crashes at X gas limit, it will crash at all higher gas limits as well -- so the crash is only 
-listed once at the lowest gas limit where it occurs.
 
 
 ### SP1
