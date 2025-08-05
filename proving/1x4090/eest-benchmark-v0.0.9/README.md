@@ -20,6 +20,7 @@ file will be present but result will have a `crashed` field with the error messa
 | Name | Lowest Gas Limit | Error |
 | ---- | --------- | ----- |
 | `test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_fp_to_g2]` | 45M | SDK reported failure |
+| `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_1045_gas_base_heavy]` | 45M | SDK reported failure |
 | `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_odd_32b_exp_96]` | 45M | Host process crashed OOM |
 | `test_worst_compute.py::test_worst_modarith[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-op_MULMOD-mod_bits_191]` | 45M | Host machine crashed OOM |
 | `test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_exp_208_gas_balanced]` | 45M | Host process crashed OOM |
