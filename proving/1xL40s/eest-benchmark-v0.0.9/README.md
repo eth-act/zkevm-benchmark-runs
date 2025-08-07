@@ -3,7 +3,7 @@
 Used [`zkevm-benchmark-workload` commit](https://github.com/eth-act/zkevm-benchmark-workload/tree/d2bbf1e8750064a3deae32eb61434bccfbd11ee8).
 
 ## Run status
-- [ ] 10M gas limit (in progress)
+- [X] 10M gas limit
 - [ ] 45M gas limit
 - [ ] 60M gas limit
 - [ ] 90M gas limit
