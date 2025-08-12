@@ -6,8 +6,8 @@ This repository contains benchmark results for zkEVM proving across different ha
 
 | Hardware Setup | Available Benchmarks | Details |
 |----------------|---------------------|----------|
-| **1x4090** | `eest-benchmark-v0.0.9` | [View Results](proving/1x4090/README.md) |
-| **1xL40s** | `eest-benchmark-v0.0.9`, `mainnet-22974575-22974674` | [View Results](proving/1xL40s/README.md) |
+| **1x4090** | `eest-benchmark-v0.0.3` | [View Results](proving/1x4090/README.md) |
+| **1xL40s** | `eest-benchmark-v0.0.3`, `mainnet-22974575-22974674` | [View Results](proving/1xL40s/README.md) |
 
 ## Benchmark Types
 
@@ -18,7 +18,7 @@ This repository contains benchmark results for zkEVM proving across different ha
 
 ### Status Categories
 
-- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from _crashes.txt)
+- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from crashes.txt)
 - ❌ **SDK Reported Crashes**: Fixtures that failed during proving (reported by SDK)
 - ✅ **Successful Runs**: Fixtures that completed proving successfully (sorted slowest to fastest)
 

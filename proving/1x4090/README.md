@@ -4,44 +4,16 @@ This folder contains benchmark results for the **1x4090** hardware setup.
 
 ## Available Benchmark Runs
 
-- [eest-benchmark-v0.0.9](#eestbenchmarkv009)
+- [eest-benchmark-v0.0.3](#eestbenchmarkv003)
 
 ---
 
-## eest-benchmark-v0.0.9
-
-**Benchmark Tool:** https://github.com/eth-act/zkevm-benchmark-workload/tree/d2bbf1e8750064a3deae32eb61434bccfbd11ee8
+## eest-benchmark-v0.0.3
 
 ### sp1-v5.1.0
 
-**Total fixtures processed:** 360
+**Total fixtures processed:** 341
 
-
-### 💥 Prover Crashes
-
-| Fixture Name | Time | Throughput | Gas Used |
-|--------------|------|------------|----------|
-| test_worst_compute.py::test_worst_modarith[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-op_MULMOD-mod_bits_191] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_400_gas_exp_heavy] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_408_gas_balanced] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_677_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_767_gas_balanced] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_800_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_867_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_996_gas_balanced] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_even_24b_exp_168] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_even_32b_exp_40] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_exp_208_gas_balanced] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_exp_298_gas_exp_heavy] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_min_as_balanced] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_odd_32b_exp_96] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_odd_32b_exp_cover_windows] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_pawel_2] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-blake2f] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_fp_to_g1] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_g1msm] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_g2add] | 💥 Crashed (Prover) | N/A | N/A |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-point_evaluation] | 💥 Crashed (Prover) | N/A | N/A |
 
 ### ❌ SDK Reported Crashes
 
@@ -50,11 +22,13 @@ This folder contains benchmark results for the **1x4090** hardware setup.
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_1045_gas_base_heavy] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_1360_gas_balanced] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_408_gas_base_heavy] | ❌ Crashed (SDK) | N/A | 45,000,000 |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_800_gas_base_heavy] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_800_gas_exp_heavy] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_even_16b_exp_320] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_even_32b_exp_96] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_min_as_exp_heavy] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_odd_32b_exp_256] | ❌ Crashed (SDK) | N/A | 45,000,000 |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_fp_to_g1] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_fp_to_g2] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 | test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-bls12_pairing_check] | ❌ Crashed (SDK) | N/A | 45,000,000 |
 
