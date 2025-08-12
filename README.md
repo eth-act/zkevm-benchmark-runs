@@ -16,9 +16,13 @@ This repository contains benchmark results for zkEVM proving across different ha
 
 ## Understanding the Results
 
+### Benchmark Workload
+
+Each benchmark run includes a **Benchmark Workload** link that points to the specific version of the [zkevm-benchmark-workload](https://github.com/eth-act/zkevm-benchmark-workload) tool used to generate the test fixtures.
+
 ### Status Categories
 
-- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from crashes.txt)
+- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from _crashes.txt)
 - ❌ **SDK Reported Crashes**: Fixtures that failed during proving (reported by SDK)
 - ✅ **Successful Runs**: Fixtures that completed proving successfully (sorted slowest to fastest)
 

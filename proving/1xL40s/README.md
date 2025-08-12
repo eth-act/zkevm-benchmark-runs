@@ -13,8 +13,20 @@ This folder contains benchmark results for the **1xL40s** hardware setup.
 
 ### sp1-v5.1.0
 
-**Total fixtures processed:** 452
+**Benchmark Workload:** [https://github.com/eth-act/zkevm-benchmark-workload/tree/d2bbf1e8750064a3deae32eb61434bccfbd11ee8](https://github.com/eth-act/zkevm-benchmark-workload/tree/d2bbf1e8750064a3deae32eb61434bccfbd11ee8)
 
+**Total fixtures processed:** 457
+
+
+### 💥 Prover Crashes
+
+| Fixture Name | Time | Throughput | Gas Used |
+|--------------|------|------------|----------|
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_1045_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_408_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_616_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_800_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_867_gas_base_heavy] | 💥 Crashed (Prover) | N/A | N/A |
 
 ### ✅ Successful Runs
 
