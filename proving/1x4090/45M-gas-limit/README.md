@@ -299,8 +299,8 @@ EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP14] | 6m 37.96s | 6m 37.96s |
 | test_worst_memory.py::test_worst_calldatacopy[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-non_zero_data_False-fixed_src_dst_False-1MiB-call] | 6m 37.93s | 6m 37.93s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP3] | 6m 37.83s | 6m 37.83s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP5] | 6m 36.89s | 6m 36.89s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP4] | 6m 36.89s | 6m 36.89s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP5] | 6m 36.89s | 6m 36.89s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP11] | 6m 35.91s | 6m 35.91s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP1] | 6m 35.38s | 6m 35.38s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP7] | 6m 34.59s | 6m 34.59s |
@@ -433,8 +433,8 @@ EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log3] | 17.84s | 17.84s |
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log2] | 17.36s | 17.36s |
 | test_worst_bytecode.py::test_worst_creates_collisions[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_CREATE2] | 17.33s | 17.33s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log0] | 16.29s | 16.29s |
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log3] | 16.29s | 16.29s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log0] | 16.29s | 16.29s |
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log2] | 16.27s | 16.27s |
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log4] | 16.15s | 16.15s |
 | test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log4] | 16.08s | 16.08s |

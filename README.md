@@ -17,7 +17,6 @@ The benchmark results are organized in the following hierarchy:
 proving/
 ├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090
 │   ├── [Configuration]/           # Gas limit or mainnet range
-│   │   ├── [Structure varies by configuration type]
 │   │   │
 │   │   ├── Gas Limits (EEST):
 │   │   │   ├── [EL Client]/       # e.g., reth, ethrex
@@ -25,7 +24,8 @@ proving/
 │   │   │   │   │   └── [zkVM]/    # e.g., sp1-v5.1.0, risc0-v1.2.0
 │   │   │
 │   │   └── Mainnet Ranges:
-│   │       └── [zkVM]/            # e.g., sp1-v5.1.0, risc0-v1.2.0
+│   │       ├── [EL Client]/       # e.g., reth, ethrex
+│   │       │   └── [zkVM]/        # e.g., sp1-v5.1.0, risc0-v1.2.0
 ```
 
 ## Configuration Types

@@ -12,7 +12,7 @@ This folder contains benchmark results for the **1xL40s** hardware setup.
 
 | Configuration | Description | Details |
 |---------------|-------------|----------|
-| **mainnet-22974575-22974674** | Mainnet blocks 22974575 to 22974674 | [View Results](mainnet-22974575-22974674/README.md) |
+| **mainnet-23326233-23326262** | Mainnet blocks 23326233 to 23326262 | [View Results](mainnet-23326233-23326262/README.md) |
 
 ## Hardware Information
 
