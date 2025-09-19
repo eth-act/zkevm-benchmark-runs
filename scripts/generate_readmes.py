@@ -763,7 +763,7 @@ def generate_root_readme(proving_path: Path) -> str:
 def main():
     """Main function to generate all README files."""
     script_dir = Path(__file__).parent
-    proving_path = script_dir / "proving"
+    proving_path = script_dir / "../proving"
     
     if not proving_path.exists():
         print(f"Error: {proving_path} does not exist")
@@ -803,7 +803,7 @@ def main():
     # Generate root README
     print("Generating root README...")
     root_readme_content = generate_root_readme(proving_path)
-    root_readme_file = script_dir / "README.md"
+    root_readme_file = script_dir / "../README.md"
     
     with open(root_readme_file, 'w') as f:
         f.write(root_readme_content)
