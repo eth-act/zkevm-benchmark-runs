@@ -19,6 +19,7 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 on **1xL40s** hardware.
 
 - **risc0-v3.0.3**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/fe55f9fb1fb3f5c9d87f137c92668a2e748f6e66](https://github.com/eth-act/zkevm-benchmark-workload/tree/fe55f9fb1fb3f5c9d87f137c92668a2e748f6e66)
 - **sp1-v5.2.1**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/fe55f9fb1fb3f5c9d87f137c92668a2e748f6e66](https://github.com/eth-act/zkevm-benchmark-workload/tree/fe55f9fb1fb3f5c9d87f137c92668a2e748f6e66)
+- **zisk-v0.11.0**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/db9db10649d129f677296b5224289f73c5395f97](https://github.com/eth-act/zkevm-benchmark-workload/tree/db9db10649d129f677296b5224289f73c5395f97)
 
 ### Notes
 
