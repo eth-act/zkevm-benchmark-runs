@@ -323,14 +323,14 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
         
         test_case_data.append(row_data)
     
-    # Sort by average time: 
+    # Sort by average time:
     # 1. Cases with no avg_time_ms (all crashed/missing) appear first (sorted by name)
-    # 2. Cases with avg_time_ms appear next, sorted slowest to fastest
+    # 2. Cases with avg_time_ms appear next, sorted slowest to fastest, then by name for stability
     def sort_key(x):
         if x['avg_time_ms'] is None:
             return (0, x['name'])  # No avg time - sort by name, appear first
         else:
-            return (1, -x['avg_time_ms'])  # Has avg time - sort by time (negative for slowest first)
+            return (1, -x['avg_time_ms'], x['name'])  # Has avg time - sort by time (negative for slowest first), then by name for stability
     
     test_case_data.sort(key=sort_key)
     
