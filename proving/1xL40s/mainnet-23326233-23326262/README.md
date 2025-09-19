@@ -25,7 +25,7 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 on **1xL40s** hardware.
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | risc0-v3.0.3 Time | sp1-v5.2.1 Time | Avg Time |
+| Test Case | risc0-v3.0.3<br/>(218.42KiB) | sp1-v5.2.1<br/>(1.41MiB) | Avg |
 |-----------|-----------|-----------|----------|
 | rpc_block_23326238 | 26m 54.34s | 7m 47.36s | 17m 20.85s |
 | rpc_block_23326255 | 27m 0.25s | 7m 22.82s | 17m 11.53s |

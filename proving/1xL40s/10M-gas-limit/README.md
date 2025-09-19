@@ -25,7 +25,7 @@ EEST benchmarks with 10M-gas-limit gas limit on **1xL40s** hardware.
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | risc0-v3.0.1 Time | sp1-v5.1.0 Time | Avg Time |
+| Test Case | risc0-v3.0.1<br/>(217.91KiB) | sp1-v5.1.0<br/>(1.41MiB) | Avg |
 |-----------|-----------|-----------|----------|
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_408_gas_base_heavy] | ❌ SDK Crash | 💥 Prover Crash | — |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_10M-blockchain_test_from_state_test-mod_616_gas_base_heavy] | ❌ SDK Crash | 💥 Prover Crash | — |

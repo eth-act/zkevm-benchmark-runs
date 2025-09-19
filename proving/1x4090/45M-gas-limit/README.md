@@ -24,7 +24,7 @@ EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | sp1-v5.1.0 Time | Avg Time |
+| Test Case | sp1-v5.1.0<br/>(1.41MiB) | Avg |
 |-----------|-----------|----------|
 | test_worst_compute.py::test_worst_modarith[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-op_MULMOD-mod_bits_191] | 💥 Prover Crash | — |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-mod_1045_gas_base_heavy] | ❌ SDK Crash | — |
@@ -299,8 +299,8 @@ EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP14] | 6m 37.96s | 6m 37.96s |
 | test_worst_memory.py::test_worst_calldatacopy[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-non_zero_data_False-fixed_src_dst_False-1MiB-call] | 6m 37.93s | 6m 37.93s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP3] | 6m 37.83s | 6m 37.83s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP4] | 6m 36.89s | 6m 36.89s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP5] | 6m 36.89s | 6m 36.89s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP4] | 6m 36.89s | 6m 36.89s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP11] | 6m 35.91s | 6m 35.91s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP1] | 6m 35.38s | 6m 35.38s |
 | test_worst_compute.py::test_worst_dup[fork_Prague-benchmark-gas-value_45M-blockchain_test_from_state_test-opcode_DUP7] | 6m 34.59s | 6m 34.59s |
