@@ -1002,8 +1002,9 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
 
                 for el_client_folder in el_client_folders:
                     el_client_name = el_client_folder.name
-                    zkvm_data = collect_el_client_data(el_client_folder, mode)
-                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = zkvm_data
+                    # Hardware info is always at config level
+                    el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
+                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
             else:
                 # Gas limit: config -> EL client -> [eest-benchmark] -> zkVM
                 el_client_folders = [item for item in config_folder.iterdir()
@@ -1016,24 +1017,45 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
                         # For proving, look inside eest-benchmark folder
                         benchmark_folder = el_client_folder / "eest-benchmark"
                         if benchmark_folder.exists():
-                            zkvm_data = collect_el_client_data(benchmark_folder, mode)
+                            # Hardware info is always at config level
+                            el_client_data = collect_el_client_data(benchmark_folder, mode, config_folder)
                         else:
-                            zkvm_data = {}
+                            el_client_data = {'hardware_info': load_hardware_info(config_folder), 'zkvm_data': {}}
                     else:
                         # For execution, zkVMs are directly under el_client_folder
-                        zkvm_data = collect_el_client_data(el_client_folder, mode)
+                        # Hardware info is always at config level
+                        el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
 
-                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = zkvm_data
+                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
 
     return mode_data
 
-def collect_el_client_data(el_client_folder: Path, mode: str) -> Dict[str, Any]:
+def load_hardware_info(el_client_folder: Path) -> Optional[Dict[str, Any]]:
+    """Load hardware information from hardware.json file."""
+    hardware_file = el_client_folder / "hardware.json"
+    if hardware_file.exists():
+        try:
+            with open(hardware_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not read {hardware_file}: {e}")
+    return None
+
+def collect_el_client_data(el_client_folder: Path, mode: str, hardware_info_folder: Path) -> Dict[str, Any]:
     """Collect zkVM data for an EL client.
+
+    Args:
+        el_client_folder: Path to the folder containing zkVM data
+        mode: Either 'proving' or 'execution'
+        hardware_info_folder: Path to the folder containing hardware.json
 
     Returns:
         Dictionary organized by zkVM name with their results
     """
     zkvm_data = {}
+
+    # Load hardware info from the specified folder
+    hardware_info = load_hardware_info(hardware_info_folder)
 
     zkvm_folders = [item for item in el_client_folder.iterdir()
                    if item.is_dir() and not item.name.startswith('.')]
@@ -1061,7 +1083,7 @@ def collect_el_client_data(el_client_folder: Path, mode: str) -> Dict[str, Any]:
             'prover_crashed_runs': prover_crashed_runs
         }
 
-    return zkvm_data
+    return {'hardware_info': hardware_info, 'zkvm_data': zkvm_data}
 
 def generate_index_html(output_dir: Path):
     """Generate the main index.html file."""
@@ -1087,7 +1109,7 @@ def generate_index_html(output_dir: Path):
 
         <div class="filters">
             <div class="filter-group">
-                <label for="hardware-filter">Hardware:</label>
+                <label for="hardware-filter">Machine:</label>
                 <select id="hardware-filter">
                     <option value="all">All</option>
                 </select>
@@ -1320,6 +1342,19 @@ header h1 {
 
 .info-box p {
     margin-bottom: 5px;
+}
+
+.hardware-info {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 3px solid #6c757d;
+    font-size: 0.95em;
+}
+
+.hardware-info strong {
+    color: #495057;
 }
 
 .table-container {
@@ -1772,17 +1807,43 @@ function generateResultsSection(hardware, config, elClient, elClientData) {
             <div class="results-section-content" id="${sectionId}">
     `;
 
+    // Display hardware info if available
+    if (elClientData.hardware_info) {
+        html += generateHardwareInfo(elClientData.hardware_info);
+    }
+
     // Summary first, then comparison table (for both modes)
-    html += generateSummary(elClientData);
-    html += generateComparisonTable(elClientData);
+    html += generateSummary(elClientData.zkvm_data);
+    html += generateComparisonTable(elClientData.zkvm_data);
 
     html += '</div></div>';
 
     return html;
 }
 
-function generateComparisonTable(elClientData) {
-    const zkVMs = Object.keys(elClientData).sort();
+function generateHardwareInfo(hardwareInfo) {
+    let html = '<div class="hardware-info">';
+
+    // CPU info
+    if (hardwareInfo.cpu_model) {
+        html += `<strong>CPU:</strong> ${hardwareInfo.cpu_model}`;
+        if (hardwareInfo.total_ram_gib) {
+            html += ` | <strong>RAM:</strong> ${hardwareInfo.total_ram_gib} GiB`;
+        }
+    }
+
+    // GPU info
+    if (hardwareInfo.gpus && hardwareInfo.gpus.length > 0) {
+        const gpuModels = hardwareInfo.gpus.map(gpu => gpu.model).join(', ');
+        html += ` | <strong>GPU:</strong> ${gpuModels}`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function generateComparisonTable(zkVMData) {
+    const zkVMs = Object.keys(zkVMData).sort();
     if (zkVMs.length === 0) return '';
 
     // Collect all test cases
@@ -1791,7 +1852,7 @@ function generateComparisonTable(elClientData) {
 
     zkVMs.forEach(zkvm => {
         zkVMResults[zkvm] = {};
-        const data = elClientData[zkvm];
+        const data = zkVMData[zkvm];
 
         [...data.successful_runs, ...data.sdk_crashed_runs, ...data.prover_crashed_runs].forEach(run => {
             allTestCases.add(run.name);
@@ -1809,7 +1870,7 @@ function generateComparisonTable(elClientData) {
     if (currentMode === 'proving') {
         proofSizeRow = '<tr><th>Proof Size</th>';
         zkVMs.forEach(zkvm => {
-            const data = elClientData[zkvm];
+            const data = zkVMData[zkvm];
             const proofSizes = data.successful_runs
                 .map(r => r.proof_size)
                 .filter(s => s && s > 0);
@@ -1893,8 +1954,8 @@ function generateComparisonTable(elClientData) {
     return html;
 }
 
-function generateSummary(elClientData) {
-    const zkVMs = Object.keys(elClientData).sort();
+function generateSummary(zkVMData) {
+    const zkVMs = Object.keys(zkVMData).sort();
 
     let html = `
         <h3>Summary</h3>
@@ -1920,7 +1981,7 @@ function generateSummary(elClientData) {
     `;
 
     zkVMs.forEach(zkvm => {
-        const data = elClientData[zkvm];
+        const data = zkVMData[zkvm];
         const successful = data.successful_runs.length;
         const sdkCrashed = data.sdk_crashed_runs.length;
         const proverCrashed = data.prover_crashed_runs.length;
