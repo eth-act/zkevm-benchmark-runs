@@ -1,8 +1,8 @@
 # 1xL40s - 10M-gas-limit
 
-## Gas Limit Configuration
+## Gas Limit Configuration - Proving
 
-EEST benchmarks with 10M-gas-limit gas limit on **1xL40s** hardware.
+EEST benchmarks with 10M-gas-limit gas limit (proving results) on **1xL40s** hardware.
 
 ## Available EL Clients
 
@@ -13,7 +13,7 @@ EEST benchmarks with 10M-gas-limit gas limit on **1xL40s** hardware.
 ## reth
 
 
-## Benchmark Results Comparison
+## Proving Results Comparison
 
 ### Benchmark Workloads
 

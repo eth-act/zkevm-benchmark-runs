@@ -2,7 +2,7 @@
 """
 Script to generate README.md files for zkEVM benchmark runs.
 
-This script processes benchmark runs in the proving folder and generates:
+This script processes benchmark runs in the proving and executions folders and generates:
 1. README.md files in each hardware setup folder
 2. A top-level README.md summarizing all hardware setups
 """
@@ -75,30 +75,52 @@ def load_crashes_from_file(crashes_file: Path) -> List[str]:
                     crashes.append(line)
     return crashes
 
-def process_json_file(json_file: Path) -> Dict[str, Any]:
-    """Process a single JSON benchmark result file."""
+def process_json_file(json_file: Path, mode: str = 'proving') -> Dict[str, Any]:
+    """Process a single JSON benchmark result file.
+
+    Args:
+        json_file: Path to the JSON file
+        mode: Either 'proving' or 'execution' to determine which data to extract
+    """
     try:
         with open(json_file, 'r') as f:
             data = json.load(f)
-        
+
         result = {
             'name': data.get('name', json_file.stem),
             'gas_used': data.get('metadata', {}).get('block_used_gas', 0),
             'status': 'unknown'
         }
-        
-        proving_data = data.get('proving', {})
-        
-        if 'success' in proving_data:
-            result['status'] = 'success'
-            result['proving_time_ms'] = proving_data['success'].get('proving_time_ms', 0)
-            result['proof_size'] = proving_data['success'].get('proof_size', 0)
-        elif 'crashed' in proving_data:
-            result['status'] = 'crashed'
-            result['crash_reason'] = proving_data['crashed'].get('reason', 'Unknown error')
-        
+
+        if mode == 'proving':
+            proving_data = data.get('proving', {})
+
+            if 'success' in proving_data:
+                result['status'] = 'success'
+                result['proving_time_ms'] = proving_data['success'].get('proving_time_ms', 0)
+                result['proof_size'] = proving_data['success'].get('proof_size', 0)
+            elif 'crashed' in proving_data:
+                result['status'] = 'crashed'
+                result['crash_reason'] = proving_data['crashed'].get('reason', 'Unknown error')
+
+        elif mode == 'execution':
+            execution_data = data.get('execution', {})
+
+            if 'success' in execution_data:
+                result['status'] = 'success'
+                # Extract execution time from duration
+                duration = execution_data['success'].get('execution_duration', {})
+                secs = duration.get('secs', 0)
+                nanos = duration.get('nanos', 0)
+                # Convert to milliseconds
+                result['execution_time_ms'] = secs * 1000 + nanos / 1_000_000
+                result['total_num_cycles'] = execution_data['success'].get('total_num_cycles', 0)
+            elif 'crashed' in execution_data:
+                result['status'] = 'crashed'
+                result['crash_reason'] = execution_data['crashed'].get('reason', 'Unknown error')
+
         return result
-        
+
     except Exception as e:
         print(f"Error processing {json_file}: {e}")
         return {
@@ -108,12 +130,18 @@ def process_json_file(json_file: Path) -> Dict[str, Any]:
             'error': str(e)
         }
 
-def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
-    """Process a zkVM folder (e.g., sp1-v5.1.0) and categorize results."""
+def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str], mode: str = 'proving') -> Tuple[List[Dict], List[Dict], List[Dict]]:
+    """Process a zkVM folder (e.g., sp1-v5.1.0) and categorize results.
+
+    Args:
+        zkvm_folder: Path to the zkVM folder
+        crashed_fixtures: List of fixture names that crashed
+        mode: Either 'proving' or 'execution' to determine which data to extract
+    """
     successful_runs = []
     sdk_crashed_runs = []
     prover_crashed_runs = []
-    
+
     # First, add all fixtures from _crashes.txt as prover crashes
     for crashed_fixture in crashed_fixtures:
         prover_crashed_runs.append({
@@ -121,14 +149,14 @@ def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str]) -> Tuple
             'gas_used': 0,
             'status': 'prover_crashed'
         })
-    
+
     # Keep track of JSON files to detect duplicates
     json_fixture_names = []
     duplicates_found = []
-    
+
     # Then process JSON files
     for json_file in zkvm_folder.glob('*.json'):
-        result = process_json_file(json_file)
+        result = process_json_file(json_file, mode=mode)
         fixture_name = result['name']
         json_fixture_names.append(fixture_name)
         
@@ -171,27 +199,36 @@ def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str]) -> Tuple
     
     return successful_runs, sdk_crashed_runs, prover_crashed_runs
 
-def generate_results_table(runs: List[Dict], title: str) -> str:
-    """Generate a markdown table for benchmark results."""
+def generate_results_table(runs: List[Dict], title: str, mode: str = 'proving') -> str:
+    """Generate a markdown table for benchmark results.
+
+    Args:
+        runs: List of run results
+        title: Title for the table section
+        mode: Either 'proving' or 'execution' to determine which metrics to display
+    """
     if not runs:
         return f"\n### {title}\n\nNo results found.\n"
-    
+
     markdown = f"\n### {title}\n\n"
     markdown += "| Fixture Name | Time | Throughput |\n"
     markdown += "|--------------|------|------------|\n"
-    
-    # Sort by proving time (successful runs - slowest to fastest) or alphabetically (others)
-    if runs[0].get('proving_time_ms'):
-        runs.sort(key=lambda x: x.get('proving_time_ms', 0), reverse=True)  # Slowest first
+
+    # Determine time field based on mode
+    time_field = 'proving_time_ms' if mode == 'proving' else 'execution_time_ms'
+
+    # Sort by time (successful runs - slowest to fastest) or alphabetically (others)
+    if runs[0].get(time_field):
+        runs.sort(key=lambda x: x.get(time_field, 0), reverse=True)  # Slowest first
     else:
         runs.sort(key=lambda x: x['name'])
-    
+
     for run in runs:
         name = run['name']
-        
-        if run['status'] == 'success' and 'proving_time_ms' in run:
-            time_str = format_time(run['proving_time_ms'])
-            throughput = format_throughput(run['gas_used'], run['proving_time_ms']) if run['gas_used'] > 0 else "N/A"
+
+        if run['status'] == 'success' and time_field in run:
+            time_str = format_time(run[time_field])
+            throughput = format_throughput(run['gas_used'], run[time_field]) if run['gas_used'] > 0 else "N/A"
         elif run['status'] == 'crashed':
             time_str = "❌ Crashed (SDK)"
             throughput = "N/A"
@@ -201,13 +238,19 @@ def generate_results_table(runs: List[Dict], title: str) -> str:
         else:
             time_str = "❌ Error"
             throughput = "N/A"
-        
+
         markdown += f"| {name} | {time_str} | {throughput} |\n"
-    
+
     return markdown
 
-def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: Dict[str, str]) -> str:
-    """Generate a combined table with test cases as rows and zkVMs as columns."""
+def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: Dict[str, str], mode: str = 'proving') -> str:
+    """Generate a combined table with test cases as rows and zkVMs as columns.
+
+    Args:
+        zkvm_results: Dictionary of zkVM results
+        workload_urls: Dictionary of workload URLs for each zkVM
+        mode: Either 'proving' or 'execution' to determine which metrics to display
+    """
     if not zkvm_results:
         return "\nNo zkVM results found.\n"
 
@@ -224,35 +267,40 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
     # Get sorted list of zkVMs
     zkvm_names = sorted(zkvm_results.keys())
 
-    # Collect proof sizes for each zkVM and validate consistency
+    # Determine time field based on mode
+    time_field = 'proving_time_ms' if mode == 'proving' else 'execution_time_ms'
+
+    # Collect proof sizes for each zkVM (proving only) and validate consistency
     zkvm_proof_sizes = {}
     proof_size_warnings = []
 
-    for zkvm in zkvm_names:
-        zkvm_data = zkvm_results[zkvm]
-        proof_sizes_found = set()
+    if mode == 'proving':
+        for zkvm in zkvm_names:
+            zkvm_data = zkvm_results[zkvm]
+            proof_sizes_found = set()
 
-        # Collect all proof sizes from successful runs
-        for run in zkvm_data.get('successful_runs', []):
-            if 'proof_size' in run and run['proof_size'] > 0:
-                proof_sizes_found.add(run['proof_size'])
+            # Collect all proof sizes from successful runs
+            for run in zkvm_data.get('successful_runs', []):
+                if 'proof_size' in run and run['proof_size'] > 0:
+                    proof_sizes_found.add(run['proof_size'])
 
-        if proof_sizes_found:
-            if len(proof_sizes_found) > 1:
-                # Check if the difference is significant (more than 1KB difference)
-                sizes_list = sorted(proof_sizes_found)
-                min_size = min(sizes_list)
-                max_size = max(sizes_list)
-                if max_size - min_size > 1024:  # More than 1KB difference
-                    proof_size_warnings.append(f"⚠️  WARNING: {zkvm} has inconsistent proof sizes: {', '.join([format_proof_size(s) for s in sizes_list])}")
-                zkvm_proof_sizes[zkvm] = max_size  # Use the largest one
+            if proof_sizes_found:
+                if len(proof_sizes_found) > 1:
+                    # Check if the difference is significant (more than 1KB difference)
+                    sizes_list = sorted(proof_sizes_found)
+                    min_size = min(sizes_list)
+                    max_size = max(sizes_list)
+                    if max_size - min_size > 1024:  # More than 1KB difference
+                        proof_size_warnings.append(f"⚠️  WARNING: {zkvm} has inconsistent proof sizes: {', '.join([format_proof_size(s) for s in sizes_list])}")
+                    zkvm_proof_sizes[zkvm] = max_size  # Use the largest one
+                else:
+                    zkvm_proof_sizes[zkvm] = proof_sizes_found.pop()
             else:
-                zkvm_proof_sizes[zkvm] = proof_sizes_found.pop()
-        else:
-            zkvm_proof_sizes[zkvm] = None
+                zkvm_proof_sizes[zkvm] = None
 
     # Build the table header
-    markdown = "\n## Benchmark Results Comparison\n\n"
+    result_type = "Proving" if mode == 'proving' else "Execution"
+    markdown = f"\n## {result_type} Results Comparison\n\n"
 
     # Show workload URLs if available
     if workload_urls:
@@ -273,13 +321,16 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
     markdown += "- **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.\n"
     markdown += "- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.\n\n"
 
-    # Create table header with proof sizes
+    # Create table header with proof sizes (proving only)
     header = "| Test Case |"
     separator = "|-----------|"
     for zkvm in zkvm_names:
-        proof_size = zkvm_proof_sizes.get(zkvm)
-        if proof_size:
-            header += f" {zkvm}<br/>({format_proof_size(proof_size)}) |"
+        if mode == 'proving':
+            proof_size = zkvm_proof_sizes.get(zkvm)
+            if proof_size:
+                header += f" {zkvm}<br/>({format_proof_size(proof_size)}) |"
+            else:
+                header += f" {zkvm} |"
         else:
             header += f" {zkvm} |"
         separator += "-----------|"
@@ -312,8 +363,8 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
             
             if result:
                 row_data['zkvm_results'][zkvm] = result
-                if result['status'] == 'success' and 'proving_time_ms' in result:
-                    valid_times.append(result['proving_time_ms'])
+                if result['status'] == 'success' and time_field in result:
+                    valid_times.append(result[time_field])
             else:
                 row_data['zkvm_results'][zkvm] = None
         
@@ -342,8 +393,8 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
         for zkvm in zkvm_names:
             result = test_data['zkvm_results'].get(zkvm)
             if result:
-                if result['status'] == 'success' and 'proving_time_ms' in result:
-                    time_str = format_time(result['proving_time_ms'])
+                if result['status'] == 'success' and time_field in result:
+                    time_str = format_time(result[time_field])
                 elif result['status'] == 'crashed':
                     time_str = "❌ SDK Crash"
                 elif result['status'] == 'prover_crashed':
@@ -352,7 +403,7 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
                     time_str = "❌ Error"
             else:
                 time_str = "—"
-            
+
             row += f" {time_str} |"
         
         # Add average column
@@ -366,22 +417,29 @@ def generate_combined_zkvm_table(zkvm_results: Dict[str, Dict], workload_urls: D
     
     return markdown
 
-def generate_benchmark_config_readme(config_path: Path) -> str:
-    """Generate README.md content for a specific benchmark configuration (gas limit or mainnet range)."""
+def generate_benchmark_config_readme(config_path: Path, mode: str = 'proving') -> str:
+    """Generate README.md content for a specific benchmark configuration (gas limit or mainnet range).
+
+    Args:
+        config_path: Path to the configuration folder
+        mode: Either 'proving' or 'execution' to determine which data to process
+    """
     config_name = config_path.name
     hardware_name = config_path.parent.name
     
     # Determine if this is a gas limit or mainnet range
+    mode_label = "Proving" if mode == 'proving' else "Execution"
+
     if config_name.endswith('-gas-limit'):
-        config_type = "Gas Limit Configuration"
-        config_desc = f"EEST benchmarks with {config_name} gas limit"
+        config_type = f"Gas Limit Configuration - {mode_label}"
+        config_desc = f"EEST benchmarks with {config_name} gas limit ({mode_label.lower()} results)"
     elif config_name.startswith('mainnet-'):
-        config_type = "Mainnet Block Range"
-        config_desc = f"Mainnet blocks benchmark for {config_name}"
+        config_type = f"Mainnet Block Range - {mode_label}"
+        config_desc = f"Mainnet blocks benchmark for {config_name} ({mode_label.lower()} results)"
     else:
-        config_type = "Benchmark Configuration"
-        config_desc = f"Benchmark results for {config_name}"
-    
+        config_type = f"Benchmark Configuration - {mode_label}"
+        config_desc = f"Benchmark results for {config_name} ({mode_label.lower()})"
+
     readme_content = f"# {hardware_name} - {config_name}\n\n"
     readme_content += f"## {config_type}\n\n"
     readme_content += f"{config_desc} on **{hardware_name}** hardware.\n\n"
@@ -433,7 +491,7 @@ def generate_benchmark_config_readme(config_path: Path) -> str:
                 crashed_fixtures = load_crashes_from_file(crashes_file)
 
                 # Process results
-                successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(zkvm_folder, crashed_fixtures)
+                successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(zkvm_folder, crashed_fixtures, mode=mode)
 
                 zkvm_results[zkvm_name] = {
                     'successful_runs': successful_runs,
@@ -442,7 +500,7 @@ def generate_benchmark_config_readme(config_path: Path) -> str:
                 }
 
             # Generate the combined comparison table
-            readme_content += generate_combined_zkvm_table(zkvm_results, workload_urls)
+            readme_content += generate_combined_zkvm_table(zkvm_results, workload_urls, mode=mode)
 
             # Add summary statistics
             total_test_cases = set()
@@ -496,21 +554,26 @@ def generate_benchmark_config_readme(config_path: Path) -> str:
         
         for el_client_folder in el_client_folders:
             readme_content += f"## {el_client_folder.name}\n\n"
-            
-            # Look for the eest-benchmark folder
-            benchmark_folder = el_client_folder / "eest-benchmark"
-            
-            if not benchmark_folder.exists() or not benchmark_folder.is_dir():
-                readme_content += "No eest-benchmark folder found.\n\n"
-                continue
-            
-            # Find zkVM folders within eest-benchmark
-            zkvm_folders = [item for item in benchmark_folder.iterdir() if item.is_dir() and not item.name.startswith('.')]
-            
+
+            # For proving mode: look for the eest-benchmark folder
+            # For execution mode: zkVMs are directly under el_client_folder
+            if mode == 'proving':
+                benchmark_folder = el_client_folder / "eest-benchmark"
+
+                if not benchmark_folder.exists() or not benchmark_folder.is_dir():
+                    readme_content += "No eest-benchmark folder found.\n\n"
+                    continue
+
+                # Find zkVM folders within eest-benchmark
+                zkvm_folders = [item for item in benchmark_folder.iterdir() if item.is_dir() and not item.name.startswith('.')]
+            else:
+                # For execution mode, zkVMs are directly under el_client_folder
+                zkvm_folders = [item for item in el_client_folder.iterdir() if item.is_dir() and not item.name.startswith('.')]
+
             if not zkvm_folders:
-                readme_content += "No zkVM results found in eest-benchmark folder.\n\n"
+                readme_content += "No zkVM results found.\n\n"
                 continue
-            
+
             zkvm_folders.sort(key=lambda x: x.name)
             
             # Collect results from all zkVMs
@@ -529,18 +592,18 @@ def generate_benchmark_config_readme(config_path: Path) -> str:
                 # Load crashed fixtures from _crashes.txt
                 crashes_file = zkvm_folder / "_crashes.txt"
                 crashed_fixtures = load_crashes_from_file(crashes_file)
-                
+
                 # Process results
-                successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(zkvm_folder, crashed_fixtures)
-                
+                successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(zkvm_folder, crashed_fixtures, mode=mode)
+
                 zkvm_results[zkvm_name] = {
                     'successful_runs': successful_runs,
                     'sdk_crashed_runs': sdk_crashed_runs,
                     'prover_crashed_runs': prover_crashed_runs
                 }
-            
+
             # Generate the combined comparison table
-            readme_content += generate_combined_zkvm_table(zkvm_results, workload_urls)
+            readme_content += generate_combined_zkvm_table(zkvm_results, workload_urls, mode=mode)
             
             # Add summary statistics
             total_test_cases = set()
@@ -670,63 +733,99 @@ def generate_hardware_readme(hardware_path: Path) -> str:
     
     return readme_content
 
-def generate_root_readme(proving_path: Path) -> str:
-    """Generate the root README.md content."""
+def generate_root_readme(proving_path: Path, executions_path: Path) -> str:
+    """Generate the root README.md content.
+
+    Args:
+        proving_path: Path to the proving folder
+        executions_path: Path to the executions folder
+    """
     readme_content = "# zkEVM Benchmark Runs\n\n"
-    readme_content += "This repository contains benchmark results for zkEVM proving across different hardware configurations.\n\n"
+    readme_content += "This repository contains benchmark results for zkEVM proving and execution across different hardware configurations.\n\n"
     
-    # Find all hardware setup folders
-    hardware_folders = []
-    for item in proving_path.iterdir():
-        if item.is_dir() and not item.name.startswith('.'):
-            hardware_folders.append(item)
-    
-    if not hardware_folders:
+    # Collect all unique hardware setups from both proving and executions
+    all_hardware = set()
+
+    if proving_path.exists():
+        for item in proving_path.iterdir():
+            if item.is_dir() and not item.name.startswith('.'):
+                all_hardware.add(item.name)
+
+    if executions_path.exists():
+        for item in executions_path.iterdir():
+            if item.is_dir() and not item.name.startswith('.'):
+                all_hardware.add(item.name)
+
+    if not all_hardware:
         readme_content += "No hardware configurations found.\n"
         return readme_content
-    
-    hardware_folders.sort(key=lambda x: x.name)
-    
+
+    hardware_names = sorted(all_hardware)
+
     readme_content += "## Hardware Configurations\n\n"
-    readme_content += "| Hardware Setup | Configurations | Details |\n"
-    readme_content += "|----------------|----------------|----------|\n"
-    
-    for hardware_folder in hardware_folders:
-        hardware_name = hardware_folder.name
-        
-        # Find all configurations (gas limits and mainnet ranges)
-        configurations = []
-        
-        for config_item in hardware_folder.iterdir():
-            if config_item.is_dir() and not config_item.name.startswith('.') and config_item.name != "README.md":
-                configurations.append(config_item.name)
-        
-        configurations.sort()
-        
-        if configurations:
-            # Group configurations by type
-            gas_limits = [c for c in configurations if c.endswith('-gas-limit')]
-            mainnet_ranges = [c for c in configurations if c.startswith('mainnet-')]
-            others = [c for c in configurations if not c.endswith('-gas-limit') and not c.startswith('mainnet-')]
-            
-            config_parts = []
-            if gas_limits:
-                config_parts.append(f"{len(gas_limits)} gas limit{'s' if len(gas_limits) > 1 else ''}")
-            if mainnet_ranges:
-                config_parts.append(f"{len(mainnet_ranges)} mainnet range{'s' if len(mainnet_ranges) > 1 else ''}")
-            if others:
-                config_parts.append(f"{len(others)} other")
-            
-            config_str = ", ".join(config_parts)
-        else:
-            config_str = "None"
-        
-        readme_content += f"| **{hardware_name}** | {config_str} | [View Results](proving/{hardware_name}/README.md) |\n"
+    readme_content += "| Hardware Setup | Proving Results | Execution Results |\n"
+    readme_content += "|----------------|-----------------|-------------------|\n"
+
+    for hardware_name in hardware_names:
+        proving_link = "—"
+        execution_link = "—"
+
+        # Check if hardware has proving results
+        proving_hw_path = proving_path / hardware_name
+        if proving_hw_path.exists():
+            # Count configurations
+            configurations = []
+            for config_item in proving_hw_path.iterdir():
+                if config_item.is_dir() and not config_item.name.startswith('.') and config_item.name != "README.md":
+                    configurations.append(config_item.name)
+
+            if configurations:
+                gas_limits = [c for c in configurations if c.endswith('-gas-limit')]
+                mainnet_ranges = [c for c in configurations if c.startswith('mainnet-')]
+                others = [c for c in configurations if not c.endswith('-gas-limit') and not c.startswith('mainnet-')]
+
+                config_parts = []
+                if gas_limits:
+                    config_parts.append(f"{len(gas_limits)} gas limit{'s' if len(gas_limits) > 1 else ''}")
+                if mainnet_ranges:
+                    config_parts.append(f"{len(mainnet_ranges)} mainnet range{'s' if len(mainnet_ranges) > 1 else ''}")
+                if others:
+                    config_parts.append(f"{len(others)} other")
+
+                config_str = ", ".join(config_parts)
+                proving_link = f"[{config_str}](proving/{hardware_name}/README.md)"
+
+        # Check if hardware has execution results
+        execution_hw_path = executions_path / hardware_name
+        if execution_hw_path.exists():
+            # Count configurations
+            configurations = []
+            for config_item in execution_hw_path.iterdir():
+                if config_item.is_dir() and not config_item.name.startswith('.') and config_item.name != "README.md":
+                    configurations.append(config_item.name)
+
+            if configurations:
+                gas_limits = [c for c in configurations if c.endswith('-gas-limit')]
+                mainnet_ranges = [c for c in configurations if c.startswith('mainnet-')]
+                others = [c for c in configurations if not c.endswith('-gas-limit') and not c.startswith('mainnet-')]
+
+                config_parts = []
+                if gas_limits:
+                    config_parts.append(f"{len(gas_limits)} gas limit{'s' if len(gas_limits) > 1 else ''}")
+                if mainnet_ranges:
+                    config_parts.append(f"{len(mainnet_ranges)} mainnet range{'s' if len(mainnet_ranges) > 1 else ''}")
+                if others:
+                    config_parts.append(f"{len(others)} other")
+
+                config_str = ", ".join(config_parts)
+                execution_link = f"[{config_str}](executions/{hardware_name}/README.md)"
+
+        readme_content += f"| **{hardware_name}** | {proving_link} | {execution_link} |\n"
     
     readme_content += "\n## Folder Structure\n\n"
     readme_content += "The benchmark results are organized in the following hierarchy:\n\n"
     readme_content += "```\n"
-    readme_content += "proving/\n"
+    readme_content += "proving/                            # Proving benchmark results\n"
     readme_content += "├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090\n"
     readme_content += "│   ├── [Configuration]/           # Gas limit or mainnet range\n"
     readme_content += "│   │   │\n"
@@ -738,6 +837,12 @@ def generate_root_readme(proving_path: Path) -> str:
     readme_content += "│   │   └── Mainnet Ranges:\n"
     readme_content += "│   │       ├── [EL Client]/       # e.g., reth, ethrex\n"
     readme_content += "│   │       │   └── [zkVM]/        # e.g., sp1-v5.1.0, risc0-v1.2.0\n"
+    readme_content += "\n"
+    readme_content += "executions/                         # Execution benchmark results\n"
+    readme_content += "├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090\n"
+    readme_content += "│   ├── [Configuration]/           # Gas limit or mainnet range\n"
+    readme_content += "│   │   ├── [EL Client]/           # e.g., reth, ethrex\n"
+    readme_content += "│   │   │   └── [zkVM]/            # e.g., sp1-v5.1.0, risc0-v1.2.0\n"
     readme_content += "```\n\n"
     
     readme_content += "## Configuration Types\n\n"
@@ -745,70 +850,96 @@ def generate_root_readme(proving_path: Path) -> str:
     readme_content += "- **mainnet-A-B**: Mainnet block range benchmarks (blocks A through B)\n\n"
     
     readme_content += "## Understanding the Results\n\n"
+    readme_content += "### Result Types\n\n"
+    readme_content += "- **Proving**: Measures the time and resources required to generate zero-knowledge proofs for blocks\n"
+    readme_content += "- **Execution**: Measures the time and cycles required to execute blocks within the zkVM (without proof generation)\n\n"
     readme_content += "### Individual Configuration READMEs\n\n"
     readme_content += "Each configuration folder (gas limit or mainnet range) contains its own detailed README.md file with specific benchmark results, organized by EL client and zkVM.\n\n"
     readme_content += "### Benchmark Workload\n\n"
     readme_content += "EEST benchmark runs include a **Benchmark Workload** link that points to the specific version of the [zkevm-benchmark-workload](https://github.com/eth-act/zkevm-benchmark-workload) tool used to generate the test fixtures.\n\n"
     readme_content += "### Status Categories\n\n"
-    readme_content += "- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from _crashes.txt)\n"
-    readme_content += "- ❌ **SDK Reported Crashes**: Fixtures that failed during proving (reported by SDK)\n"
-    readme_content += "- ✅ **Successful Runs**: Fixtures that completed proving successfully (sorted slowest to fastest)\n\n"
-    
+    readme_content += "- 💥 **Prover Crashes**: Fixtures that crashed the prover/executor entirely (from _crashes.txt)\n"
+    readme_content += "- ❌ **SDK Reported Crashes**: Fixtures that failed during proving/execution (reported by SDK)\n"
+    readme_content += "- ✅ **Successful Runs**: Fixtures that completed successfully (sorted slowest to fastest)\n\n"
+
     readme_content += "### Metrics\n\n"
+    readme_content += "**Proving:**\n"
     readme_content += "- **Time**: How long it took to generate the proof\n"
-    readme_content += "- **Throughput**: Gas processed per second (gas/s)\n\n"
+    readme_content += "- **Throughput**: Gas processed per second (gas/s)\n"
+    readme_content += "- **Proof Size**: Size of the generated proof\n\n"
+    readme_content += "**Execution:**\n"
+    readme_content += "- **Time**: How long it took to execute the block in the zkVM\n"
+    readme_content += "- **Throughput**: Gas processed per second (gas/s)\n"
+    readme_content += "- **Cycles**: Total number of zkVM cycles used\n\n"
     
     return readme_content
+
+def process_benchmark_folder(folder_path: Path, mode: str):
+    """Process a benchmark folder (proving or executions) and generate READMEs.
+
+    Args:
+        folder_path: Path to the folder to process
+        mode: Either 'proving' or 'execution'
+    """
+    if not folder_path.exists():
+        print(f"Warning: {folder_path} does not exist, skipping...")
+        return
+
+    print(f"Processing {folder_path.name} folder ({mode} mode)...")
+
+    # Find all hardware setup folders
+    hardware_folders = [item for item in folder_path.iterdir() if item.is_dir() and not item.name.startswith('.')]
+
+    for hardware_folder in hardware_folders:
+        print(f"  Processing {hardware_folder.name}...")
+
+        # Generate README for the hardware setup (index-style)
+        hardware_readme_content = generate_hardware_readme(hardware_folder)
+        hardware_readme_file = hardware_folder / "README.md"
+
+        with open(hardware_readme_file, 'w') as f:
+            f.write(hardware_readme_content)
+
+        print(f"  Generated {hardware_readme_file}")
+
+        # Generate individual README files for each configuration (gas limit/mainnet)
+        config_folders = [item for item in hardware_folder.iterdir()
+                         if item.is_dir() and not item.name.startswith('.') and item.name != "README.md"]
+
+        for config_folder in config_folders:
+            print(f"    Processing {config_folder.name}...")
+            config_readme_content = generate_benchmark_config_readme(config_folder, mode=mode)
+            config_readme_file = config_folder / "README.md"
+
+            with open(config_readme_file, 'w') as f:
+                f.write(config_readme_content)
+
+            print(f"    Generated {config_readme_file}")
 
 def main():
     """Main function to generate all README files."""
     script_dir = Path(__file__).parent
     proving_path = script_dir / "../proving"
-    
-    if not proving_path.exists():
-        print(f"Error: {proving_path} does not exist")
-        return
-    
+    executions_path = script_dir / "../executions"
+
     print("Generating README files for zkEVM benchmark runs...")
-    
-    # Find all hardware setup folders
-    hardware_folders = [item for item in proving_path.iterdir() if item.is_dir() and not item.name.startswith('.')]
-    
-    for hardware_folder in hardware_folders:
-        print(f"Processing {hardware_folder.name}...")
-        
-        # Generate README for the hardware setup (index-style)
-        hardware_readme_content = generate_hardware_readme(hardware_folder)
-        hardware_readme_file = hardware_folder / "README.md"
-        
-        with open(hardware_readme_file, 'w') as f:
-            f.write(hardware_readme_content)
-        
-        print(f"Generated {hardware_readme_file}")
-        
-        # Generate individual README files for each configuration (gas limit/mainnet)
-        config_folders = [item for item in hardware_folder.iterdir() 
-                         if item.is_dir() and not item.name.startswith('.') and item.name != "README.md"]
-        
-        for config_folder in config_folders:
-            print(f"  Processing {config_folder.name}...")
-            config_readme_content = generate_benchmark_config_readme(config_folder)
-            config_readme_file = config_folder / "README.md"
-            
-            with open(config_readme_file, 'w') as f:
-                f.write(config_readme_content)
-            
-            print(f"  Generated {config_readme_file}")
-    
+
+    # Process proving folder
+    process_benchmark_folder(proving_path, mode='proving')
+
+    # Process executions folder
+    process_benchmark_folder(executions_path, mode='execution')
+
     # Generate root README
     print("Generating root README...")
-    root_readme_content = generate_root_readme(proving_path)
+    root_readme_content = generate_root_readme(proving_path, executions_path)
     root_readme_file = script_dir / "../README.md"
-    
+
     with open(root_readme_file, 'w') as f:
         f.write(root_readme_content)
-    
+
     print(f"Generated {root_readme_file}")
+
     print("✅ All README files generated successfully!")
 
 if __name__ == "__main__":

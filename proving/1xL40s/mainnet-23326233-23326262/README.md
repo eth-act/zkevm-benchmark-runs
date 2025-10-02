@@ -1,8 +1,8 @@
 # 1xL40s - mainnet-23326233-23326262
 
-## Mainnet Block Range
+## Mainnet Block Range - Proving
 
-Mainnet blocks benchmark for mainnet-23326233-23326262 on **1xL40s** hardware.
+Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1xL40s** hardware.
 
 ## Available EL Clients
 
@@ -13,7 +13,7 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 on **1xL40s** hardware.
 ## reth
 
 
-## Benchmark Results Comparison
+## Proving Results Comparison
 
 ### Benchmark Workloads
 

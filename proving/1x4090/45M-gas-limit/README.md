@@ -1,8 +1,8 @@
 # 1x4090 - 45M-gas-limit
 
-## Gas Limit Configuration
+## Gas Limit Configuration - Proving
 
-EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
+EEST benchmarks with 45M-gas-limit gas limit (proving results) on **1x4090** hardware.
 
 ## Available EL Clients
 
@@ -13,7 +13,7 @@ EEST benchmarks with 45M-gas-limit gas limit on **1x4090** hardware.
 ## reth
 
 
-## Benchmark Results Comparison
+## Proving Results Comparison
 
 ### Benchmark Workloads
 

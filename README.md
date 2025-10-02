@@ -1,20 +1,20 @@
 # zkEVM Benchmark Runs
 
-This repository contains benchmark results for zkEVM proving across different hardware configurations.
+This repository contains benchmark results for zkEVM proving and execution across different hardware configurations.
 
 ## Hardware Configurations
 
-| Hardware Setup | Configurations | Details |
-|----------------|----------------|----------|
-| **1x4090** | 1 gas limit | [View Results](proving/1x4090/README.md) |
-| **1xL40s** | 1 gas limit, 1 mainnet range | [View Results](proving/1xL40s/README.md) |
+| Hardware Setup | Proving Results | Execution Results |
+|----------------|-----------------|-------------------|
+| **1x4090** | [1 gas limit](proving/1x4090/README.md) | — |
+| **1xL40s** | [1 gas limit, 1 mainnet range](proving/1xL40s/README.md) | [3 gas limits](executions/1xL40s/README.md) |
 
 ## Folder Structure
 
 The benchmark results are organized in the following hierarchy:
 
 ```
-proving/
+proving/                            # Proving benchmark results
 ├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090
 │   ├── [Configuration]/           # Gas limit or mainnet range
 │   │   │
@@ -26,6 +26,12 @@ proving/
 │   │   └── Mainnet Ranges:
 │   │       ├── [EL Client]/       # e.g., reth, ethrex
 │   │       │   └── [zkVM]/        # e.g., sp1-v5.1.0, risc0-v1.2.0
+
+executions/                         # Execution benchmark results
+├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090
+│   ├── [Configuration]/           # Gas limit or mainnet range
+│   │   ├── [EL Client]/           # e.g., reth, ethrex
+│   │   │   └── [zkVM]/            # e.g., sp1-v5.1.0, risc0-v1.2.0
 ```
 
 ## Configuration Types
@@ -34,6 +40,11 @@ proving/
 - **mainnet-A-B**: Mainnet block range benchmarks (blocks A through B)
 
 ## Understanding the Results
+
+### Result Types
+
+- **Proving**: Measures the time and resources required to generate zero-knowledge proofs for blocks
+- **Execution**: Measures the time and cycles required to execute blocks within the zkVM (without proof generation)
 
 ### Individual Configuration READMEs
 
@@ -45,12 +56,19 @@ EEST benchmark runs include a **Benchmark Workload** link that points to the spe
 
 ### Status Categories
 
-- 💥 **Prover Crashes**: Fixtures that crashed the prover entirely (from _crashes.txt)
-- ❌ **SDK Reported Crashes**: Fixtures that failed during proving (reported by SDK)
-- ✅ **Successful Runs**: Fixtures that completed proving successfully (sorted slowest to fastest)
+- 💥 **Prover Crashes**: Fixtures that crashed the prover/executor entirely (from _crashes.txt)
+- ❌ **SDK Reported Crashes**: Fixtures that failed during proving/execution (reported by SDK)
+- ✅ **Successful Runs**: Fixtures that completed successfully (sorted slowest to fastest)
 
 ### Metrics
 
+**Proving:**
 - **Time**: How long it took to generate the proof
 - **Throughput**: Gas processed per second (gas/s)
+- **Proof Size**: Size of the generated proof
+
+**Execution:**
+- **Time**: How long it took to execute the block in the zkVM
+- **Throughput**: Gas processed per second (gas/s)
+- **Cycles**: Total number of zkVM cycles used
 
