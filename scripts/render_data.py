@@ -1087,15 +1087,6 @@ def generate_index_html(output_dir: Path):
 
         <div class="filters">
             <div class="filter-group">
-                <label for="dataset-filter">Dataset:</label>
-                <select id="dataset-filter">
-                    <option value="all">All</option>
-                    <option value="eest">EEST Runs</option>
-                    <option value="mainnet">Mainnet Runs</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
                 <label for="hardware-filter">Hardware:</label>
                 <select id="hardware-filter">
                     <option value="all">All</option>
@@ -1116,12 +1107,11 @@ def generate_index_html(output_dir: Path):
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label for="crashes-filter">Show:</label>
-                <select id="crashes-filter">
-                    <option value="all">All Rows</option>
-                    <option value="crashes-only">Crashes Only</option>
-                </select>
+            <div class="filter-group checkbox-group">
+                <label>
+                    <input type="checkbox" id="crashes-filter">
+                    Show crashes only
+                </label>
             </div>
         </div>
 
@@ -1238,6 +1228,27 @@ header h1 {
     border-radius: 4px;
     font-size: 1em;
     background: white;
+}
+
+.filter-group.checkbox-group {
+    display: flex;
+    align-items: center;
+    min-width: auto;
+}
+
+.filter-group.checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.filter-group.checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 #content {
@@ -1461,7 +1472,6 @@ def generate_js(website_data: Dict[str, Any], output_dir: Path):
     app_js_content = """// Current state
 let currentMode = 'execution';
 let currentFilters = {
-    dataset: 'all',
     hardware: 'all',
     config: 'all',
     elClient: 'all',
@@ -1489,13 +1499,12 @@ function setupTabs() {
 
             // Reset filters
             currentFilters = {
-                dataset: 'all',
                 hardware: 'all',
                 config: 'all',
                 elClient: 'all',
                 crashesOnly: false
             };
-            document.getElementById('crashes-filter').value = 'all';
+            document.getElementById('crashes-filter').checked = false;
 
             // Update UI
             populateFilters();
@@ -1504,14 +1513,6 @@ function setupTabs() {
     });
 
     // Setup filter change handlers
-    document.getElementById('dataset-filter').addEventListener('change', (e) => {
-        currentFilters.dataset = e.target.value;
-        populateHardwareFilter();
-        populateConfigFilter();
-        populateElClientFilter();
-        renderResults();
-    });
-
     document.getElementById('hardware-filter').addEventListener('change', (e) => {
         currentFilters.hardware = e.target.value;
         populateConfigFilter();
@@ -1531,7 +1532,7 @@ function setupTabs() {
     });
 
     document.getElementById('crashes-filter').addEventListener('change', (e) => {
-        currentFilters.crashesOnly = e.target.value === 'crashes-only';
+        currentFilters.crashesOnly = e.target.checked;
         renderResults();
     });
 }
@@ -1550,14 +1551,6 @@ function populateHardwareFilter() {
 
     select.innerHTML = '<option value="all">All</option>';
     hardwareNames.forEach(name => {
-        // Filter by dataset if applicable
-        if (currentFilters.dataset !== 'all') {
-            const hasMatchingDataset = Object.values(modeData[name]).some(config =>
-                config.dataset_type === currentFilters.dataset
-            );
-            if (!hasMatchingDataset) return;
-        }
-
         const option = document.createElement('option');
         option.value = name;
         option.textContent = name;
@@ -1576,7 +1569,6 @@ function populateConfigFilter() {
         if (currentFilters.hardware !== 'all' && hardware !== currentFilters.hardware) return;
 
         Object.entries(hwData).forEach(([config, configData]) => {
-            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
             configs.add(config);
         });
     });
@@ -1603,7 +1595,6 @@ function populateElClientFilter() {
 
         Object.entries(hwData).forEach(([config, configData]) => {
             if (currentFilters.config !== 'all' && config !== currentFilters.config) return;
-            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
 
             Object.keys(configData.el_clients || {}).forEach(client => elClients.add(client));
         });
@@ -1628,18 +1619,6 @@ function renderResults() {
 
     let html = '';
 
-    // Add notes section
-    html += `
-        <div class="notes">
-            <strong>Notes:</strong>
-            <ul>
-                <li><strong>Empty results (—):</strong> zkVM has not yet run this benchmark</li>
-                <li><strong>💥 Prover Crash:</strong> Prover crashed on this test case</li>
-                <li><strong>❌ SDK Crash:</strong> SDK reported a crash on this test case</li>
-            </ul>
-        </div>
-    `;
-
     let hasResults = false;
 
     // Iterate through filtered data
@@ -1648,7 +1627,6 @@ function renderResults() {
 
         Object.entries(hwData).forEach(([config, configData]) => {
             if (currentFilters.config !== 'all' && config !== currentFilters.config) return;
-            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
 
             Object.entries(configData.el_clients || {}).forEach(([elClient, elClientData]) => {
                 if (currentFilters.elClient !== 'all' && elClient !== currentFilters.elClient) return;
@@ -1794,17 +1772,9 @@ function generateResultsSection(hardware, config, elClient, elClientData) {
             <div class="results-section-content" id="${sectionId}">
     `;
 
-    // For execution mode: Summary first, then comparison table
-    // For proving mode: No workloads, comparison table, then summary
-    if (currentMode === 'execution') {
-        // Summary first for execution
-        html += generateSummary(elClientData);
-        html += generateComparisonTable(elClientData);
-    } else {
-        // Proving mode: no workload URLs, table first, then summary
-        html += generateComparisonTable(elClientData);
-        html += generateSummary(elClientData);
-    }
+    // Summary first, then comparison table (for both modes)
+    html += generateSummary(elClientData);
+    html += generateComparisonTable(elClientData);
 
     html += '</div></div>';
 
@@ -1936,7 +1906,14 @@ function generateSummary(elClientData) {
                         <th>Total</th>
                         <th>✅ Successful</th>
                         <th>❌ SDK Crashed</th>
-                        <th>💥 Prover Crashed</th>
+    `;
+
+    // Only show Prover Crashed column in proving mode
+    if (currentMode === 'proving') {
+        html += '<th>💥 Prover Crashed</th>';
+    }
+
+    html += `
                     </tr>
                 </thead>
                 <tbody>
@@ -1955,9 +1932,14 @@ function generateSummary(elClientData) {
                 <td>${total}</td>
                 <td>${successful}</td>
                 <td>${sdkCrashed}</td>
-                <td>${proverCrashed}</td>
-            </tr>
         `;
+
+        // Only show Prover Crashed column in proving mode
+        if (currentMode === 'proving') {
+            html += `<td>${proverCrashed}</td>`;
+        }
+
+        html += '</tr>';
     });
 
     html += `
