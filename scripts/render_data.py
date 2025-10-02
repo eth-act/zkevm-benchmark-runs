@@ -1513,8 +1513,53 @@ let currentFilters = {
     crashesOnly: false
 };
 
+// Load filters from URL query parameters
+function loadFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('mode')) {
+        currentMode = params.get('mode');
+    }
+    if (params.has('hardware')) {
+        currentFilters.hardware = params.get('hardware');
+    }
+    if (params.has('config')) {
+        currentFilters.config = params.get('config');
+    }
+    if (params.has('elClient')) {
+        currentFilters.elClient = params.get('elClient');
+    }
+    if (params.has('crashesOnly')) {
+        currentFilters.crashesOnly = params.get('crashesOnly') === 'true';
+    }
+}
+
+// Update URL with current filters
+function updateURL() {
+    const params = new URLSearchParams();
+
+    params.set('mode', currentMode);
+
+    if (currentFilters.hardware !== 'all') {
+        params.set('hardware', currentFilters.hardware);
+    }
+    if (currentFilters.config !== 'all') {
+        params.set('config', currentFilters.config);
+    }
+    if (currentFilters.elClient !== 'all') {
+        params.set('elClient', currentFilters.elClient);
+    }
+    if (currentFilters.crashesOnly) {
+        params.set('crashesOnly', 'true');
+    }
+
+    const newURL = window.location.pathname + '?' + params.toString();
+    window.history.pushState({}, '', newURL);
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
+    loadFiltersFromURL();
     setupTabs();
     populateFilters();
     renderResults();
@@ -1523,6 +1568,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Setup tab switching
 function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-button');
+
+    // Set initial active tab based on currentMode
+    tabButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === currentMode);
+    });
+
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             // Update active tab
@@ -1544,6 +1595,7 @@ function setupTabs() {
             // Update UI
             populateFilters();
             renderResults();
+            updateURL();
         });
     });
 
@@ -1553,22 +1605,26 @@ function setupTabs() {
         populateConfigFilter();
         populateElClientFilter();
         renderResults();
+        updateURL();
     });
 
     document.getElementById('config-filter').addEventListener('change', (e) => {
         currentFilters.config = e.target.value;
         populateElClientFilter();
         renderResults();
+        updateURL();
     });
 
     document.getElementById('el-client-filter').addEventListener('change', (e) => {
         currentFilters.elClient = e.target.value;
         renderResults();
+        updateURL();
     });
 
     document.getElementById('crashes-filter').addEventListener('change', (e) => {
         currentFilters.crashesOnly = e.target.checked;
         renderResults();
+        updateURL();
     });
 }
 
@@ -1592,7 +1648,13 @@ function populateHardwareFilter() {
         select.appendChild(option);
     });
 
-    select.value = currentFilters.hardware;
+    // Validate and set the value
+    if (hardwareNames.includes(currentFilters.hardware)) {
+        select.value = currentFilters.hardware;
+    } else {
+        select.value = 'all';
+        currentFilters.hardware = 'all';
+    }
 }
 
 function populateConfigFilter() {
@@ -1617,7 +1679,13 @@ function populateConfigFilter() {
         select.appendChild(option);
     });
 
-    select.value = currentFilters.config;
+    // Validate and set the value
+    if (sortedConfigs.includes(currentFilters.config)) {
+        select.value = currentFilters.config;
+    } else {
+        select.value = 'all';
+        currentFilters.config = 'all';
+    }
 }
 
 function populateElClientFilter() {
@@ -1644,7 +1712,16 @@ function populateElClientFilter() {
         select.appendChild(option);
     });
 
-    select.value = currentFilters.elClient;
+    // Validate and set the value
+    if (sortedClients.includes(currentFilters.elClient)) {
+        select.value = currentFilters.elClient;
+    } else {
+        select.value = 'all';
+        currentFilters.elClient = 'all';
+    }
+
+    // Update checkbox state
+    document.getElementById('crashes-filter').checked = currentFilters.crashesOnly;
 }
 
 // Render results
