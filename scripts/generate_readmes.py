@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-Script to generate README.md files for zkEVM benchmark runs.
+Script to generate README.md files and/or static HTML website for zkEVM benchmark runs.
 
 This script processes benchmark runs in the proving and executions folders and generates:
-1. README.md files in each hardware setup folder
-2. A top-level README.md summarizing all hardware setups
+1. README.md files in each hardware setup folder (with --readmes)
+2. A static HTML website for GitHub Pages (with --website)
 """
 
 import json
-import os
+import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
-import re
 
 def format_time(ms: int) -> str:
     """Format milliseconds into human-readable time format."""
@@ -916,31 +915,1149 @@ def process_benchmark_folder(folder_path: Path, mode: str):
 
             print(f"    Generated {config_readme_file}")
 
+def generate_website(proving_path: Path, executions_path: Path, output_dir: Path):
+    """Generate static HTML website for GitHub Pages.
+
+    Args:
+        proving_path: Path to the proving folder
+        executions_path: Path to the executions folder
+        output_dir: Path to the output directory for the website
+    """
+    print("Generating static HTML website...")
+
+    # Create output directory if it doesn't exist
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Collect all data
+    website_data = collect_website_data(proving_path, executions_path)
+
+    # Generate HTML files
+    generate_index_html(output_dir)
+    generate_css(output_dir)
+    generate_js(website_data, output_dir)
+
+    print(f"✅ Website generated in {output_dir}")
+
+def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str, Any]:
+    """Collect all benchmark data for the website.
+
+    Returns:
+        Dictionary containing all benchmark data organized by mode, hardware, config, EL client, and zkVM
+    """
+    data = {
+        'proving': {},
+        'execution': {}
+    }
+
+    # Process proving data
+    if proving_path.exists():
+        data['proving'] = collect_mode_data(proving_path, 'proving')
+
+    # Process execution data
+    if executions_path.exists():
+        data['execution'] = collect_mode_data(executions_path, 'execution')
+
+    return data
+
+def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
+    """Collect data for a specific mode (proving or execution).
+
+    Returns:
+        Dictionary organized by hardware -> config -> EL client -> zkVM -> results
+    """
+    mode_data = {}
+
+    # Find all hardware folders
+    hardware_folders = [item for item in mode_path.iterdir()
+                       if item.is_dir() and not item.name.startswith('.')]
+
+    for hardware_folder in hardware_folders:
+        hardware_name = hardware_folder.name
+        mode_data[hardware_name] = {}
+
+        # Find all config folders (gas limits and mainnet ranges)
+        config_folders = [item for item in hardware_folder.iterdir()
+                         if item.is_dir() and not item.name.startswith('.')]
+
+        for config_folder in config_folders:
+            config_name = config_folder.name
+            mode_data[hardware_name][config_name] = {}
+
+            # Determine dataset type
+            if config_name.endswith('-gas-limit'):
+                dataset_type = 'eest'
+            elif config_name.startswith('mainnet-'):
+                dataset_type = 'mainnet'
+            else:
+                dataset_type = 'other'
+
+            mode_data[hardware_name][config_name]['dataset_type'] = dataset_type
+            mode_data[hardware_name][config_name]['el_clients'] = {}
+
+            # Handle different structures for mainnet vs gas limit
+            if config_name.startswith('mainnet-'):
+                # Mainnet: config -> EL client -> zkVM
+                el_client_folders = [item for item in config_folder.iterdir()
+                                   if item.is_dir() and not item.name.startswith('.')]
+
+                for el_client_folder in el_client_folders:
+                    el_client_name = el_client_folder.name
+                    zkvm_data = collect_el_client_data(el_client_folder, mode)
+                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = zkvm_data
+            else:
+                # Gas limit: config -> EL client -> [eest-benchmark] -> zkVM
+                el_client_folders = [item for item in config_folder.iterdir()
+                                   if item.is_dir() and not item.name.startswith('.')]
+
+                for el_client_folder in el_client_folders:
+                    el_client_name = el_client_folder.name
+
+                    if mode == 'proving':
+                        # For proving, look inside eest-benchmark folder
+                        benchmark_folder = el_client_folder / "eest-benchmark"
+                        if benchmark_folder.exists():
+                            zkvm_data = collect_el_client_data(benchmark_folder, mode)
+                        else:
+                            zkvm_data = {}
+                    else:
+                        # For execution, zkVMs are directly under el_client_folder
+                        zkvm_data = collect_el_client_data(el_client_folder, mode)
+
+                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = zkvm_data
+
+    return mode_data
+
+def collect_el_client_data(el_client_folder: Path, mode: str) -> Dict[str, Any]:
+    """Collect zkVM data for an EL client.
+
+    Returns:
+        Dictionary organized by zkVM name with their results
+    """
+    zkvm_data = {}
+
+    zkvm_folders = [item for item in el_client_folder.iterdir()
+                   if item.is_dir() and not item.name.startswith('.')]
+
+    for zkvm_folder in zkvm_folders:
+        zkvm_name = zkvm_folder.name
+
+        # Load workload URL
+        workload_file = zkvm_folder / "_zkevm-benchmark-workload.txt"
+        workload_url = load_workload_info(workload_file)
+
+        # Load crashed fixtures
+        crashes_file = zkvm_folder / "_crashes.txt"
+        crashed_fixtures = load_crashes_from_file(crashes_file)
+
+        # Process results
+        successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(
+            zkvm_folder, crashed_fixtures, mode=mode
+        )
+
+        zkvm_data[zkvm_name] = {
+            'workload_url': workload_url,
+            'successful_runs': successful_runs,
+            'sdk_crashed_runs': sdk_crashed_runs,
+            'prover_crashed_runs': prover_crashed_runs
+        }
+
+    return zkvm_data
+
+def generate_index_html(output_dir: Path):
+    """Generate the main index.html file."""
+    html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zkEVM Benchmark Results</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>zkEVM Benchmark Results</h1>
+            <p class="subtitle">Performance comparison of zkEVM provers and executors</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="execution">Execution</button>
+            <button class="tab-button" data-tab="proving">Proving</button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="dataset-filter">Dataset:</label>
+                <select id="dataset-filter">
+                    <option value="all">All</option>
+                    <option value="eest">EEST Runs</option>
+                    <option value="mainnet">Mainnet Runs</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="hardware-filter">Hardware:</label>
+                <select id="hardware-filter">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="config-filter">Configuration:</label>
+                <select id="config-filter">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="el-client-filter">EL Client:</label>
+                <select id="el-client-filter">
+                    <option value="all">All</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="crashes-filter">Show:</label>
+                <select id="crashes-filter">
+                    <option value="all">All Rows</option>
+                    <option value="crashes-only">Crashes Only</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading">Loading benchmark data...</div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+"""
+
+    with open(output_dir / "index.html", 'w') as f:
+        f.write(html_content)
+
+def generate_css(output_dir: Path):
+    """Generate the CSS file for the website."""
+    css_content = """* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.1em;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 15px 30px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    background: #e8f4f8;
+}
+
+.tab-button.active {
+    background: #3498db;
+    color: white;
+}
+
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    background: white;
+}
+
+#content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.2em;
+}
+
+.results-section {
+    margin-bottom: 40px;
+}
+
+.results-section h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 2px solid #3498db;
+    background: #f8f9fa;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.results-section h2:hover {
+    background: #e9ecef;
+}
+
+.results-section h2::after {
+    content: '▼';
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.results-section h2.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+.results-section-content {
+    overflow: visible;
+}
+
+.results-section-content.collapsed {
+    display: none;
+}
+
+.results-section h3 {
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.info-box {
+    background: #e8f4f8;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+}
+
+.info-box p {
+    margin-bottom: 5px;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table thead {
+    background: #34495e;
+    color: white;
+}
+
+table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+table th:hover {
+    background: #2c3e50;
+}
+
+table th.sortable::after {
+    content: ' ⇅';
+    font-size: 0.8em;
+    opacity: 0.5;
+}
+
+table th.sorted-asc::after {
+    content: ' ▲';
+    opacity: 1;
+}
+
+table th.sorted-desc::after {
+    content: ' ▼';
+    opacity: 1;
+}
+
+table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.crash-sdk {
+    color: #e74c3c;
+}
+
+.crash-prover {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.empty-result {
+    color: #999;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.summary-table {
+    margin-top: 30px;
+}
+
+.summary-table th {
+    background: #2c3e50;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.notes {
+    background: #fff9e6;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #f39c12;
+}
+
+.notes ul {
+    margin-left: 20px;
+}
+
+.notes li {
+    margin-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+}
+"""
+
+    with open(output_dir / "styles.css", 'w') as f:
+        f.write(css_content)
+
+def generate_js(website_data: Dict[str, Any], output_dir: Path):
+    """Generate the JavaScript files for the website."""
+
+    # Generate data.js with the benchmark data
+    data_js_content = f"const benchmarkData = {json.dumps(website_data, indent=2)};\n"
+
+    with open(output_dir / "data.js", 'w') as f:
+        f.write(data_js_content)
+
+    # Generate app.js with the application logic
+    app_js_content = """// Current state
+let currentMode = 'execution';
+let currentFilters = {
+    dataset: 'all',
+    hardware: 'all',
+    config: 'all',
+    elClient: 'all',
+    crashesOnly: false
+};
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    setupTabs();
+    populateFilters();
+    renderResults();
+});
+
+// Setup tab switching
+function setupTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active tab
+            tabButtons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+
+            // Update current mode
+            currentMode = button.dataset.tab;
+
+            // Reset filters
+            currentFilters = {
+                dataset: 'all',
+                hardware: 'all',
+                config: 'all',
+                elClient: 'all',
+                crashesOnly: false
+            };
+            document.getElementById('crashes-filter').value = 'all';
+
+            // Update UI
+            populateFilters();
+            renderResults();
+        });
+    });
+
+    // Setup filter change handlers
+    document.getElementById('dataset-filter').addEventListener('change', (e) => {
+        currentFilters.dataset = e.target.value;
+        populateHardwareFilter();
+        populateConfigFilter();
+        populateElClientFilter();
+        renderResults();
+    });
+
+    document.getElementById('hardware-filter').addEventListener('change', (e) => {
+        currentFilters.hardware = e.target.value;
+        populateConfigFilter();
+        populateElClientFilter();
+        renderResults();
+    });
+
+    document.getElementById('config-filter').addEventListener('change', (e) => {
+        currentFilters.config = e.target.value;
+        populateElClientFilter();
+        renderResults();
+    });
+
+    document.getElementById('el-client-filter').addEventListener('change', (e) => {
+        currentFilters.elClient = e.target.value;
+        renderResults();
+    });
+
+    document.getElementById('crashes-filter').addEventListener('change', (e) => {
+        currentFilters.crashesOnly = e.target.value === 'crashes-only';
+        renderResults();
+    });
+}
+
+// Populate filter dropdowns
+function populateFilters() {
+    populateHardwareFilter();
+    populateConfigFilter();
+    populateElClientFilter();
+}
+
+function populateHardwareFilter() {
+    const select = document.getElementById('hardware-filter');
+    const modeData = benchmarkData[currentMode] || {};
+    const hardwareNames = Object.keys(modeData).sort();
+
+    select.innerHTML = '<option value="all">All</option>';
+    hardwareNames.forEach(name => {
+        // Filter by dataset if applicable
+        if (currentFilters.dataset !== 'all') {
+            const hasMatchingDataset = Object.values(modeData[name]).some(config =>
+                config.dataset_type === currentFilters.dataset
+            );
+            if (!hasMatchingDataset) return;
+        }
+
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+
+    select.value = currentFilters.hardware;
+}
+
+function populateConfigFilter() {
+    const select = document.getElementById('config-filter');
+    const modeData = benchmarkData[currentMode] || {};
+    const configs = new Set();
+
+    Object.entries(modeData).forEach(([hardware, hwData]) => {
+        if (currentFilters.hardware !== 'all' && hardware !== currentFilters.hardware) return;
+
+        Object.entries(hwData).forEach(([config, configData]) => {
+            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
+            configs.add(config);
+        });
+    });
+
+    const sortedConfigs = Array.from(configs).sort();
+    select.innerHTML = '<option value="all">All</option>';
+    sortedConfigs.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+
+    select.value = currentFilters.config;
+}
+
+function populateElClientFilter() {
+    const select = document.getElementById('el-client-filter');
+    const modeData = benchmarkData[currentMode] || {};
+    const elClients = new Set();
+
+    Object.entries(modeData).forEach(([hardware, hwData]) => {
+        if (currentFilters.hardware !== 'all' && hardware !== currentFilters.hardware) return;
+
+        Object.entries(hwData).forEach(([config, configData]) => {
+            if (currentFilters.config !== 'all' && config !== currentFilters.config) return;
+            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
+
+            Object.keys(configData.el_clients || {}).forEach(client => elClients.add(client));
+        });
+    });
+
+    const sortedClients = Array.from(elClients).sort();
+    select.innerHTML = '<option value="all">All</option>';
+    sortedClients.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+
+    select.value = currentFilters.elClient;
+}
+
+// Render results
+function renderResults() {
+    const content = document.getElementById('content');
+    const modeData = benchmarkData[currentMode] || {};
+
+    let html = '';
+
+    // Add notes section
+    html += `
+        <div class="notes">
+            <strong>Notes:</strong>
+            <ul>
+                <li><strong>Empty results (—):</strong> zkVM has not yet run this benchmark</li>
+                <li><strong>💥 Prover Crash:</strong> Prover crashed on this test case</li>
+                <li><strong>❌ SDK Crash:</strong> SDK reported a crash on this test case</li>
+            </ul>
+        </div>
+    `;
+
+    let hasResults = false;
+
+    // Iterate through filtered data
+    Object.entries(modeData).forEach(([hardware, hwData]) => {
+        if (currentFilters.hardware !== 'all' && hardware !== currentFilters.hardware) return;
+
+        Object.entries(hwData).forEach(([config, configData]) => {
+            if (currentFilters.config !== 'all' && config !== currentFilters.config) return;
+            if (currentFilters.dataset !== 'all' && configData.dataset_type !== currentFilters.dataset) return;
+
+            Object.entries(configData.el_clients || {}).forEach(([elClient, elClientData]) => {
+                if (currentFilters.elClient !== 'all' && elClient !== currentFilters.elClient) return;
+
+                hasResults = true;
+
+                // Generate section for this combination
+                html += generateResultsSection(hardware, config, elClient, elClientData);
+            });
+        });
+    });
+
+    if (!hasResults) {
+        html += '<div class="no-results">No results match the current filters.</div>';
+    }
+
+    content.innerHTML = html;
+
+    // Setup collapsible sections
+    setupCollapsibleSections();
+
+    // Setup sortable tables
+    setupSortableTables();
+}
+
+// Setup collapsible section headers
+function setupCollapsibleSections() {
+    document.querySelectorAll('.results-section h2').forEach(header => {
+        header.addEventListener('click', () => {
+            const sectionId = header.dataset.section;
+            const content = document.getElementById(sectionId);
+
+            header.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        });
+    });
+}
+
+// Setup sortable tables
+function setupSortableTables() {
+    document.querySelectorAll('.table-container table').forEach(table => {
+        const headers = table.querySelectorAll('thead tr:first-child th');
+
+        headers.forEach((header, index) => {
+            // Skip the first header row if it's a proof size row
+            header.classList.add('sortable');
+
+            header.addEventListener('click', () => {
+                sortTable(table, index, header);
+            });
+        });
+
+        // Sort by Avg (last column) descending by default
+        const avgColumnIndex = headers.length - 1;
+        sortTable(table, avgColumnIndex, headers[avgColumnIndex], true);
+    });
+}
+
+function sortTable(table, columnIndex, header, isInitialSort = false) {
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Determine sort direction
+    let ascending = true;
+    if (!isInitialSort) {
+        if (header.classList.contains('sorted-asc')) {
+            ascending = false;
+        } else if (header.classList.contains('sorted-desc')) {
+            ascending = true;
+        }
+    } else {
+        // Initial sort on Avg column should be descending
+        ascending = false;
+    }
+
+    // Remove sort indicators from all headers in this table
+    table.querySelectorAll('thead th').forEach(h => {
+        h.classList.remove('sorted-asc', 'sorted-desc');
+    });
+
+    // Add sort indicator to current header
+    header.classList.add(ascending ? 'sorted-asc' : 'sorted-desc');
+
+    // Sort rows
+    rows.sort((a, b) => {
+        const aCell = a.cells[columnIndex];
+        const bCell = b.cells[columnIndex];
+
+        if (!aCell || !bCell) return 0;
+
+        const aText = aCell.textContent.trim();
+        const bText = bCell.textContent.trim();
+
+        // Handle special cases (crashes, empty results)
+        if (aText === '—' && bText === '—') return 0;
+        if (aText === '—') return ascending ? 1 : -1;
+        if (bText === '—') return ascending ? -1 : 1;
+
+        if (aText.includes('Crash') && bText.includes('Crash')) {
+            // Both crashes - sort alphabetically
+            return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+        }
+        if (aText.includes('Crash')) return ascending ? 1 : -1;
+        if (bText.includes('Crash')) return ascending ? -1 : 1;
+
+        // Try to parse as time values
+        const aValue = parseTimeToMs(aText);
+        const bValue = parseTimeToMs(bText);
+
+        if (aValue !== null && bValue !== null) {
+            return ascending ? aValue - bValue : bValue - aValue;
+        }
+
+        // Fall back to string comparison
+        return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    });
+
+    // Re-append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function parseTimeToMs(timeStr) {
+    // Parse time strings like "1.23s", "2m 30.50s", "1h 5m 30.00s"
+    let totalMs = 0;
+
+    const hourMatch = timeStr.match(/(\\d+)h/);
+    const minMatch = timeStr.match(/(\\d+)m/);
+    const secMatch = timeStr.match(/([\\d.]+)s/);
+
+    if (hourMatch) totalMs += parseInt(hourMatch[1]) * 3600000;
+    if (minMatch) totalMs += parseInt(minMatch[1]) * 60000;
+    if (secMatch) totalMs += parseFloat(secMatch[1]) * 1000;
+
+    return totalMs > 0 ? totalMs : null;
+}
+
+function generateResultsSection(hardware, config, elClient, elClientData) {
+    const sectionId = `section-${hardware}-${config}-${elClient}`.replace(/[^a-zA-Z0-9-]/g, '-');
+
+    let html = `
+        <div class="results-section">
+            <h2 data-section="${sectionId}">${hardware} - ${config} - ${elClient}</h2>
+            <div class="results-section-content" id="${sectionId}">
+    `;
+
+    // For execution mode: Summary first, then comparison table
+    // For proving mode: No workloads, comparison table, then summary
+    if (currentMode === 'execution') {
+        // Summary first for execution
+        html += generateSummary(elClientData);
+        html += generateComparisonTable(elClientData);
+    } else {
+        // Proving mode: no workload URLs, table first, then summary
+        html += generateComparisonTable(elClientData);
+        html += generateSummary(elClientData);
+    }
+
+    html += '</div></div>';
+
+    return html;
+}
+
+function generateComparisonTable(elClientData) {
+    const zkVMs = Object.keys(elClientData).sort();
+    if (zkVMs.length === 0) return '';
+
+    // Collect all test cases
+    const allTestCases = new Set();
+    const zkVMResults = {};
+
+    zkVMs.forEach(zkvm => {
+        zkVMResults[zkvm] = {};
+        const data = elClientData[zkvm];
+
+        [...data.successful_runs, ...data.sdk_crashed_runs, ...data.prover_crashed_runs].forEach(run => {
+            allTestCases.add(run.name);
+            zkVMResults[zkvm][run.name] = run;
+        });
+    });
+
+    const testCases = Array.from(allTestCases).sort();
+
+    // Determine time field based on mode
+    const timeField = currentMode === 'proving' ? 'proving_time_ms' : 'execution_time_ms';
+
+    // Collect proof sizes for proving mode
+    let proofSizeRow = '';
+    if (currentMode === 'proving') {
+        proofSizeRow = '<tr><th>Proof Size</th>';
+        zkVMs.forEach(zkvm => {
+            const data = elClientData[zkvm];
+            const proofSizes = data.successful_runs
+                .map(r => r.proof_size)
+                .filter(s => s && s > 0);
+
+            if (proofSizes.length > 0) {
+                const size = Math.max(...proofSizes);
+                proofSizeRow += `<td>${formatProofSize(size)}</td>`;
+            } else {
+                proofSizeRow += '<td>—</td>';
+            }
+        });
+        proofSizeRow += '<td>—</td></tr>';
+    }
+
+    let html = `
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Case</th>
+                        ${zkVMs.map(zkvm => `<th>${zkvm}</th>`).join('')}
+                        <th>Avg</th>
+                    </tr>
+                    ${proofSizeRow}
+                </thead>
+                <tbody>
+    `;
+
+    // Generate rows for each test case
+    let rowsGenerated = 0;
+    let rowsFiltered = 0;
+
+    testCases.forEach(testCase => {
+        const times = [];
+        let hasCrash = false;
+
+        const cells = zkVMs.map(zkvm => {
+            const result = zkVMResults[zkvm][testCase];
+            if (!result) {
+                return '<td class="empty-result">—</td>';
+            }
+
+            if (result.status === 'success' && result[timeField]) {
+                const time = result[timeField];
+                times.push(time);
+                return `<td>${formatTime(time)}</td>`;
+            } else if (result.status === 'crashed') {
+                hasCrash = true;
+                return '<td class="crash-sdk">❌ SDK Crash</td>';
+            } else if (result.status === 'prover_crashed') {
+                hasCrash = true;
+                return '<td class="crash-prover">💥 Prover Crash</td>';
+            } else {
+                hasCrash = true;
+                return '<td class="crash-sdk">❌ Error</td>';
+            }
+        });
+
+        // Filter out rows without crashes if crashesOnly filter is active
+        if (currentFilters.crashesOnly && !hasCrash) {
+            rowsFiltered++;
+            return;
+        }
+
+        const avgCell = times.length > 0
+            ? `<td>${formatTime(times.reduce((a, b) => a + b, 0) / times.length)}</td>`
+            : '<td class="empty-result">—</td>';
+
+        html += `<tr><td>${testCase}</td>${cells.join('')}${avgCell}</tr>`;
+        rowsGenerated++;
+    });
+
+    console.log(`Table generated: ${rowsGenerated} rows (${rowsFiltered} filtered out, ${testCases.length} total test cases)`);
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    return html;
+}
+
+function generateSummary(elClientData) {
+    const zkVMs = Object.keys(elClientData).sort();
+
+    let html = `
+        <h3>Summary</h3>
+        <div class="table-container">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>zkVM</th>
+                        <th>Total</th>
+                        <th>✅ Successful</th>
+                        <th>❌ SDK Crashed</th>
+                        <th>💥 Prover Crashed</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    zkVMs.forEach(zkvm => {
+        const data = elClientData[zkvm];
+        const successful = data.successful_runs.length;
+        const sdkCrashed = data.sdk_crashed_runs.length;
+        const proverCrashed = data.prover_crashed_runs.length;
+        const total = successful + sdkCrashed + proverCrashed;
+
+        html += `
+            <tr>
+                <td>${zkvm}</td>
+                <td>${total}</td>
+                <td>${successful}</td>
+                <td>${sdkCrashed}</td>
+                <td>${proverCrashed}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    return html;
+}
+
+// Utility functions
+function formatTime(ms) {
+    const seconds = ms / 1000;
+
+    if (seconds < 60) {
+        return `${seconds.toFixed(2)}s`;
+    } else if (seconds < 3600) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}m ${remainingSeconds.toFixed(2)}s`;
+    } else {
+        const hours = Math.floor(seconds / 3600);
+        const remainingMinutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `${hours}h ${remainingMinutes}m ${remainingSeconds.toFixed(2)}s`;
+    }
+}
+
+function formatProofSize(sizeBytes) {
+    if (sizeBytes >= 1024 * 1024) {
+        return `${(sizeBytes / (1024 * 1024)).toFixed(2)}MiB`;
+    } else if (sizeBytes >= 1024) {
+        return `${(sizeBytes / 1024).toFixed(2)}KiB`;
+    } else {
+        return `${sizeBytes}B`;
+    }
+}
+"""
+
+    with open(output_dir / "app.js", 'w') as f:
+        f.write(app_js_content)
+
 def main():
-    """Main function to generate all README files."""
+    """Main function to generate README files and/or website."""
+    parser = argparse.ArgumentParser(
+        description='Generate README files and/or static HTML website for zkEVM benchmark runs.'
+    )
+    parser.add_argument(
+        '--readmes',
+        action='store_true',
+        help='Generate README.md files (default behavior if no flags are specified)'
+    )
+    parser.add_argument(
+        '--website',
+        action='store_true',
+        help='Generate static HTML website for GitHub Pages'
+    )
+    parser.add_argument(
+        '--output-dir',
+        type=str,
+        default='docs',
+        help='Output directory for the website (default: docs)'
+    )
+
+    args = parser.parse_args()
+
+    # If no flags are specified, default to --readmes
+    if not args.readmes and not args.website:
+        args.readmes = True
+
     script_dir = Path(__file__).parent
     proving_path = script_dir / "../proving"
     executions_path = script_dir / "../executions"
 
-    print("Generating README files for zkEVM benchmark runs...")
+    # Generate READMEs if requested
+    if args.readmes:
+        print("Generating README files for zkEVM benchmark runs...")
 
-    # Process proving folder
-    process_benchmark_folder(proving_path, mode='proving')
+        # Process proving folder
+        process_benchmark_folder(proving_path, mode='proving')
 
-    # Process executions folder
-    process_benchmark_folder(executions_path, mode='execution')
+        # Process executions folder
+        process_benchmark_folder(executions_path, mode='execution')
 
-    # Generate root README
-    print("Generating root README...")
-    root_readme_content = generate_root_readme(proving_path, executions_path)
-    root_readme_file = script_dir / "../README.md"
+        # Generate root README
+        print("Generating root README...")
+        root_readme_content = generate_root_readme(proving_path, executions_path)
+        root_readme_file = script_dir / "../README.md"
 
-    with open(root_readme_file, 'w') as f:
-        f.write(root_readme_content)
+        with open(root_readme_file, 'w') as f:
+            f.write(root_readme_content)
 
-    print(f"Generated {root_readme_file}")
+        print(f"Generated {root_readme_file}")
+        print("✅ All README files generated successfully!")
 
-    print("✅ All README files generated successfully!")
+    # Generate website if requested
+    if args.website:
+        output_dir = script_dir / f"../{args.output_dir}"
+        generate_website(proving_path, executions_path, output_dir)
 
 if __name__ == "__main__":
     main()
