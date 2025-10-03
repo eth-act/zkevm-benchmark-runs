@@ -1137,6 +1137,22 @@ def generate_index_html(output_dir: Path):
             </div>
         </div>
 
+        <div id="reproduce-section" class="reproduce-section">
+            <div class="reproduce-header" id="reproduce-header">
+                <span>How to reproduce?</span>
+                <span class="reproduce-toggle">▶</span>
+            </div>
+            <div class="reproduce-content" id="reproduce-content">
+                <p>To reproduce do:</p>
+                <pre><code>$ git clone git@github.com:eth-act/zkevm-benchmark-workload.git
+$ cd zkevm-benchmark-workload
+# Change 60M to 10M or 45M as desired.
+$ RUST_LOG=info cargo run --release -p witness-generator-cli -- tests --include 60M- --include Prague --tag v5.1.0
+# Change 'zisk' to any other zkvm name.
+$ RUST_LOG=info cargo run --release -p ere-hosts -- --zkvms zisk stateless-validator --execution-client reth</code></pre>
+            </div>
+        </div>
+
         <div id="content">
             <div class="loading">Loading benchmark data...</div>
         </div>
@@ -1271,6 +1287,77 @@ header h1 {
     width: 18px;
     height: 18px;
     cursor: pointer;
+}
+
+.reproduce-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.reproduce-section.hidden {
+    display: none;
+}
+
+.reproduce-header {
+    padding: 10px 15px;
+    background: #f8f9fa;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.reproduce-header:hover {
+    background: #e9ecef;
+}
+
+.reproduce-toggle {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+}
+
+.reproduce-header.expanded .reproduce-toggle {
+    transform: rotate(90deg);
+}
+
+.reproduce-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.reproduce-content.expanded {
+    max-height: 500px;
+    padding: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.reproduce-content p {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.reproduce-content pre {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 4px;
+    border-left: 3px solid #3498db;
+    overflow-x: auto;
+}
+
+.reproduce-content code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+    color: #2c3e50;
 }
 
 #content {
@@ -1589,8 +1676,10 @@ function updateURL() {
 document.addEventListener('DOMContentLoaded', () => {
     loadFiltersFromURL();
     setupTabs();
+    setupReproduceSection();
     populateFilters();
     renderResults();
+    updateReproduceSectionVisibility();
 });
 
 // Setup tab switching
@@ -1624,6 +1713,7 @@ function setupTabs() {
             populateFilters();
             renderResults();
             updateURL();
+            updateReproduceSectionVisibility();
         });
     });
 
@@ -1927,16 +2017,27 @@ function sortTable(table, columnIndex, header, isInitialSort = false) {
         const bText = bCell.textContent.trim();
 
         // Handle special cases (crashes, empty results)
-        if (aText === '—' && bText === '—') return 0;
-        if (aText === '—') return ascending ? 1 : -1;
-        if (bText === '—') return ascending ? -1 : 1;
+        // Check crashes first, then empty results
+        const aIsCrash = aText.includes('❌') || aText.includes('💥');
+        const bIsCrash = bText.includes('❌') || bText.includes('💥');
 
-        if (aText.includes('Crash') && bText.includes('Crash')) {
+        if (aIsCrash && bIsCrash) {
             // Both crashes - sort alphabetically
             return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
         }
-        if (aText.includes('Crash')) return ascending ? 1 : -1;
-        if (bText.includes('Crash')) return ascending ? -1 : 1;
+        if (aText === '—' && bText === '—') return 0;
+
+        // Crashes vs empty: crash always before empty
+        if (aIsCrash && bText === '—') return -1;
+        if (bIsCrash && aText === '—') return 1;
+
+        // Crash vs normal: when descending, crashes at top; when ascending, crashes at bottom
+        if (aIsCrash) return ascending ? 1 : -1;
+        if (bIsCrash) return ascending ? -1 : 1;
+
+        // Empty vs normal: empty always after normal
+        if (aText === '—') return 1;
+        if (bText === '—') return -1;
 
         // Try to parse as time values
         const aValue = parseTimeToMs(aText);
@@ -2279,6 +2380,28 @@ function formatProofSize(sizeBytes) {
         return `${(sizeBytes / 1024).toFixed(2)}KiB`;
     } else {
         return `${sizeBytes}B`;
+    }
+}
+
+// Setup reproduce section toggle
+function setupReproduceSection() {
+    const header = document.getElementById('reproduce-header');
+    const content = document.getElementById('reproduce-content');
+
+    header.addEventListener('click', () => {
+        header.classList.toggle('expanded');
+        content.classList.toggle('expanded');
+    });
+}
+
+// Update reproduce section visibility based on current tab
+function updateReproduceSectionVisibility() {
+    const reproduceSection = document.getElementById('reproduce-section');
+
+    if (currentMode === 'execution') {
+        reproduceSection.classList.remove('hidden');
+    } else {
+        reproduceSection.classList.add('hidden');
     }
 }
 """
