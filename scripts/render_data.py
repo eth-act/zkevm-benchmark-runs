@@ -1167,7 +1167,7 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -1375,11 +1375,27 @@ table thead {
 
 table th {
     padding: 12px;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
     cursor: pointer;
     user-select: none;
     position: relative;
+    border-left: 1px solid #555;
+}
+
+table th:first-child {
+    border-left: none;
+    text-align: left;
+}
+
+table thead tr:first-child th {
+    background: #2c3e50;
+    border-bottom: 2px solid #555;
+}
+
+table thead tr:nth-child(2) th {
+    background: #34495e;
+    font-size: 0.9em;
 }
 
 table th:hover {
@@ -1441,6 +1457,18 @@ table tbody tr:nth-child(even) {
 
 .summary-table th {
     background: #2c3e50;
+}
+
+.summary-table .zkvm-cell {
+    font-weight: 600;
+    background: #f8f9fa;
+    vertical-align: middle;
+    border-right: 2px solid #ddd;
+}
+
+.summary-table .el-client-subrow {
+    padding-left: 20px;
+    font-size: 0.95em;
 }
 
 a {
@@ -1740,14 +1768,22 @@ function renderResults() {
         Object.entries(hwData).forEach(([config, configData]) => {
             if (currentFilters.config !== 'all' && config !== currentFilters.config) return;
 
+            // Collect all EL clients for this hardware+config combination
+            const elClients = {};
+            let hasMatchingClients = false;
+
             Object.entries(configData.el_clients || {}).forEach(([elClient, elClientData]) => {
                 if (currentFilters.elClient !== 'all' && elClient !== currentFilters.elClient) return;
 
-                hasResults = true;
-
-                // Generate section for this combination
-                html += generateResultsSection(hardware, config, elClient, elClientData);
+                elClients[elClient] = elClientData;
+                hasMatchingClients = true;
             });
+
+            if (hasMatchingClients) {
+                hasResults = true;
+                // Generate section for this hardware+config combination with all EL clients
+                html += generateResultsSection(hardware, config, elClients);
+            }
         });
     });
 
@@ -1780,20 +1816,78 @@ function setupCollapsibleSections() {
 // Setup sortable tables
 function setupSortableTables() {
     document.querySelectorAll('.table-container table').forEach(table => {
-        const headers = table.querySelectorAll('thead tr:first-child th');
+        // Check if this is a summary table or comparison table
+        const isSummaryTable = table.classList.contains('summary-table');
 
-        headers.forEach((header, index) => {
-            // Skip the first header row if it's a proof size row
-            header.classList.add('sortable');
-
-            header.addEventListener('click', () => {
-                sortTable(table, index, header);
+        if (isSummaryTable) {
+            // For summary tables, use the single header row
+            const headers = table.querySelectorAll('thead tr th');
+            headers.forEach((header, index) => {
+                header.classList.add('sortable');
+                header.addEventListener('click', () => {
+                    sortTable(table, index, header);
+                });
             });
-        });
+        } else {
+            // For comparison tables with double headers, we need to handle this differently
+            // The actual sortable columns are in the tbody, so we count actual td cells
+            const firstDataRow = table.querySelector('tbody tr:first-child');
+            if (!firstDataRow) return;
 
-        // Sort by Avg (last column) descending by default
-        const avgColumnIndex = headers.length - 1;
-        sortTable(table, avgColumnIndex, headers[avgColumnIndex], true);
+            const columnCount = firstDataRow.cells.length;
+
+            // Create clickable areas for sorting - we'll use the first header row
+            const firstHeaderRow = table.querySelector('thead tr:first-child');
+            const headers = firstHeaderRow.querySelectorAll('th');
+
+            headers.forEach((header, index) => {
+                header.classList.add('sortable');
+
+                header.addEventListener('click', () => {
+                    // Map the header index to actual column index
+                    let actualColumnIndex;
+
+                    if (index === 0) {
+                        // Test Case column
+                        actualColumnIndex = 0;
+                    } else if (index === headers.length - 1) {
+                        // Avg column (last column)
+                        actualColumnIndex = columnCount - 1;
+                    } else {
+                        // zkVM columns - we can't sort by these directly
+                        // Instead, sort by the first EL client column under this zkVM
+                        const elClientCount = parseInt(header.getAttribute('colspan')) || 1;
+                        // Calculate which column this zkVM's first EL client is
+                        let colOffset = 1; // Skip Test Case column
+                        for (let i = 1; i < index; i++) {
+                            const prevColspan = parseInt(headers[i].getAttribute('colspan')) || 1;
+                            colOffset += prevColspan;
+                        }
+                        actualColumnIndex = colOffset;
+                    }
+
+                    sortTable(table, actualColumnIndex, header);
+                });
+            });
+
+            // Also make the second header row (EL clients) sortable
+            const secondHeaderRow = table.querySelector('thead tr:nth-child(2)');
+            if (secondHeaderRow) {
+                const elHeaders = secondHeaderRow.querySelectorAll('th');
+                elHeaders.forEach((header, index) => {
+                    header.classList.add('sortable');
+                    header.addEventListener('click', () => {
+                        // EL client columns start at index 1 (after Test Case)
+                        sortTable(table, index + 1, header);
+                    });
+                });
+            }
+
+            // Sort by Avg (last column) descending by default
+            const avgColumnIndex = columnCount - 1;
+            const avgHeader = headers[headers.length - 1];
+            sortTable(table, avgColumnIndex, avgHeader, true);
+        }
     });
 }
 
@@ -1875,23 +1969,24 @@ function parseTimeToMs(timeStr) {
     return totalMs > 0 ? totalMs : null;
 }
 
-function generateResultsSection(hardware, config, elClient, elClientData) {
-    const sectionId = `section-${hardware}-${config}-${elClient}`.replace(/[^a-zA-Z0-9-]/g, '-');
+function generateResultsSection(hardware, config, allElClients) {
+    const sectionId = `section-${hardware}-${config}`.replace(/[^a-zA-Z0-9-]/g, '-');
 
     let html = `
         <div class="results-section">
-            <h2 data-section="${sectionId}">${hardware} - ${config} - ${elClient}</h2>
+            <h2 data-section="${sectionId}">${hardware} - ${config}</h2>
             <div class="results-section-content" id="${sectionId}">
     `;
 
-    // Display hardware info if available
-    if (elClientData.hardware_info) {
-        html += generateHardwareInfo(elClientData.hardware_info);
+    // Display hardware info if available (from first EL client)
+    const firstElClient = Object.values(allElClients)[0];
+    if (firstElClient && firstElClient.hardware_info) {
+        html += generateHardwareInfo(firstElClient.hardware_info);
     }
 
     // Summary first, then comparison table (for both modes)
-    html += generateSummary(elClientData.zkvm_data);
-    html += generateComparisonTable(elClientData.zkvm_data);
+    html += generateSummary(allElClients);
+    html += generateComparisonTable(allElClients);
 
     html += '</div></div>';
 
@@ -1919,62 +2014,88 @@ function generateHardwareInfo(hardwareInfo) {
     return html;
 }
 
-function generateComparisonTable(zkVMData) {
-    const zkVMs = Object.keys(zkVMData).sort();
+function generateComparisonTable(allElClients) {
+    // Collect all zkVMs and EL clients
+    const allZkVMs = new Set();
+    const elClientNames = Object.keys(allElClients).sort();
+
+    if (elClientNames.length === 0) return '';
+
+    // Collect all zkVMs across all EL clients
+    elClientNames.forEach(elClient => {
+        const zkVMData = allElClients[elClient].zkvm_data;
+        Object.keys(zkVMData).forEach(zkvm => allZkVMs.add(zkvm));
+    });
+
+    const zkVMs = Array.from(allZkVMs).sort();
     if (zkVMs.length === 0) return '';
 
-    // Collect all test cases
+    // Collect all test cases and organize results by zkVM -> EL -> test case
     const allTestCases = new Set();
-    const zkVMResults = {};
+    const results = {}; // zkvm -> elClient -> testCase -> result
 
     zkVMs.forEach(zkvm => {
-        zkVMResults[zkvm] = {};
-        const data = zkVMData[zkvm];
+        results[zkvm] = {};
+        elClientNames.forEach(elClient => {
+            results[zkvm][elClient] = {};
+            const zkVMData = allElClients[elClient].zkvm_data[zkvm];
 
-        [...data.successful_runs, ...data.sdk_crashed_runs, ...data.prover_crashed_runs].forEach(run => {
-            allTestCases.add(run.name);
-            zkVMResults[zkvm][run.name] = run;
+            if (zkVMData) {
+                [...zkVMData.successful_runs, ...zkVMData.sdk_crashed_runs, ...zkVMData.prover_crashed_runs].forEach(run => {
+                    allTestCases.add(run.name);
+                    results[zkvm][elClient][run.name] = run;
+                });
+            }
         });
     });
 
     const testCases = Array.from(allTestCases).sort();
-
-    // Determine time field based on mode
     const timeField = currentMode === 'proving' ? 'proving_time_ms' : 'execution_time_ms';
 
-    // Collect proof sizes for proving mode
-    let proofSizeRow = '';
-    if (currentMode === 'proving') {
-        proofSizeRow = '<tr><th>Proof Size</th>';
-        zkVMs.forEach(zkvm => {
-            const data = zkVMData[zkvm];
-            const proofSizes = data.successful_runs
-                .map(r => r.proof_size)
-                .filter(s => s && s > 0);
+    // Build the table with double header
+    let html = `<div class="table-container"><table><thead>`;
 
-            if (proofSizes.length > 0) {
-                const size = Math.max(...proofSizes);
-                proofSizeRow += `<td>${formatProofSize(size)}</td>`;
-            } else {
-                proofSizeRow += '<td>—</td>';
-            }
+    // First header row: zkVM names with colspan
+    html += '<tr><th rowspan="2">Test Case</th>';
+    zkVMs.forEach(zkvm => {
+        html += `<th colspan="${elClientNames.length}">${zkvm}</th>`;
+    });
+    html += '<th rowspan="2">Avg</th></tr>';
+
+    // Second header row: EL client names (repeated for each zkVM)
+    html += '<tr>';
+    zkVMs.forEach(zkvm => {
+        elClientNames.forEach(elClient => {
+            html += `<th>${elClient}</th>`;
         });
-        proofSizeRow += '<td>—</td></tr>';
+    });
+    html += '</tr>';
+
+    // Proof size row for proving mode
+    if (currentMode === 'proving') {
+        html += '<tr><th>Proof Size</th>';
+        zkVMs.forEach(zkvm => {
+            elClientNames.forEach(elClient => {
+                const zkVMData = allElClients[elClient].zkvm_data[zkvm];
+                if (zkVMData) {
+                    const proofSizes = zkVMData.successful_runs
+                        .map(r => r.proof_size)
+                        .filter(s => s && s > 0);
+                    if (proofSizes.length > 0) {
+                        const size = Math.max(...proofSizes);
+                        html += `<td>${formatProofSize(size)}</td>`;
+                    } else {
+                        html += '<td>—</td>';
+                    }
+                } else {
+                    html += '<td>—</td>';
+                }
+            });
+        });
+        html += '<td>—</td></tr>';
     }
 
-    let html = `
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Test Case</th>
-                        ${zkVMs.map(zkvm => `<th>${zkvm}</th>`).join('')}
-                        <th>Avg</th>
-                    </tr>
-                    ${proofSizeRow}
-                </thead>
-                <tbody>
-    `;
+    html += '</thead><tbody>';
 
     // Generate rows for each test case
     let rowsGenerated = 0;
@@ -1983,27 +2104,29 @@ function generateComparisonTable(zkVMData) {
     testCases.forEach(testCase => {
         const times = [];
         let hasCrash = false;
+        const cells = [];
 
-        const cells = zkVMs.map(zkvm => {
-            const result = zkVMResults[zkvm][testCase];
-            if (!result) {
-                return '<td class="empty-result">—</td>';
-            }
+        zkVMs.forEach(zkvm => {
+            elClientNames.forEach(elClient => {
+                const result = results[zkvm][elClient][testCase];
 
-            if (result.status === 'success' && result[timeField]) {
-                const time = result[timeField];
-                times.push(time);
-                return `<td>${formatTime(time)}</td>`;
-            } else if (result.status === 'crashed') {
-                hasCrash = true;
-                return '<td class="crash-sdk">❌ SDK Crash</td>';
-            } else if (result.status === 'prover_crashed') {
-                hasCrash = true;
-                return '<td class="crash-prover">💥 Prover Crash</td>';
-            } else {
-                hasCrash = true;
-                return '<td class="crash-sdk">❌ Error</td>';
-            }
+                if (!result) {
+                    cells.push('<td class="empty-result">—</td>');
+                } else if (result.status === 'success' && result[timeField]) {
+                    const time = result[timeField];
+                    times.push(time);
+                    cells.push(`<td>${formatTime(time)}</td>`);
+                } else if (result.status === 'crashed') {
+                    hasCrash = true;
+                    cells.push('<td class="crash-sdk">❌ SDK</td>');
+                } else if (result.status === 'prover_crashed') {
+                    hasCrash = true;
+                    cells.push('<td class="crash-prover">💥 Prover</td>');
+                } else {
+                    hasCrash = true;
+                    cells.push('<td class="crash-sdk">❌ Error</td>');
+                }
+            });
         });
 
         // Filter out rows without crashes if crashesOnly filter is active
@@ -2022,17 +2145,22 @@ function generateComparisonTable(zkVMData) {
 
     console.log(`Table generated: ${rowsGenerated} rows (${rowsFiltered} filtered out, ${testCases.length} total test cases)`);
 
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
+    html += '</tbody></table></div>';
 
     return html;
 }
 
-function generateSummary(zkVMData) {
-    const zkVMs = Object.keys(zkVMData).sort();
+function generateSummary(allElClients) {
+    // Collect all zkVMs across all EL clients
+    const allZkVMs = new Set();
+    const elClientNames = Object.keys(allElClients).sort();
+
+    elClientNames.forEach(elClient => {
+        const zkVMData = allElClients[elClient].zkvm_data;
+        Object.keys(zkVMData).forEach(zkvm => allZkVMs.add(zkvm));
+    });
+
+    const zkVMs = Array.from(allZkVMs).sort();
 
     let html = `
         <h3>Summary</h3>
@@ -2041,6 +2169,7 @@ function generateSummary(zkVMData) {
                 <thead>
                     <tr>
                         <th>zkVM</th>
+                        <th>EL Client</th>
                         <th>Total</th>
                         <th>✅ Successful</th>
                         <th>❌ SDK Crashed</th>
@@ -2058,26 +2187,62 @@ function generateSummary(zkVMData) {
     `;
 
     zkVMs.forEach(zkvm => {
-        const data = zkVMData[zkvm];
-        const successful = data.successful_runs.length;
-        const sdkCrashed = data.sdk_crashed_runs.length;
-        const proverCrashed = data.prover_crashed_runs.length;
-        const total = successful + sdkCrashed + proverCrashed;
+        let isFirstRow = true;
+        const sortedElClients = elClientNames.slice().sort();
 
-        html += `
-            <tr>
-                <td>${zkvm}</td>
-                <td>${total}</td>
-                <td>${successful}</td>
-                <td>${sdkCrashed}</td>
-        `;
+        sortedElClients.forEach(elClient => {
+            const data = allElClients[elClient].zkvm_data[zkvm];
 
-        // Only show Prover Crashed column in proving mode
-        if (currentMode === 'proving') {
-            html += `<td>${proverCrashed}</td>`;
-        }
+            if (data) {
+                const successful = data.successful_runs.length;
+                const sdkCrashed = data.sdk_crashed_runs.length;
+                const proverCrashed = data.prover_crashed_runs.length;
+                const total = successful + sdkCrashed + proverCrashed;
 
-        html += '</tr>';
+                html += '<tr>';
+
+                // Only show zkVM name in the first row
+                if (isFirstRow) {
+                    html += `<td rowspan="${sortedElClients.length}" class="zkvm-cell">${zkvm}</td>`;
+                    isFirstRow = false;
+                }
+
+                html += `
+                        <td class="el-client-subrow">${elClient}</td>
+                        <td>${total}</td>
+                        <td>${successful}</td>
+                        <td>${sdkCrashed}</td>
+                `;
+
+                // Only show Prover Crashed column in proving mode
+                if (currentMode === 'proving') {
+                    html += `<td>${proverCrashed}</td>`;
+                }
+
+                html += '</tr>';
+            } else {
+                // Show empty row for zkVM+EL combinations with no data
+                html += '<tr>';
+
+                if (isFirstRow) {
+                    html += `<td rowspan="${sortedElClients.length}" class="zkvm-cell">${zkvm}</td>`;
+                    isFirstRow = false;
+                }
+
+                html += `
+                        <td class="el-client-subrow">${elClient}</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                `;
+
+                if (currentMode === 'proving') {
+                    html += '<td>—</td>';
+                }
+
+                html += '</tr>';
+            }
+        });
     });
 
     html += `
