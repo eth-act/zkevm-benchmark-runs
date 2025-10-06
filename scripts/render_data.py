@@ -741,6 +741,7 @@ def generate_root_readme(proving_path: Path, executions_path: Path) -> str:
     """
     readme_content = "# zkEVM Benchmark Runs\n\n"
     readme_content += "This repository contains benchmark results for zkEVM proving and execution across different hardware configurations.\n\n"
+    readme_content += "You can see a website rendering of the results [here](https://eth-act.github.io/zkevm-benchmark-runs/).\n\n"
     
     # Collect all unique hardware setups from both proving and executions
     all_hardware = set()

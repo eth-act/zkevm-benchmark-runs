@@ -6,7 +6,69 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1x
 
 ## Available EL Clients
 
+- [ethrex](#ethrex)
 - [reth](#reth)
+
+---
+
+## ethrex
+
+
+## Proving Results Comparison
+
+### Benchmark Workloads
+
+- **risc0-v3.0.3**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d](https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d)
+- **sp1-v5.2.1**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d](https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d)
+
+### Notes
+
+- **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
+- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
+
+| Test Case | risc0-v3.0.3<br/>(218.42KiB) | sp1-v5.2.1<br/>(1.41MiB) | Avg |
+|-----------|-----------|-----------|----------|
+| rpc_block_23326238 | 1h 55m 15.44s | 18m 0.89s | 1h 6m 38.16s |
+| rpc_block_23326255 | 1h 51m 27.03s | 17m 58.75s | 1h 4m 42.89s |
+| rpc_block_23326234 | 1h 35m 30.10s | 12m 49.26s | 54m 9.68s |
+| rpc_block_23326246 | 1h 28m 49.59s | 12m 15.39s | 50m 32.49s |
+| rpc_block_23326241 | 1h 25m 14.04s | 14m 0.04s | 49m 37.04s |
+| rpc_block_23326252 | 1h 25m 21.43s | 11m 43.55s | 48m 32.49s |
+| rpc_block_23326247 | 1h 19m 20.68s | 11m 20.73s | 45m 20.71s |
+| rpc_block_23326235 | 1h 7m 24.76s | 10m 0.37s | 38m 42.56s |
+| rpc_block_23326239 | 1h 7m 31.26s | 9m 51.01s | 38m 41.13s |
+| rpc_block_23326262 | 1h 3m 30.10s | 9m 52.92s | 36m 41.51s |
+| rpc_block_23326251 | 1h 2m 59.84s | 9m 26.86s | 36m 13.35s |
+| rpc_block_23326242 | 1h 1m 20.19s | 9m 11.29s | 35m 15.74s |
+| rpc_block_23326236 | 1h 0m 35.97s | 8m 57.76s | 34m 46.86s |
+| rpc_block_23326254 | 59m 36.84s | 7m 56.20s | 33m 46.52s |
+| rpc_block_23326240 | 55m 45.10s | 10m 1.21s | 32m 53.16s |
+| rpc_block_23326258 | 53m 44.40s | 7m 27.62s | 30m 36.01s |
+| rpc_block_23326245 | 53m 20.51s | 7m 33.23s | 30m 26.87s |
+| rpc_block_23326260 | 51m 27.41s | 9m 4.42s | 30m 15.92s |
+| rpc_block_23326233 | 37m 32.25s | 5m 32.68s | 21m 32.46s |
+| rpc_block_23326249 | 32m 21.83s | 5m 5.72s | 18m 43.78s |
+| rpc_block_23326250 | ❌ SDK Crash | 16m 13.69s | 16m 13.69s |
+| rpc_block_23326261 | ❌ SDK Crash | 15m 59.51s | 15m 59.51s |
+| rpc_block_23326253 | 24m 46.55s | 3m 38.10s | 14m 12.32s |
+| rpc_block_23326257 | ❌ SDK Crash | 13m 18.33s | 13m 18.33s |
+| rpc_block_23326256 | ❌ SDK Crash | 10m 59.39s | 10m 59.39s |
+| rpc_block_23326244 | ❌ SDK Crash | 10m 42.93s | 10m 42.93s |
+| rpc_block_23326248 | ❌ SDK Crash | 10m 35.13s | 10m 35.13s |
+| rpc_block_23326243 | ❌ SDK Crash | 10m 18.21s | 10m 18.21s |
+| rpc_block_23326259 | ❌ SDK Crash | 10m 17.27s | 10m 17.27s |
+| rpc_block_23326237 | ❌ SDK Crash | 4m 51.96s | 4m 51.96s |
+
+## Summary
+
+**Total unique test cases:** 30
+
+### Results by zkVM
+
+| zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
+|------|-------|---------------|----------------|--------------------|
+| risc0-v3.0.3 | 30 | 21 | 9 | 0 |
+| sp1-v5.2.1 | 30 | 30 | 0 | 0 |
 
 ---
 
