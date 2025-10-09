@@ -1732,6 +1732,7 @@ function setupTabs() {
         populateElClientFilter();
         renderResults();
         updateURL();
+        updateReproduceSectionVisibility();
     });
 
     document.getElementById('el-client-filter').addEventListener('change', (e) => {
@@ -2399,7 +2400,10 @@ function setupReproduceSection() {
 function updateReproduceSectionVisibility() {
     const reproduceSection = document.getElementById('reproduce-section');
 
-    if (currentMode === 'execution') {
+    // Only show for execution mode AND non-mainnet datasets (EEST only)
+    const isMainnetDataset = currentFilters.config !== 'all' && currentFilters.config.startsWith('mainnet-');
+
+    if (currentMode === 'execution' && !isMainnetDataset) {
         reproduceSection.classList.remove('hidden');
     } else {
         reproduceSection.classList.add('hidden');
