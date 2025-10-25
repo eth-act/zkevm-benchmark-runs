@@ -947,7 +947,8 @@ def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str,
     """
     data = {
         'proving': {},
-        'execution': {}
+        'execution': {},
+        'cycles-gas': {}
     }
 
     # Process proving data
@@ -957,6 +958,8 @@ def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str,
     # Process execution data
     if executions_path.exists():
         data['execution'] = collect_mode_data(executions_path, 'execution')
+        # Compute cycles/gas data from execution data
+        data['cycles-gas'] = compute_cycles_gas_data(data['execution'])
 
     return data
 
@@ -1030,6 +1033,39 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
                     mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
 
     return mode_data
+
+def compute_cycles_gas_data(execution_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Compute cycles/gas ratios from execution data.
+
+    Args:
+        execution_data: Execution mode data structure
+
+    Returns:
+        Dictionary with same structure but containing cycles/gas ratios instead of execution times
+    """
+    import copy
+    cycles_gas_data = copy.deepcopy(execution_data)
+
+    # Traverse the nested structure: hardware -> config -> el_clients -> zkVM -> results
+    for hardware_name, hardware_data in cycles_gas_data.items():
+        for config_name, config_data in hardware_data.items():
+            for el_client_name, el_client_data in config_data.get('el_clients', {}).items():
+                for zkvm_name, zkvm_data in el_client_data.get('zkvm_data', {}).items():
+                    # Process successful runs
+                    for run in zkvm_data.get('successful_runs', []):
+                        cycles = run.get('total_num_cycles', 0)
+                        gas = run.get('gas_used', 0)
+
+                        if gas > 0 and cycles > 0:
+                            # Compute cycles/gas ratio
+                            run['cycles_per_gas'] = cycles / gas
+                        else:
+                            run['cycles_per_gas'] = 0
+
+                    # SDK and prover crashed runs don't have cycles/gas data
+                    # but we keep them to show crashes in the table
+
+    return cycles_gas_data
 
 def load_hardware_info(el_client_folder: Path) -> Optional[Dict[str, Any]]:
     """Load hardware information from hardware.json file."""
@@ -1105,6 +1141,7 @@ def generate_index_html(output_dir: Path):
 
         <div class="tabs">
             <button class="tab-button active" data-tab="execution">Execution</button>
+            <button class="tab-button" data-tab="cycles-gas">Cycles/gas</button>
             <button class="tab-button" data-tab="proving">Proving</button>
         </div>
 
@@ -2041,9 +2078,13 @@ function sortTable(table, columnIndex, header, isInitialSort = false) {
         if (aText === '—') return 1;
         if (bText === '—') return -1;
 
-        // Try to parse as time values
-        const aValue = parseTimeToMs(aText);
-        const bValue = parseTimeToMs(bText);
+        // Try to parse as time values or cycles/gas values
+        let aValue = parseTimeToMs(aText);
+        let bValue = parseTimeToMs(bText);
+
+        // If time parsing failed, try parsing as cycles/gas
+        if (aValue === null) aValue = parseCyclesPerGas(aText);
+        if (bValue === null) bValue = parseCyclesPerGas(bText);
 
         if (aValue !== null && bValue !== null) {
             return ascending ? aValue - bValue : bValue - aValue;
@@ -2070,6 +2111,23 @@ function parseTimeToMs(timeStr) {
     if (secMatch) totalMs += parseFloat(secMatch[1]) * 1000;
 
     return totalMs > 0 ? totalMs : null;
+}
+
+function parseCyclesPerGas(cyclesStr) {
+    // Parse cycles/gas strings like "1.23K", "45.67M", "123.45"
+    const mMatch = cyclesStr.match(/([\\d.]+)M/);
+    const kMatch = cyclesStr.match(/([\\d.]+)K/);
+    const plainMatch = cyclesStr.match(/^([\\d.]+)$/);
+
+    if (mMatch) {
+        return parseFloat(mMatch[1]) * 1_000_000;
+    } else if (kMatch) {
+        return parseFloat(kMatch[1]) * 1_000;
+    } else if (plainMatch) {
+        return parseFloat(plainMatch[1]);
+    }
+
+    return null;
 }
 
 function generateResultsSection(hardware, config, allElClients) {
@@ -2153,7 +2211,9 @@ function generateComparisonTable(allElClients) {
     });
 
     const testCases = Array.from(allTestCases).sort();
-    const timeField = currentMode === 'proving' ? 'proving_time_ms' : 'execution_time_ms';
+    const timeField = currentMode === 'proving' ? 'proving_time_ms' :
+                      currentMode === 'cycles-gas' ? 'cycles_per_gas' :
+                      'execution_time_ms';
 
     // Build the table with double header
     let html = `<div class="table-container"><table><thead>`;
@@ -2215,10 +2275,16 @@ function generateComparisonTable(allElClients) {
 
                 if (!result) {
                     cells.push('<td class="empty-result">—</td>');
+                } else if (result.status === 'success' && currentMode === 'cycles-gas' && result[timeField] === 0) {
+                    // In cycles-gas mode, if cycles is 0, show em-dash instead of error
+                    cells.push('<td class="empty-result">—</td>');
                 } else if (result.status === 'success' && result[timeField]) {
                     const time = result[timeField];
                     times.push(time);
-                    cells.push(`<td>${formatTime(time)}</td>`);
+                    const formattedValue = currentMode === 'cycles-gas' ?
+                                          formatCyclesPerGas(time) :
+                                          formatTime(time);
+                    cells.push(`<td>${formattedValue}</td>`);
                 } else if (result.status === 'crashed') {
                     hasCrash = true;
                     cells.push('<td class="crash-sdk">❌ SDK</td>');
@@ -2239,7 +2305,13 @@ function generateComparisonTable(allElClients) {
         }
 
         const avgCell = times.length > 0
-            ? `<td>${formatTime(times.reduce((a, b) => a + b, 0) / times.length)}</td>`
+            ? (() => {
+                const avg = times.reduce((a, b) => a + b, 0) / times.length;
+                const formattedAvg = currentMode === 'cycles-gas' ?
+                                    formatCyclesPerGas(avg) :
+                                    formatTime(avg);
+                return `<td>${formattedAvg}</td>`;
+              })()
             : '<td class="empty-result">—</td>';
 
         html += `<tr><td>${testCase}</td>${cells.join('')}${avgCell}</tr>`;
@@ -2382,6 +2454,16 @@ function formatProofSize(sizeBytes) {
         return `${(sizeBytes / 1024).toFixed(2)}KiB`;
     } else {
         return `${sizeBytes}B`;
+    }
+}
+
+function formatCyclesPerGas(cyclesPerGas) {
+    if (cyclesPerGas >= 1_000_000) {
+        return `${(cyclesPerGas / 1_000_000).toFixed(2)}M`;
+    } else if (cyclesPerGas >= 1_000) {
+        return `${(cyclesPerGas / 1_000).toFixed(2)}K`;
+    } else {
+        return cyclesPerGas.toFixed(2);
     }
 }
 
