@@ -88,38 +88,38 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1x
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | airbender-v0.1.0<br/>(1.06MiB) | risc0-v3.0.3<br/>(218.42KiB) | sp1-v5.2.1<br/>(1.41MiB) | zisk-v0.12.0<br/>(244.02KiB) | Avg |
+| Test Case | airbender-v0.1.0<br/>(1.06MiB) | risc0-v3.0.3<br/>(218.42KiB) | sp1-v5.2.1<br/>(1.41MiB) | zisk-v0.13.0<br/>(244.02KiB) | Avg |
 |-----------|-----------|-----------|-----------|-----------|----------|
-| rpc_block_23326261 | 14m 17.45s | 24m 37.07s | 7m 22.55s | 5m 52.30s | 13m 2.34s |
-| rpc_block_23326238 | 12m 9.64s | 24m 29.19s | 7m 47.36s | 5m 59.59s | 12m 36.45s |
-| rpc_block_23326255 | 12m 25.06s | 24m 29.62s | 7m 22.82s | 5m 39.31s | 12m 29.20s |
-| rpc_block_23326250 | 12m 16.24s | 23m 4.83s | 7m 2.16s | 5m 24.25s | 11m 56.87s |
-| rpc_block_23326234 | 10m 58.61s | 19m 51.00s | 5m 59.33s | 4m 47.35s | 10m 24.07s |
-| rpc_block_23326257 | 10m 25.74s | 18m 44.11s | 6m 49.20s | 4m 51.80s | 10m 12.71s |
-| rpc_block_23326241 | 9m 57.85s | 19m 6.83s | 5m 58.22s | 4m 26.56s | 9m 52.37s |
-| rpc_block_23326246 | 9m 46.74s | 18m 10.11s | 5m 45.87s | 5m 5.70s | 9m 42.10s |
-| rpc_block_23326252 | 9m 41.58s | 17m 42.96s | 5m 20.49s | 4m 18.03s | 9m 15.76s |
-| rpc_block_23326256 | 10m 25.91s | 16m 56.74s | 5m 17.94s | 4m 7.70s | 9m 12.07s |
-| rpc_block_23326247 | 9m 8.66s | 17m 29.03s | 5m 17.45s | 4m 17.17s | 9m 3.08s |
-| rpc_block_23326244 | 9m 5.04s | 16m 33.48s | 4m 58.60s | 3m 58.82s | 8m 38.98s |
-| rpc_block_23326239 | 8m 12.66s | 15m 36.34s | 4m 49.86s | 3m 50.28s | 8m 7.29s |
-| rpc_block_23326259 | 8m 29.77s | 15m 21.62s | 4m 43.39s | 3m 46.85s | 8m 5.41s |
-| rpc_block_23326248 | 8m 15.49s | 15m 16.82s | 4m 38.94s | 3m 41.15s | 7m 58.10s |
-| rpc_block_23326235 | 8m 3.18s | 15m 3.12s | 4m 35.62s | 3m 39.08s | 7m 50.25s |
-| rpc_block_23326243 | 7m 29.80s | 14m 1.18s | 4m 33.95s | 3m 26.42s | 7m 22.84s |
-| rpc_block_23326262 | 7m 34.20s | 14m 0.56s | 4m 24.39s | 3m 24.69s | 7m 20.96s |
-| rpc_block_23326251 | 7m 21.66s | 13m 57.72s | 4m 16.72s | 3m 26.25s | 7m 15.59s |
-| rpc_block_23326236 | 7m 34.40s | 13m 36.75s | 4m 11.80s | 3m 18.24s | 7m 10.29s |
-| rpc_block_23326242 | 7m 49.80s | 13m 28.22s | 4m 6.56s | 3m 14.10s | 7m 9.67s |
-| rpc_block_23326254 | 7m 7.31s | 12m 17.37s | 3m 46.73s | 2m 59.48s | 6m 32.72s |
-| rpc_block_23326245 | 6m 40.32s | 11m 34.95s | 3m 35.36s | 2m 52.83s | 6m 10.87s |
-| rpc_block_23326240 | 5m 45.21s | 12m 3.11s | 3m 50.82s | 2m 56.40s | 6m 8.88s |
-| rpc_block_23326260 | 6m 25.82s | 11m 25.21s | 3m 47.06s | 2m 38.03s | 6m 4.03s |
-| rpc_block_23326258 | 6m 16.35s | 11m 11.41s | 3m 40.50s | 2m 52.62s | 6m 0.22s |
-| rpc_block_23326233 | 4m 48.08s | 8m 12.31s | 2m 33.43s | 2m 2.72s | 4m 24.13s |
-| rpc_block_23326237 | 4m 57.31s | 7m 35.71s | 2m 28.34s | 1m 54.85s | 4m 14.05s |
-| rpc_block_23326249 | 4m 28.80s | 6m 48.27s | 2m 21.81s | 1m 40.67s | 3m 49.89s |
-| rpc_block_23326253 | 3m 43.37s | 5m 29.19s | 1m 58.33s | 1m 24.88s | 3m 8.94s |
+| rpc_block_23326261 | 14m 17.45s | 24m 37.07s | 7m 22.55s | 4m 5.74s | 12m 35.70s |
+| rpc_block_23326238 | 12m 9.64s | 24m 29.19s | 7m 47.36s | 4m 24.56s | 12m 12.69s |
+| rpc_block_23326255 | 12m 25.06s | 24m 29.62s | 7m 22.82s | 4m 5.03s | 12m 5.63s |
+| rpc_block_23326250 | 12m 16.24s | 23m 4.83s | 7m 2.16s | 3m 50.17s | 11m 33.35s |
+| rpc_block_23326234 | 10m 58.61s | 19m 51.00s | 5m 59.33s | 3m 26.05s | 10m 3.75s |
+| rpc_block_23326257 | 10m 25.74s | 18m 44.11s | 6m 49.20s | 3m 57.35s | 9m 59.10s |
+| rpc_block_23326241 | 9m 57.85s | 19m 6.83s | 5m 58.22s | 3m 8.83s | 9m 32.93s |
+| rpc_block_23326246 | 9m 46.74s | 18m 10.11s | 5m 45.87s | 3m 58.04s | 9m 25.19s |
+| rpc_block_23326252 | 9m 41.58s | 17m 42.96s | 5m 20.49s | 3m 5.72s | 8m 57.68s |
+| rpc_block_23326256 | 10m 25.91s | 16m 56.74s | 5m 17.94s | 2m 47.37s | 8m 51.99s |
+| rpc_block_23326247 | 9m 8.66s | 17m 29.03s | 5m 17.45s | 3m 7.48s | 8m 45.65s |
+| rpc_block_23326244 | 9m 5.04s | 16m 33.48s | 4m 58.60s | 2m 53.56s | 8m 22.67s |
+| rpc_block_23326239 | 8m 12.66s | 15m 36.34s | 4m 49.86s | 2m 49.10s | 7m 51.99s |
+| rpc_block_23326259 | 8m 29.77s | 15m 21.62s | 4m 43.39s | 2m 44.45s | 7m 49.81s |
+| rpc_block_23326248 | 8m 15.49s | 15m 16.82s | 4m 38.94s | 2m 41.55s | 7m 43.20s |
+| rpc_block_23326235 | 8m 3.18s | 15m 3.12s | 4m 35.62s | 2m 41.06s | 7m 35.75s |
+| rpc_block_23326243 | 7m 29.80s | 14m 1.18s | 4m 33.95s | 2m 31.66s | 7m 9.15s |
+| rpc_block_23326262 | 7m 34.20s | 14m 0.56s | 4m 24.39s | 2m 25.36s | 7m 6.13s |
+| rpc_block_23326251 | 7m 21.66s | 13m 57.72s | 4m 16.72s | 2m 32.05s | 7m 2.04s |
+| rpc_block_23326236 | 7m 34.40s | 13m 36.75s | 4m 11.80s | 2m 25.27s | 6m 57.05s |
+| rpc_block_23326242 | 7m 49.80s | 13m 28.22s | 4m 6.56s | 2m 19.52s | 6m 56.02s |
+| rpc_block_23326254 | 7m 7.31s | 12m 17.37s | 3m 46.73s | 2m 8.84s | 6m 20.06s |
+| rpc_block_23326245 | 6m 40.32s | 11m 34.95s | 3m 35.36s | 2m 4.49s | 5m 58.78s |
+| rpc_block_23326240 | 5m 45.21s | 12m 3.11s | 3m 50.82s | 2m 13.18s | 5m 58.08s |
+| rpc_block_23326260 | 6m 25.82s | 11m 25.21s | 3m 47.06s | 1m 46.82s | 5m 51.23s |
+| rpc_block_23326258 | 6m 16.35s | 11m 11.41s | 3m 40.50s | 2m 2.03s | 5m 47.57s |
+| rpc_block_23326233 | 4m 48.08s | 8m 12.31s | 2m 33.43s | 1m 31.53s | 4m 16.34s |
+| rpc_block_23326237 | 4m 57.31s | 7m 35.71s | 2m 28.34s | 1m 21.38s | 4m 5.68s |
+| rpc_block_23326249 | 4m 28.80s | 6m 48.27s | 2m 21.81s | 1m 7.64s | 3m 41.63s |
+| rpc_block_23326253 | 3m 43.37s | 5m 29.19s | 1m 58.33s | 1m 1.33s | 3m 3.06s |
 
 ## Summary
 
@@ -132,7 +132,7 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1x
 | airbender-v0.1.0 | 30 | 30 | 0 | 0 |
 | risc0-v3.0.3 | 30 | 30 | 0 | 0 |
 | sp1-v5.2.1 | 30 | 30 | 0 | 0 |
-| zisk-v0.12.0 | 30 | 30 | 0 | 0 |
+| zisk-v0.13.0 | 30 | 30 | 0 | 0 |
 
 ---
 
