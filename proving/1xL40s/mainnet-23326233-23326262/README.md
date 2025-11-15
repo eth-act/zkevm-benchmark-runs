@@ -16,48 +16,43 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1x
 
 ## Proving Results Comparison
 
-### Benchmark Workloads
-
-- **risc0-v3.0.3**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d](https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d)
-- **sp1-v5.2.1**: [https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d](https://github.com/eth-act/zkevm-benchmark-workload/tree/256b522cd7b7a18c4cc61347321ac2c4780c297d)
-
 ### Notes
 
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | risc0-v3.0.3<br/>(218.42KiB) | sp1-v5.2.1<br/>(1.41MiB) | Avg |
+| Test Case | risc0-v3.0.3<br/>(218.01KiB) | sp1-v5.2.2<br/>(1.41MiB) | Avg |
 |-----------|-----------|-----------|----------|
-| rpc_block_23326238 | 1h 55m 15.44s | 18m 0.89s | 1h 6m 38.16s |
-| rpc_block_23326255 | 1h 51m 27.03s | 17m 58.75s | 1h 4m 42.89s |
-| rpc_block_23326234 | 1h 35m 30.10s | 12m 49.26s | 54m 9.68s |
-| rpc_block_23326246 | 1h 28m 49.59s | 12m 15.39s | 50m 32.49s |
-| rpc_block_23326241 | 1h 25m 14.04s | 14m 0.04s | 49m 37.04s |
-| rpc_block_23326252 | 1h 25m 21.43s | 11m 43.55s | 48m 32.49s |
-| rpc_block_23326247 | 1h 19m 20.68s | 11m 20.73s | 45m 20.71s |
-| rpc_block_23326235 | 1h 7m 24.76s | 10m 0.37s | 38m 42.56s |
-| rpc_block_23326239 | 1h 7m 31.26s | 9m 51.01s | 38m 41.13s |
-| rpc_block_23326262 | 1h 3m 30.10s | 9m 52.92s | 36m 41.51s |
-| rpc_block_23326251 | 1h 2m 59.84s | 9m 26.86s | 36m 13.35s |
-| rpc_block_23326242 | 1h 1m 20.19s | 9m 11.29s | 35m 15.74s |
-| rpc_block_23326236 | 1h 0m 35.97s | 8m 57.76s | 34m 46.86s |
-| rpc_block_23326254 | 59m 36.84s | 7m 56.20s | 33m 46.52s |
-| rpc_block_23326240 | 55m 45.10s | 10m 1.21s | 32m 53.16s |
-| rpc_block_23326258 | 53m 44.40s | 7m 27.62s | 30m 36.01s |
-| rpc_block_23326245 | 53m 20.51s | 7m 33.23s | 30m 26.87s |
-| rpc_block_23326260 | 51m 27.41s | 9m 4.42s | 30m 15.92s |
-| rpc_block_23326233 | 37m 32.25s | 5m 32.68s | 21m 32.46s |
-| rpc_block_23326249 | 32m 21.83s | 5m 5.72s | 18m 43.78s |
-| rpc_block_23326250 | ❌ SDK Crash | 16m 13.69s | 16m 13.69s |
-| rpc_block_23326261 | ❌ SDK Crash | 15m 59.51s | 15m 59.51s |
-| rpc_block_23326253 | 24m 46.55s | 3m 38.10s | 14m 12.32s |
-| rpc_block_23326257 | ❌ SDK Crash | 13m 18.33s | 13m 18.33s |
-| rpc_block_23326256 | ❌ SDK Crash | 10m 59.39s | 10m 59.39s |
-| rpc_block_23326244 | ❌ SDK Crash | 10m 42.93s | 10m 42.93s |
-| rpc_block_23326248 | ❌ SDK Crash | 10m 35.13s | 10m 35.13s |
-| rpc_block_23326243 | ❌ SDK Crash | 10m 18.21s | 10m 18.21s |
-| rpc_block_23326259 | ❌ SDK Crash | 10m 17.27s | 10m 17.27s |
-| rpc_block_23326237 | ❌ SDK Crash | 4m 51.96s | 4m 51.96s |
+| rpc_block_23326261 | 1h 35m 34.24s | 10m 53.37s | 53m 13.80s |
+| rpc_block_23326255 | 1h 32m 44.17s | 13m 8.62s | 52m 56.39s |
+| rpc_block_23326238 | 1h 33m 36.18s | 12m 8.74s | 52m 52.46s |
+| rpc_block_23326257 | 1h 27m 50.63s | 10m 3.65s | 48m 57.14s |
+| rpc_block_23326234 | 1h 18m 29.43s | 8m 54.22s | 43m 41.82s |
+| rpc_block_23326241 | 1h 10m 59.41s | 10m 4.65s | 40m 32.03s |
+| rpc_block_23326246 | 1h 10m 45.00s | 8m 17.97s | 39m 31.49s |
+| rpc_block_23326256 | 1h 8m 59.22s | 7m 44.16s | 38m 21.69s |
+| rpc_block_23326252 | 1h 8m 15.76s | 8m 9.06s | 38m 12.41s |
+| rpc_block_23326259 | 1h 0m 46.43s | 7m 4.58s | 33m 55.51s |
+| rpc_block_23326244 | 59m 25.82s | 7m 24.48s | 33m 25.15s |
+| rpc_block_23326248 | 58m 37.06s | 6m 58.24s | 32m 47.65s |
+| rpc_block_23326239 | 56m 33.73s | 6m 57.65s | 31m 45.69s |
+| rpc_block_23326251 | 53m 3.57s | 6m 19.54s | 29m 41.55s |
+| rpc_block_23326243 | 51m 26.33s | 6m 26.63s | 28m 56.48s |
+| rpc_block_23326242 | 51m 1.71s | 6m 49.45s | 28m 55.58s |
+| rpc_block_23326254 | 52m 4.56s | 5m 38.97s | 28m 51.76s |
+| rpc_block_23326236 | 50m 42.45s | 6m 13.42s | 28m 27.93s |
+| rpc_block_23326245 | 45m 28.91s | 5m 19.33s | 25m 24.12s |
+| rpc_block_23326240 | 44m 4.83s | 6m 19.94s | 25m 12.38s |
+| rpc_block_23326258 | 43m 44.57s | 5m 10.09s | 24m 27.33s |
+| rpc_block_23326260 | 41m 33.14s | 5m 51.69s | 23m 42.42s |
+| rpc_block_23326233 | 31m 0.35s | 3m 55.31s | 17m 27.83s |
+| rpc_block_23326237 | 30m 32.44s | 3m 36.91s | 17m 4.68s |
+| rpc_block_23326250 | ❌ SDK Crash | 10m 39.46s | 10m 39.46s |
+| rpc_block_23326247 | ❌ SDK Crash | 7m 53.91s | 7m 53.91s |
+| rpc_block_23326235 | ❌ SDK Crash | 6m 55.76s | 6m 55.76s |
+| rpc_block_23326262 | ❌ SDK Crash | 6m 35.19s | 6m 35.19s |
+| rpc_block_23326249 | ❌ SDK Crash | 3m 25.03s | 3m 25.03s |
+| rpc_block_23326253 | ❌ SDK Crash | 2m 45.68s | 2m 45.68s |
 
 ## Summary
 
@@ -67,8 +62,8 @@ Mainnet blocks benchmark for mainnet-23326233-23326262 (proving results) on **1x
 
 | zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
 |------|-------|---------------|----------------|--------------------|
-| risc0-v3.0.3 | 30 | 21 | 9 | 0 |
-| sp1-v5.2.1 | 30 | 30 | 0 | 0 |
+| risc0-v3.0.3 | 30 | 24 | 6 | 0 |
+| sp1-v5.2.2 | 30 | 30 | 0 | 0 |
 
 ---
 
