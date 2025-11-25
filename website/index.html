@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Proving Gas Repricing Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container header-row">
+            <div class="header-text">
+                <h1>Ethereum Proving Gas Repricing Analysis</h1>
+                <p>Analyzing zkVM proving costs to identify operations for gas repricing</p>
+            </div>
+            <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">☀️ Light mode</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="loading">Loading benchmark data...</div>
+        <div id="error" class="error-message hidden"></div>
+        <div id="app" class="hidden">
+            <!-- Controls Section -->
+            <div class="controls">
+                <div class="control-group">
+                    <label for="baseline">Baseline Operation</label>
+                    <select id="baseline" aria-label="Baseline Operation"></select>
+                </div>
+                <div class="control-group">
+                    <label>zkVM View</label>
+                    <div class="radio-group" id="zkvm-view">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="search">Search</label>
+                    <input type="text" id="search" aria-label="Search tests" placeholder="Filter by name or operation...">
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="hide-crashed" aria-label="Hide tests where all zkVMs crashed"> Hide tests where all zkVMs crashed
+                    </label>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="quick-filters" id="quick-filters">
+                <div class="filter-section">
+                    <span class="filter-label">Cost Filter:</span>
+                    <button class="btn btn-filter active" data-min-rel="">All</button>
+                    <button class="btn btn-filter" data-min-rel="2">≥2x</button>
+                    <button class="btn btn-filter" data-min-rel="5">≥5x</button>
+                    <button class="btn btn-filter" data-min-rel="10">≥10x (Expensive)</button>
+                    <button class="btn btn-filter" data-min-rel="50">≥50x (Very Expensive)</button>
+                </div>
+                <div class="filter-section">
+                    <span class="filter-label">Category:</span>
+                    <button class="btn btn-filter active" data-category="all">All</button>
+                    <button class="btn btn-filter" data-category="Opcode">Opcodes Only</button>
+                    <button class="btn btn-filter" data-category="Precompile">Precompiles Only</button>
+                </div>
+            </div>
+
+            <!-- Summary Statistics -->
+            <div class="stats-panel" id="stats-panel">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Baseline Info Display -->
+            <div class="baseline-info" id="baseline-info">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Operation Filters -->
+            <details open>
+                <summary><h2>Operation Filters (Opcodes / Precompiles)</h2></summary>
+                <div class="checkbox-group" id="operation-filters">
+                    <!-- Dynamically populated -->
+                </div>
+            </details>
+
+            <!-- Data Table -->
+            <div class="section">
+                <h2>Benchmark Results <span id="table-count" class="text-secondary"></span></h2>
+                <div class="pagination" id="pagination-top"></div>
+                <div class="table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr id="table-header">
+                                <!-- Dynamically populated -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination-bottom"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Generated: <span id="generated-at">-</span></p>
+            <p>Hardware: <span id="hardware-info">-</span></p>
+            <p><a href="data/results.json">Raw Data (JSON)</a></p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
