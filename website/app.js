@@ -11,12 +11,10 @@ const CONFIG = Object.freeze({
     DEBOUNCE_MS: 150,
     PAGE_SIZE_OPTIONS: [25, 50, 100, 250],
     THEME_KEY: 'epra-theme',
-    REVOKE_URL_DELAY_MS: 100,
 });
 
 const STATUS = Object.freeze({
     SUCCESS: 'success',
-    CRASHED: 'crashed',
 });
 
 const VIEW = Object.freeze({
@@ -795,122 +793,6 @@ class BenchmarkApp {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Export Functions
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Downloads a file with the given content.
-     * @param {string} content - File content.
-     * @param {string} filename - File name.
-     * @param {string} mimeType - MIME type.
-     */
-    downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        // Delay revoking to ensure download completes in all browsers
-        setTimeout(() => URL.revokeObjectURL(url), CONFIG.REVOKE_URL_DELAY_MS);
-    }
-
-    /**
-     * Exports filtered data as CSV.
-     */
-    exportCSV() {
-        try {
-            const headers = ['Operation', 'Test Name', 'Test ID'];
-
-            if (this.selectedZkvmView === VIEW.ALL) {
-                for (const zkvm of this.data.zkvms) {
-                    headers.push(`${zkvm} Time (ms)`, `${zkvm} Relative Cost`);
-                }
-            } else {
-                headers.push('Proving Time (ms)', 'Relative Cost');
-            }
-
-            const rows = [headers];
-
-            for (const test of this.filteredTests) {
-                const row = [test.operation, test.name, test.id];
-
-                if (this.selectedZkvmView === VIEW.ALL) {
-                    for (const zkvm of this.data.zkvms) {
-                        const result = test.results[zkvm];
-                        if (result?.status === STATUS.SUCCESS) {
-                            row.push(result.proving_time_ms, this.getRelativeCost(test, zkvm)?.toFixed(2) || '');
-                        } else {
-                            row.push('CRASHED', '');
-                        }
-                    }
-                } else {
-                    const zkvm = this.selectedZkvmView === VIEW.WORST ? VIEW.WORST : this.selectedZkvmView;
-                    const time = zkvm === VIEW.WORST ? this.getWorstCaseTime(test) : this.getProvingTime(test, zkvm);
-                    const relative = this.getRelativeCost(test, zkvm);
-                    row.push(time || 'CRASHED', relative?.toFixed(2) || '');
-                }
-
-                rows.push(row);
-            }
-
-            const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-            this.downloadFile(csv, 'ethereum-proving-analysis.csv', 'text/csv');
-        } catch (error) {
-            console.error('Failed to export CSV:', error);
-            alert('Failed to export CSV. See console for details.');
-        }
-    }
-
-    /**
-     * Exports filtered data as JSON.
-     */
-    exportJSON() {
-        try {
-            const exportData = {
-                generated_at: new Date().toISOString(),
-                baseline: this.baselineTestId,
-                zkvm_view: this.selectedZkvmView,
-                tests: this.filteredTests.map(test => {
-                    const item = {
-                        id: test.id,
-                        name: test.name,
-                        operation: test.operation,
-                    };
-
-                    if (this.selectedZkvmView === VIEW.ALL || this.selectedZkvmView === VIEW.WORST) {
-                        item.worst_case_time_ms = this.getWorstCaseTime(test);
-                        item.worst_case_relative_cost = this.getRelativeCost(test, VIEW.WORST);
-                    }
-
-                    if (this.selectedZkvmView === VIEW.ALL) {
-                        item.results = {};
-                        for (const zkvm of this.data.zkvms) {
-                            item.results[zkvm] = {
-                                proving_time_ms: this.getProvingTime(test, zkvm),
-                                relative_cost: this.getRelativeCost(test, zkvm),
-                            };
-                        }
-                    } else if (this.selectedZkvmView !== VIEW.WORST) {
-                        item.proving_time_ms = this.getProvingTime(test, this.selectedZkvmView);
-                        item.relative_cost = this.getRelativeCost(test, this.selectedZkvmView);
-                    }
-
-                    return item;
-                }),
-            };
-
-            this.downloadFile(JSON.stringify(exportData, null, 2), 'ethereum-proving-analysis.json', 'application/json');
-        } catch (error) {
-            console.error('Failed to export JSON:', error);
-            alert('Failed to export JSON. See console for details.');
-        }
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
     // Theme Management
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -966,8 +848,6 @@ class BenchmarkApp {
             themeToggle: document.getElementById('theme-toggle'),
             generatedAt: document.getElementById('generated-at'),
             hardwareInfo: document.getElementById('hardware-info'),
-            exportCsvBtn: document.getElementById('export-csv-btn'),
-            exportJsonBtn: document.getElementById('export-json-btn'),
             selectAllOpsBtn: document.getElementById('select-all-ops-btn'),
             clearAllOpsBtn: document.getElementById('clear-all-ops-btn'),
         };
@@ -1099,14 +979,6 @@ class BenchmarkApp {
     }
 
     /**
-     * Initializes export button event listeners.
-     */
-    initializeExportButtons() {
-        this.elements.exportCsvBtn.addEventListener('click', () => this.exportCSV());
-        this.elements.exportJsonBtn.addEventListener('click', () => this.exportJSON());
-    }
-
-    /**
      * Initializes theme toggle.
      */
     initializeTheme() {
@@ -1175,7 +1047,6 @@ class BenchmarkApp {
             this.initializeZkvmViewSelector();
             this.initializeSearchAndFilters();
             this.initializeOperationFilters();
-            this.initializeExportButtons();
 
             // Initial render
             this.renderBaselineInfo();
