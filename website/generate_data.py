@@ -6,39 +6,60 @@ This script processes zkVM benchmark results and generates a consolidated JSON f
 for visualization in the interactive website.
 """
 
+from __future__ import annotations
+
 import json
-import os
+import logging
 import re
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 # Base paths
 BENCHMARK_BASE = Path("proving/1xL40s/10M-gas-limit/reth/eest-benchmark")
 HARDWARE_FILE = Path("proving/1xL40s/10M-gas-limit/hardware.json")
 OUTPUT_FILE = Path("website/data/results.json")
 
+
+class Category(str, Enum):
+    """Operation categories for classification."""
+
+    OPCODE = "Opcode"
+    PRECOMPILE = "Precompile"
+    OTHER = "Other"
+
+
+def _compile_patterns(pattern_strings: list[str]) -> list[re.Pattern]:
+    """Compile a list of regex pattern strings."""
+    return [re.compile(p, re.IGNORECASE) for p in pattern_strings]
+
+
 # Canonical precompile mapping rules (addresses from Ethereum Yellow Paper / EIPs)
 # Keep this table maintainable: add new fixture patterns to "patterns" when they appear.
 PRECOMPILE_RULES = [
     # 0x01
-    {"name": "ECRECOVER", "patterns": [r"^ECRECOVER$", r"^EC_RECOVER$"]},
+    {"name": "ECRECOVER", "patterns": _compile_patterns([r"^ECRECOVER$", r"^EC_RECOVER$"])},
     # 0x02
-    {"name": "SHA256", "patterns": [r"^SHA256$"]},
+    {"name": "SHA256", "patterns": _compile_patterns([r"^SHA256$"])},
     # 0x03
-    {"name": "RIPEMD160", "patterns": [r"^RIPEMD160$"]},
+    {"name": "RIPEMD160", "patterns": _compile_patterns([r"^RIPEMD160$"])},
     # 0x04
-    {"name": "IDENTITY", "patterns": [r"^IDENTITY$", r"^ID$"]},
+    {"name": "IDENTITY", "patterns": _compile_patterns([r"^IDENTITY$", r"^ID$"])},
     # 0x05
-    {"name": "MODEXP", "patterns": [r"^MODEXP$", r"^MOD ?EXP$"]},
+    {"name": "MODEXP", "patterns": _compile_patterns([r"^MODEXP$", r"^MOD ?EXP$"])},
     # 0x06 EIP-196
-    {"name": "BN128_ADD", "patterns": [r"^BN128_ADD.*$", r"^ALT_BN128_ADD$", r"^ECADD$"]},
+    {"name": "BN128_ADD", "patterns": _compile_patterns([r"^BN128_ADD.*$", r"^ALT_BN128_ADD$", r"^ECADD$"])},
     # 0x07 EIP-196
-    {"name": "BN128_MUL", "patterns": [r"^BN128_MUL.*$", r"^ALT_BN128_MUL$", r"^ECMUL$"]},
+    {"name": "BN128_MUL", "patterns": _compile_patterns([r"^BN128_MUL.*$", r"^ALT_BN128_MUL$", r"^ECMUL$"])},
     # 0x08 EIP-197
     {
         "name": "BN128_PAIRING",
-        "patterns": [
+        "patterns": _compile_patterns([
             r"^BN128_PAIRING.*$",
             r"^BN128_PAIRINGS.*$",
             r"^BN128_.*PAIRING(S)?(_.*)?$",
@@ -46,146 +67,171 @@ PRECOMPILE_RULES = [
             r"^ALT_BN128_.*PAIRING.*$",
             r"^ECPAIRING.*$",
             r"^EC_PAIRING.*$",
-        ],
+        ]),
     },
     # 0x09 EIP-152
-    {"name": "BLAKE2F", "patterns": [r"^BLAKE2F.*$"]},
+    {"name": "BLAKE2F", "patterns": _compile_patterns([r"^BLAKE2F.*$"])},
     # 0x0a EIP-4844
-    {"name": "POINT_EVALUATION", "patterns": [r"^POINT_EVALUATION$", r"^KZG.*$", r"^EIP4844_.*$"]},
+    {"name": "POINT_EVALUATION", "patterns": _compile_patterns([r"^POINT_EVALUATION$", r"^KZG.*$", r"^EIP4844_.*$"])},
     # 0x0b EIP-2537
-    {"name": "BLS12_381_G1ADD", "patterns": [r"^BLS12_381_G1ADD$", r"^BLS12_G1ADD$"]},
+    {"name": "BLS12_381_G1ADD", "patterns": _compile_patterns([r"^BLS12_381_G1ADD$", r"^BLS12_G1ADD$"])},
     # 0x0c EIP-2537
-    {"name": "BLS12_381_G1MSM", "patterns": [r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$"]},
+    {"name": "BLS12_381_G1MSM", "patterns": _compile_patterns([r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$"])},
     # 0x0d EIP-2537
-    {"name": "BLS12_381_G2ADD", "patterns": [r"^BLS12_381_G2ADD$", r"^BLS12_G2ADD$"]},
+    {"name": "BLS12_381_G2ADD", "patterns": _compile_patterns([r"^BLS12_381_G2ADD$", r"^BLS12_G2ADD$"])},
     # 0x0e EIP-2537
-    {"name": "BLS12_381_G2MSM", "patterns": [r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$"]},
+    {"name": "BLS12_381_G2MSM", "patterns": _compile_patterns([r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$"])},
     # 0x0f EIP-2537
-    {"name": "BLS12_381_PAIRING", "patterns": [r"^BLS12_381_PAIRING$", r"^BLS12_PAIRING$", r"^BLS12_PAIRING_CHECK$"]},
+    {"name": "BLS12_381_PAIRING", "patterns": _compile_patterns([r"^BLS12_381_PAIRING$", r"^BLS12_PAIRING$", r"^BLS12_PAIRING_CHECK$"])},
     # 0x10 EIP-2537
-    {"name": "BLS12_381_MAP_FP_TO_G1", "patterns": [r"^BLS12_381_MAP_FP_TO_G1$", r"^BLS12_MAP_FP_TO_G1$", r"^BLS12_FP_TO_G1$"]},
+    {"name": "BLS12_381_MAP_FP_TO_G1", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP_TO_G1$", r"^BLS12_MAP_FP_TO_G1$", r"^BLS12_FP_TO_G1$"])},
     # 0x11 EIP-2537
-    {"name": "BLS12_381_MAP_FP2_TO_G2", "patterns": [r"^BLS12_381_MAP_FP2_TO_G2$", r"^BLS12_MAP_FP2_TO_G2$", r"^BLS12_FP_TO_G2$"]},
+    {"name": "BLS12_381_MAP_FP2_TO_G2", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP2_TO_G2$", r"^BLS12_MAP_FP2_TO_G2$", r"^BLS12_FP_TO_G2$"])},
 ]
 
 # Canonical opcode mapping rules (EVM yellow paper opcodes)
 # Add aliases/fixture spelling variants to patterns to keep UI clean.
 OPCODE_RULES = [
-    {"name": "STOP", "patterns": [r"^STOP$"]},
-    {"name": "ADD", "patterns": [r"^ADD$"]},
-    {"name": "MUL", "patterns": [r"^MUL$"]},
-    {"name": "SUB", "patterns": [r"^SUB$"]},
-    {"name": "DIV", "patterns": [r"^DIV$"]},
-    {"name": "SDIV", "patterns": [r"^SDIV$"]},
-    {"name": "MOD", "patterns": [r"^MOD$"]},
-    {"name": "SMOD", "patterns": [r"^SMOD$"]},
-    {"name": "ADDMOD", "patterns": [r"^ADDMOD$"]},
-    {"name": "MULMOD", "patterns": [r"^MULMOD$"]},
-    {"name": "EXP", "patterns": [r"^EXP$"]},
-    {"name": "SIGNEXTEND", "patterns": [r"^SIGNEXTEND$"]},
-    {"name": "LT", "patterns": [r"^LT$"]},
-    {"name": "GT", "patterns": [r"^GT$"]},
-    {"name": "SLT", "patterns": [r"^SLT$"]},
-    {"name": "SGT", "patterns": [r"^SGT$"]},
-    {"name": "EQ", "patterns": [r"^EQ$"]},
-    {"name": "ISZERO", "patterns": [r"^ISZERO$"]},
-    {"name": "AND", "patterns": [r"^AND$"]},
-    {"name": "OR", "patterns": [r"^OR$"]},
-    {"name": "XOR", "patterns": [r"^XOR$"]},
-    {"name": "NOT", "patterns": [r"^NOT$"]},
-    {"name": "BYTE", "patterns": [r"^BYTE$"]},
-    {"name": "SHL", "patterns": [r"^SHL$"]},
-    {"name": "SHR", "patterns": [r"^SHR$"]},
-    {"name": "SAR", "patterns": [r"^SAR$"]},
-    {"name": "KECCAK256", "patterns": [r"^KECCAK256$", r"^KECCAK$", r"^SHA3$"]},
-    {"name": "ADDRESS", "patterns": [r"^ADDRESS$"]},
-    {"name": "BALANCE", "patterns": [r"^BALANCE$"]},
-    {"name": "ORIGIN", "patterns": [r"^ORIGIN$"]},
-    {"name": "CALLER", "patterns": [r"^CALLER$"]},
-    {"name": "CALLVALUE", "patterns": [r"^CALLVALUE$"]},
-    {"name": "CALLDATALOAD", "patterns": [r"^CALLDATALOAD$"]},
-    {"name": "CALLDATASIZE", "patterns": [r"^CALLDATASIZE$"]},
-    {"name": "CALLDATACOPY", "patterns": [r"^CALLDATACOPY$"]},
-    {"name": "CODESIZE", "patterns": [r"^CODESIZE$"]},
-    {"name": "CODECOPY", "patterns": [r"^CODECOPY$"]},
-    {"name": "GASPRICE", "patterns": [r"^GASPRICE$"]},
-    {"name": "EXTCODESIZE", "patterns": [r"^EXTCODESIZE$"]},
-    {"name": "EXTCODECOPY", "patterns": [r"^EXTCODECOPY$"]},
-    {"name": "RETURNDATASIZE", "patterns": [r"^RETURNDATASIZE$"]},
-    {"name": "RETURNDATACOPY", "patterns": [r"^RETURNDATACOPY$"]},
-    {"name": "EXTCODEHASH", "patterns": [r"^EXTCODEHASH$"]},
-    {"name": "BLOCKHASH", "patterns": [r"^BLOCKHASH$"]},
-    {"name": "COINBASE", "patterns": [r"^COINBASE$"]},
-    {"name": "TIMESTAMP", "patterns": [r"^TIMESTAMP$"]},
-    {"name": "NUMBER", "patterns": [r"^NUMBER$"]},
-    {"name": "PREVRANDAO", "patterns": [r"^PREVRANDAO$", r"^DIFFICULTY$"]},
-    {"name": "GASLIMIT", "patterns": [r"^GASLIMIT$"]},
-    {"name": "CHAINID", "patterns": [r"^CHAINID$"]},
-    {"name": "SELFBALANCE", "patterns": [r"^SELFBALANCE$"]},
-    {"name": "BASEFEE", "patterns": [r"^BASEFEE$"]},
-    {"name": "BLOBHASH", "patterns": [r"^BLOBHASH$"]},
-    {"name": "BLOBBASEFEE", "patterns": [r"^BLOBBASEFEE$"]},
-    {"name": "POP", "patterns": [r"^POP$"]},
-    {"name": "MLOAD", "patterns": [r"^MLOAD$"]},
-    {"name": "MSTORE", "patterns": [r"^MSTORE$"]},
-    {"name": "MSTORE8", "patterns": [r"^MSTORE8$"]},
-    {"name": "SLOAD", "patterns": [r"^SLOAD$"]},
-    {"name": "SSTORE", "patterns": [r"^SSTORE$"]},
-    {"name": "JUMP", "patterns": [r"^JUMP$"]},
-    {"name": "JUMPI", "patterns": [r"^JUMPI$"]},
-    {"name": "PC", "patterns": [r"^PC$"]},
-    {"name": "MSIZE", "patterns": [r"^MSIZE$"]},
-    {"name": "GAS", "patterns": [r"^GAS$"]},
-    {"name": "JUMPDEST", "patterns": [r"^JUMPDEST$"]},
-    {"name": "TLOAD", "patterns": [r"^TLOAD$"]},
-    {"name": "TSTORE", "patterns": [r"^TSTORE$"]},
-    {"name": "MCOPY", "patterns": [r"^MCOPY$"]},
-    {"name": "PUSH", "patterns": [r"^PUSH$"]},  # grouped via normalize_operation for PUSH0-32
-    {"name": "DUP", "patterns": [r"^DUP$"]},    # grouped
-    {"name": "SWAP", "patterns": [r"^SWAP$"]},  # grouped
-    {"name": "LOG", "patterns": [r"^LOG$"]},    # grouped
-    {"name": "CREATE", "patterns": [r"^CREATE$"]},
-    {"name": "CALL", "patterns": [r"^CALL$"]},
-    {"name": "CALLCODE", "patterns": [r"^CALLCODE$"]},
-    {"name": "RETURN", "patterns": [r"^RETURN$"]},
-    {"name": "DELEGATECALL", "patterns": [r"^DELEGATECALL$"]},
-    {"name": "CREATE2", "patterns": [r"^CREATE2$"]},
-    {"name": "STATICCALL", "patterns": [r"^STATICCALL$"]},
-    {"name": "REVERT", "patterns": [r"^REVERT$"]},
-    {"name": "INVALID", "patterns": [r"^INVALID$"]},
-    {"name": "SELFDESTRUCT", "patterns": [r"^SELFDESTRUCT.*$", r"^SUICIDE$"]},
+    {"name": "STOP", "patterns": _compile_patterns([r"^STOP$"])},
+    {"name": "ADD", "patterns": _compile_patterns([r"^ADD$"])},
+    {"name": "MUL", "patterns": _compile_patterns([r"^MUL$"])},
+    {"name": "SUB", "patterns": _compile_patterns([r"^SUB$"])},
+    {"name": "DIV", "patterns": _compile_patterns([r"^DIV$"])},
+    {"name": "SDIV", "patterns": _compile_patterns([r"^SDIV$"])},
+    {"name": "MOD", "patterns": _compile_patterns([r"^MOD$"])},
+    {"name": "SMOD", "patterns": _compile_patterns([r"^SMOD$"])},
+    {"name": "ADDMOD", "patterns": _compile_patterns([r"^ADDMOD$"])},
+    {"name": "MULMOD", "patterns": _compile_patterns([r"^MULMOD$"])},
+    {"name": "EXP", "patterns": _compile_patterns([r"^EXP$"])},
+    {"name": "SIGNEXTEND", "patterns": _compile_patterns([r"^SIGNEXTEND$"])},
+    {"name": "LT", "patterns": _compile_patterns([r"^LT$"])},
+    {"name": "GT", "patterns": _compile_patterns([r"^GT$"])},
+    {"name": "SLT", "patterns": _compile_patterns([r"^SLT$"])},
+    {"name": "SGT", "patterns": _compile_patterns([r"^SGT$"])},
+    {"name": "EQ", "patterns": _compile_patterns([r"^EQ$"])},
+    {"name": "ISZERO", "patterns": _compile_patterns([r"^ISZERO$"])},
+    {"name": "AND", "patterns": _compile_patterns([r"^AND$"])},
+    {"name": "OR", "patterns": _compile_patterns([r"^OR$"])},
+    {"name": "XOR", "patterns": _compile_patterns([r"^XOR$"])},
+    {"name": "NOT", "patterns": _compile_patterns([r"^NOT$"])},
+    {"name": "BYTE", "patterns": _compile_patterns([r"^BYTE$"])},
+    {"name": "SHL", "patterns": _compile_patterns([r"^SHL$"])},
+    {"name": "SHR", "patterns": _compile_patterns([r"^SHR$"])},
+    {"name": "SAR", "patterns": _compile_patterns([r"^SAR$"])},
+    {"name": "KECCAK256", "patterns": _compile_patterns([r"^KECCAK256$", r"^KECCAK$", r"^SHA3$"])},
+    {"name": "ADDRESS", "patterns": _compile_patterns([r"^ADDRESS$"])},
+    {"name": "BALANCE", "patterns": _compile_patterns([r"^BALANCE$"])},
+    {"name": "ORIGIN", "patterns": _compile_patterns([r"^ORIGIN$"])},
+    {"name": "CALLER", "patterns": _compile_patterns([r"^CALLER$"])},
+    {"name": "CALLVALUE", "patterns": _compile_patterns([r"^CALLVALUE$"])},
+    {"name": "CALLDATALOAD", "patterns": _compile_patterns([r"^CALLDATALOAD$"])},
+    {"name": "CALLDATASIZE", "patterns": _compile_patterns([r"^CALLDATASIZE$"])},
+    {"name": "CALLDATACOPY", "patterns": _compile_patterns([r"^CALLDATACOPY$"])},
+    {"name": "CODESIZE", "patterns": _compile_patterns([r"^CODESIZE$"])},
+    {"name": "CODECOPY", "patterns": _compile_patterns([r"^CODECOPY$"])},
+    {"name": "GASPRICE", "patterns": _compile_patterns([r"^GASPRICE$"])},
+    {"name": "EXTCODESIZE", "patterns": _compile_patterns([r"^EXTCODESIZE$"])},
+    {"name": "EXTCODECOPY", "patterns": _compile_patterns([r"^EXTCODECOPY$"])},
+    {"name": "RETURNDATASIZE", "patterns": _compile_patterns([r"^RETURNDATASIZE$"])},
+    {"name": "RETURNDATACOPY", "patterns": _compile_patterns([r"^RETURNDATACOPY$"])},
+    {"name": "EXTCODEHASH", "patterns": _compile_patterns([r"^EXTCODEHASH$"])},
+    {"name": "BLOCKHASH", "patterns": _compile_patterns([r"^BLOCKHASH$"])},
+    {"name": "COINBASE", "patterns": _compile_patterns([r"^COINBASE$"])},
+    {"name": "TIMESTAMP", "patterns": _compile_patterns([r"^TIMESTAMP$"])},
+    {"name": "NUMBER", "patterns": _compile_patterns([r"^NUMBER$"])},
+    {"name": "PREVRANDAO", "patterns": _compile_patterns([r"^PREVRANDAO$", r"^DIFFICULTY$"])},
+    {"name": "GASLIMIT", "patterns": _compile_patterns([r"^GASLIMIT$"])},
+    {"name": "CHAINID", "patterns": _compile_patterns([r"^CHAINID$"])},
+    {"name": "SELFBALANCE", "patterns": _compile_patterns([r"^SELFBALANCE$"])},
+    {"name": "BASEFEE", "patterns": _compile_patterns([r"^BASEFEE$"])},
+    {"name": "BLOBHASH", "patterns": _compile_patterns([r"^BLOBHASH$"])},
+    {"name": "BLOBBASEFEE", "patterns": _compile_patterns([r"^BLOBBASEFEE$"])},
+    {"name": "POP", "patterns": _compile_patterns([r"^POP$"])},
+    {"name": "MLOAD", "patterns": _compile_patterns([r"^MLOAD$"])},
+    {"name": "MSTORE", "patterns": _compile_patterns([r"^MSTORE$"])},
+    {"name": "MSTORE8", "patterns": _compile_patterns([r"^MSTORE8$"])},
+    {"name": "SLOAD", "patterns": _compile_patterns([r"^SLOAD$"])},
+    {"name": "SSTORE", "patterns": _compile_patterns([r"^SSTORE$"])},
+    {"name": "JUMP", "patterns": _compile_patterns([r"^JUMP$"])},
+    {"name": "JUMPI", "patterns": _compile_patterns([r"^JUMPI$"])},
+    {"name": "PC", "patterns": _compile_patterns([r"^PC$"])},
+    {"name": "MSIZE", "patterns": _compile_patterns([r"^MSIZE$"])},
+    {"name": "GAS", "patterns": _compile_patterns([r"^GAS$"])},
+    {"name": "JUMPDEST", "patterns": _compile_patterns([r"^JUMPDEST$"])},
+    {"name": "TLOAD", "patterns": _compile_patterns([r"^TLOAD$"])},
+    {"name": "TSTORE", "patterns": _compile_patterns([r"^TSTORE$"])},
+    {"name": "MCOPY", "patterns": _compile_patterns([r"^MCOPY$"])},
+    {"name": "PUSH", "patterns": _compile_patterns([r"^PUSH$"])},  # grouped via normalize_operation for PUSH0-32
+    {"name": "DUP", "patterns": _compile_patterns([r"^DUP$"])},  # grouped
+    {"name": "SWAP", "patterns": _compile_patterns([r"^SWAP$"])},  # grouped
+    {"name": "LOG", "patterns": _compile_patterns([r"^LOG$"])},  # grouped
+    {"name": "CREATE", "patterns": _compile_patterns([r"^CREATE$"])},
+    {"name": "CALL", "patterns": _compile_patterns([r"^CALL$"])},
+    {"name": "CALLCODE", "patterns": _compile_patterns([r"^CALLCODE$"])},
+    {"name": "RETURN", "patterns": _compile_patterns([r"^RETURN$"])},
+    {"name": "DELEGATECALL", "patterns": _compile_patterns([r"^DELEGATECALL$"])},
+    {"name": "CREATE2", "patterns": _compile_patterns([r"^CREATE2$"])},
+    {"name": "STATICCALL", "patterns": _compile_patterns([r"^STATICCALL$"])},
+    {"name": "REVERT", "patterns": _compile_patterns([r"^REVERT$"])},
+    {"name": "INVALID", "patterns": _compile_patterns([r"^INVALID$"])},
+    {"name": "SELFDESTRUCT", "patterns": _compile_patterns([r"^SELFDESTRUCT.*$", r"^SUICIDE$"])},
+]
+
+# Group similar opcodes under a single bucket (e.g., PUSH0-32 -> PUSH)
+GROUP_PATTERNS = [
+    ("PUSH", re.compile(r"^PUSH\d+$", re.IGNORECASE)),
+    ("DUP", re.compile(r"^DUP\d+$", re.IGNORECASE)),
+    ("SWAP", re.compile(r"^SWAP\d+$", re.IGNORECASE)),
+    ("LOG", re.compile(r"^LOG\d+$", re.IGNORECASE)),
 ]
 
 
-def categorize_operation(op: str) -> str:
-    """Bucket operation into Opcode / Precompile / Other."""
-    upper = op.upper()
-    if any(re.match(pat, upper, re.IGNORECASE) for rule in PRECOMPILE_RULES for pat in rule["patterns"]):
-        return "Precompile"
-    if any(re.match(pat, upper, re.IGNORECASE) for rule in OPCODE_RULES for pat in rule["patterns"]):
-        return "Opcode"
-    return "Other"
-
-
-def match_rule_in_text(text: str, rules: List[Dict[str, Any]]) -> Optional[str]:
-    """Return canonical rule name if any of its patterns appear in the text."""
-    upper = text.upper()
-
-    # Direct search across whole string
+def _match_rules(text: str, rules: list[dict[str, Any]]) -> str | None:
+    """Return canonical rule name if text matches any pattern in the rules."""
     for rule in rules:
-        for pat in rule["patterns"]:
-            if re.search(pat, upper, re.IGNORECASE):
+        for pattern in rule["patterns"]:
+            if pattern.match(text):
                 return rule["name"]
+    return None
+
+
+def _search_rules(text: str, rules: list[dict[str, Any]]) -> str | None:
+    """Return canonical rule name if any pattern is found within the text."""
+    for rule in rules:
+        for pattern in rule["patterns"]:
+            if pattern.search(text):
+                return rule["name"]
+    return None
+
+
+def _match_rules_in_tokens(text: str, rules: list[dict[str, Any]]) -> str | None:
+    """Split text into tokens and try to match each against rules."""
+    tokens = [t for t in re.split(r"[^A-Za-z0-9]+", text) if t]
+    for token in tokens:
+        match = _match_rules(token, rules)
+        if match:
+            return match
+    return None
+
+
+def categorize_operation(op: str) -> Category:
+    """Bucket operation into Opcode / Precompile / Other."""
+    if _match_rules(op, PRECOMPILE_RULES):
+        return Category.PRECOMPILE
+    if _match_rules(op, OPCODE_RULES):
+        return Category.OPCODE
+    return Category.OTHER
+
+
+def match_rule_in_text(text: str, rules: list[dict[str, Any]]) -> str | None:
+    """Return canonical rule name if any of its patterns appear in the text."""
+    # Direct search across whole string
+    result = _search_rules(text, rules)
+    if result:
+        return result
 
     # Fallback: scan tokens to satisfy anchored patterns like ^BN128_ADD.*$
-    tokens = [t for t in re.split(r"[^A-Z0-9]+", upper) if t]
-    for token in tokens:
-        for rule in rules:
-            for pat in rule["patterns"]:
-                if re.match(pat, token, re.IGNORECASE):
-                    return rule["name"]
-
-    return None
+    return _match_rules_in_tokens(text, rules)
 
 
 def extract_operation(test_name: str) -> str:
@@ -228,15 +274,6 @@ def extract_operation(test_name: str) -> str:
     return "Unknown"
 
 
-# Group similar opcodes under a single bucket (e.g., PUSH0-32 -> PUSH)
-GROUP_PATTERNS = [
-    ("PUSH", re.compile(r"^PUSH\d+$", re.IGNORECASE)),
-    ("DUP", re.compile(r"^DUP\d+$", re.IGNORECASE)),
-    ("SWAP", re.compile(r"^SWAP\d+$", re.IGNORECASE)),
-    ("LOG", re.compile(r"^LOG\d+$", re.IGNORECASE)),
-]
-
-
 def normalize_operation(operation: str) -> str:
     """Map detailed opcodes to grouped buckets when applicable."""
     for group, pattern in GROUP_PATTERNS:
@@ -245,21 +282,14 @@ def normalize_operation(operation: str) -> str:
     return operation
 
 
-def canonicalize_precompile(operation: str) -> str:
-    """Return canonical precompile name if operation matches a known rule; otherwise pass through."""
-    for rule in PRECOMPILE_RULES:
-        for pat in rule["patterns"]:
-            if re.match(pat, operation, re.IGNORECASE):
-                return rule["name"]
-    return operation
-
-
-def canonicalize_opcode(operation: str) -> str:
-    """Return canonical opcode name if operation matches a known opcode rule; otherwise pass through."""
-    for rule in OPCODE_RULES:
-        for pat in rule["patterns"]:
-            if re.match(pat, operation, re.IGNORECASE):
-                return rule["name"]
+def canonicalize_operation(operation: str) -> str:
+    """Return canonical name if operation matches a known precompile or opcode rule."""
+    result = _match_rules(operation, PRECOMPILE_RULES)
+    if result:
+        return result
+    result = _match_rules(operation, OPCODE_RULES)
+    if result:
+        return result
     return operation
 
 
@@ -282,17 +312,17 @@ def extract_short_name(test_name: str) -> str:
     return operation
 
 
-def discover_zkvms() -> List[str]:
+def discover_zkvms(benchmark_base: Path) -> list[str]:
     """Discover all zkVM versions in the benchmark directory."""
     zkvms = []
-    if BENCHMARK_BASE.exists():
-        for entry in sorted(BENCHMARK_BASE.iterdir()):
+    if benchmark_base.exists():
+        for entry in sorted(benchmark_base.iterdir()):
             if entry.is_dir():
                 zkvms.append(entry.name)
     return zkvms
 
 
-def parse_result_file(file_path: Path) -> Optional[Dict[str, Any]]:
+def parse_result_file(file_path: Path) -> dict[str, Any] | None:
     """Parse a single result JSON file."""
     try:
         with open(file_path) as f:
@@ -317,32 +347,37 @@ def parse_result_file(file_path: Path) -> Optional[Dict[str, Any]]:
 
         return result
     except (json.JSONDecodeError, OSError) as e:
-        print(f"Error parsing {file_path}: {e}")
+        logger.error("Error parsing %s: %s", file_path, e)
         return None
 
 
-def load_hardware_info() -> Dict[str, Any]:
+def load_hardware_info(hardware_file: Path) -> dict[str, Any]:
     """Load hardware specification."""
     try:
-        with open(HARDWARE_FILE) as f:
+        with open(hardware_file) as f:
             return json.load(f)
-    except (json.JSONDecodeError, OSError):
+    except (json.JSONDecodeError, OSError) as e:
+        logger.warning("Could not load hardware info from %s: %s", hardware_file, e)
         return {}
 
 
-def process_all_results() -> Dict[str, Any]:
+def process_all_results(benchmark_base: Path, hardware_file: Path) -> dict[str, Any]:
     """Process all benchmark results and generate consolidated data."""
-    zkvms = discover_zkvms()
-    print(f"Discovered zkVMs: {zkvms}")
+    zkvms = discover_zkvms(benchmark_base)
+    logger.info("Discovered zkVMs: %s", zkvms)
 
     # Collect all unique test IDs across all zkVMs
-    all_tests: Dict[str, Dict[str, Any]] = {}
-    op_buckets = {"Opcode": set(), "Precompile": set(), "Other": set()}
+    all_tests: dict[str, dict[str, Any]] = {}
+    op_buckets: dict[Category, set[str]] = {
+        Category.OPCODE: set(),
+        Category.PRECOMPILE: set(),
+        Category.OTHER: set(),
+    }
 
     for zkvm in zkvms:
-        zkvm_path = BENCHMARK_BASE / zkvm
+        zkvm_path = benchmark_base / zkvm
         json_files = list(zkvm_path.glob("*.json"))
-        print(f"Processing {zkvm}: {len(json_files)} files")
+        logger.info("Processing %s: %d files", zkvm, len(json_files))
 
         for json_file in json_files:
             result = parse_result_file(json_file)
@@ -355,9 +390,7 @@ def process_all_results() -> Dict[str, Any]:
             if test_id not in all_tests:
                 raw_operation = extract_operation(test_id)
                 grouped_operation = normalize_operation(raw_operation)
-                canonical_operation = canonicalize_precompile(grouped_operation)
-                if canonical_operation == grouped_operation:
-                    canonical_operation = canonicalize_opcode(grouped_operation)
+                canonical_operation = canonicalize_operation(grouped_operation)
                 op_category = categorize_operation(canonical_operation)
                 all_tests[test_id] = {
                     "id": test_id,
@@ -388,14 +421,14 @@ def process_all_results() -> Dict[str, Any]:
     operations = sorted(set(t["operation"] for t in tests_list))
 
     operations_by_category = {
-        cat: sorted(list(ops)) for cat, ops in op_buckets.items() if ops
+        cat.value: sorted(list(ops)) for cat, ops in op_buckets.items() if ops
     }
 
     # Build output
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "hardware": "1xL40s",
-        "hardware_info": load_hardware_info(),
+        "hardware_info": load_hardware_info(hardware_file),
         "gas_limit": "10M",
         "zkvms": zkvms,
         "operations": operations,
@@ -408,32 +441,33 @@ def process_all_results() -> Dict[str, Any]:
 
 def main():
     """Main entry point."""
-    print("Generating benchmark data...")
+    logger.info("Generating benchmark data...")
 
-    # Change to repo root directory
-    script_dir = Path(__file__).parent
-    repo_root = script_dir.parent
-    os.chdir(repo_root)
+    # Resolve paths relative to repo root
+    repo_root = Path(__file__).parent.parent
+    benchmark_base = repo_root / BENCHMARK_BASE
+    hardware_file = repo_root / HARDWARE_FILE
+    output_file = repo_root / OUTPUT_FILE
 
-    output = process_all_results()
+    output = process_all_results(benchmark_base, hardware_file)
 
     # Ensure output directory exists
-    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Write output
-    with open(OUTPUT_FILE, "w") as f:
+    with open(output_file, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"Generated {OUTPUT_FILE}")
-    print(f"  - {len(output['zkvms'])} zkVMs")
-    print(f"  - {len(output['operations'])} operations")
-    print(f"  - {len(output['tests'])} tests")
+    logger.info("Generated %s", output_file)
+    logger.info("  - %d zkVMs", len(output["zkvms"]))
+    logger.info("  - %d operations", len(output["operations"]))
+    logger.info("  - %d tests", len(output["tests"]))
 
     # Print summary stats
     for zkvm in output["zkvms"]:
         success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
         crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
-        print(f"  - {zkvm}: {success} success, {crashed} crashed")
+        logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
 
 
 if __name__ == "__main__":
