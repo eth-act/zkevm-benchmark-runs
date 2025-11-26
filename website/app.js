@@ -11,6 +11,18 @@ const CONFIG = Object.freeze({
     DEBOUNCE_MS: 150,
     PAGE_SIZE_OPTIONS: [25, 50, 100, 250],
     THEME_KEY: 'epra-theme',
+    URL_PARAMS: {
+        BASELINE: 'baseline',
+        ZKVM_VIEW: 'view',
+        SEARCH: 'q',
+        HIDE_CRASHED: 'hideCrashed',
+        OPERATIONS: 'ops',
+        SORT_COLUMN: 'sort',
+        SORT_DIR: 'dir',
+        PAGE: 'page',
+        PAGE_SIZE: 'pageSize',
+        MIN_RELATIVE: 'minRel',
+    },
 });
 
 const STATUS = Object.freeze({
@@ -67,6 +79,8 @@ class BenchmarkApp {
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.WORST;
         this.baselineTestId = null;
+        this.minRelativeCost = null; // null means no filter
+        this.expandedRows = new Set();
 
         // Pagination state
         this.currentPage = 1;
@@ -270,6 +284,7 @@ class BenchmarkApp {
     filterTests() {
         const searchTerm = this.elements.search.value.toLowerCase();
         const hideCrashed = this.elements.hideCrashed.checked;
+        const activeZkvm = this.selectedZkvmView === VIEW.ALL ? VIEW.WORST : this.selectedZkvmView;
 
         this.filteredTests = this.data.tests.filter(test => {
             if (!this.selectedOperations.has(test.operation)) return false;
@@ -277,6 +292,11 @@ class BenchmarkApp {
             if (searchTerm) {
                 const searchStr = `${test.name} ${test.operation} ${test.id}`.toLowerCase();
                 if (!searchStr.includes(searchTerm)) return false;
+            }
+            // Min relative cost filter
+            if (this.minRelativeCost !== null) {
+                const relativeCost = this.getRelativeCost(test, activeZkvm);
+                if (relativeCost === null || relativeCost < this.minRelativeCost) return false;
             }
             return true;
         });
@@ -449,7 +469,6 @@ class BenchmarkApp {
     renderTable() {
         const thead = this.elements.tableHeader;
         const tbody = this.elements.tableBody;
-
         // Update count
         this.elements.tableCount.textContent = `(${this.sortedTests.length} tests)`;
 
@@ -498,9 +517,13 @@ class BenchmarkApp {
 
         // Build body
         const rows = pageTests.map(test => {
+            const isExpanded = this.expandedRows.has(test.id);
             const rowParts = [
                 `<td><span class="category-badge">${escapeHtml(test.operation)}</span></td>`,
-                `<td>${escapeHtml(test.name)}</td>`,
+                `<td class="expandable-cell" data-test-id="${escapeHtml(test.id)}">
+                    <span class="expand-icon">${isExpanded ? '▼' : '▶'}</span>
+                    ${escapeHtml(test.name)}
+                </td>`,
             ];
 
             if (this.selectedZkvmView === VIEW.ALL) {
@@ -514,13 +537,73 @@ class BenchmarkApp {
             }
 
             rowParts.push(`<td class="test-name" title="${escapeHtml(test.id)}">${escapeHtml(test.id)}</td>`);
-            return `<tr>${rowParts.join('')}</tr>`;
+
+            let html = `<tr class="data-row ${isExpanded ? 'expanded' : ''}" data-test-id="${escapeHtml(test.id)}">${rowParts.join('')}</tr>`;
+
+            // Add expanded details row
+            if (isExpanded) {
+                html += this.renderExpandedRow(test);
+            }
+
+            return html;
         });
 
         tbody.innerHTML = rows.join('');
 
+        // Add click handlers for row expansion
+        tbody.querySelectorAll('.expandable-cell').forEach(cell => {
+            cell.addEventListener('click', () => {
+                const testId = cell.dataset.testId;
+                this.toggleRowExpansion(testId);
+            });
+        });
+
         // Render pagination
         this.renderPagination(totalPages);
+    }
+
+    /**
+     * Renders expanded row details for a single test.
+     * @param {Object} test - Test object.
+     * @returns {string} HTML string.
+     */
+    renderExpandedRow(test) {
+        const colSpan = this.selectedZkvmView === VIEW.ALL
+            ? 3 + this.data.zkvms.length * 2
+            : 5;
+
+        const details = [];
+        details.push(`<strong>Test ID:</strong> ${escapeHtml(test.id)}`);
+        details.push(`<strong>Gas Used:</strong> ${test.block_used_gas ? (test.block_used_gas / 1_000_000).toFixed(2) + 'M' : '-'}`);
+
+        // Show all zkVM results
+        details.push('<div class="expanded-zkvms">');
+        for (const zkvm of this.data.zkvms) {
+            const result = test.results[zkvm];
+            if (result?.status === STATUS.SUCCESS) {
+                const throughput = this.formatThroughput(test.block_used_gas, result.proving_time_ms);
+                details.push(`<div class="zkvm-detail"><strong>${escapeHtml(zkvm)}:</strong> ${this.formatTime(result.proving_time_ms)} (${throughput})</div>`);
+            } else {
+                const reason = result?.crash_reason || 'Unknown';
+                details.push(`<div class="zkvm-detail crashed"><strong>${escapeHtml(zkvm)}:</strong> CRASHED - ${escapeHtml(reason)}</div>`);
+            }
+        }
+        details.push('</div>');
+
+        return `<tr class="expanded-row"><td colspan="${colSpan}"><div class="expanded-content">${details.join('')}</div></td></tr>`;
+    }
+
+    /**
+     * Toggles row expansion.
+     * @param {string} id - Row identifier.
+     */
+    toggleRowExpansion(id) {
+        if (this.expandedRows.has(id)) {
+            this.expandedRows.delete(id);
+        } else {
+            this.expandedRows.add(id);
+        }
+        this.renderTable();
     }
 
     /**
@@ -666,6 +749,7 @@ class BenchmarkApp {
         }
         this.sortTests();
         this.renderTable();
+        this.updateURL();
     }
 
     /**
@@ -676,6 +760,7 @@ class BenchmarkApp {
         this.currentPage = page;
         this.renderTable();
         this.elements.resultsTable.scrollIntoView({ behavior: 'smooth' });
+        this.updateURL();
     }
 
     /**
@@ -686,6 +771,7 @@ class BenchmarkApp {
         this.pageSize = size;
         this.currentPage = 1;
         this.renderTable();
+        this.updateURL();
     }
 
     /**
@@ -699,6 +785,7 @@ class BenchmarkApp {
         this.sortTests();
         this.renderTable();
         this.updateStats();
+        this.updateURL();
     }
 
     /**
@@ -710,6 +797,7 @@ class BenchmarkApp {
         this.sortTests();
         this.renderTable();
         this.updateStats();
+        this.updateURL();
     }
 
     /**
@@ -721,6 +809,7 @@ class BenchmarkApp {
         this.sortTests();
         this.renderTable();
         this.updateStats();
+        this.updateURL();
     }
 
     /**
@@ -732,6 +821,88 @@ class BenchmarkApp {
         this.sortTests();
         this.renderTable();
         this.updateStats();
+        this.updateURL();
+    }
+
+    /**
+     * Handles minimum relative cost filter.
+     * @param {number|null} minCost - Minimum relative cost or null to disable.
+     */
+    handleMinRelativeCostChange(minCost) {
+        this.minRelativeCost = minCost;
+        this.currentPage = 1;
+        this.filterTests();
+        this.sortTests();
+        this.renderTable();
+        this.updateStats();
+        this.updateURL();
+        this.updateQuickFilterButtons();
+    }
+
+    /**
+     * Handles quick category filter (Opcodes only, Precompiles only, etc.).
+     * @param {string|null} category - Category to filter or null for all.
+     */
+    handleCategoryFilter(category) {
+        const allOps = this.data.operations_by_category
+            ? Object.values(this.data.operations_by_category).flat()
+            : this.data.operations;
+
+        if (category === null) {
+            // Select all
+            this.selectedOperations = new Set(allOps);
+        } else {
+            // Select only operations in the specified category
+            const categoryOps = this.data.operations_by_category?.[category] || [];
+            this.selectedOperations = new Set(categoryOps);
+        }
+
+        // Update checkboxes
+        this.elements.operationFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = this.selectedOperations.has(cb.value);
+        });
+
+        this.currentPage = 1;
+        this.filterTests();
+        this.sortTests();
+        this.renderTable();
+        this.updateStats();
+        this.updateURL();
+        this.updateQuickFilterButtons();
+    }
+
+    /**
+     * Updates the visual state of quick filter buttons.
+     */
+    updateQuickFilterButtons() {
+        // Update min relative cost buttons
+        const minRelBtns = document.querySelectorAll('[data-min-rel]');
+        minRelBtns.forEach(btn => {
+            const val = btn.dataset.minRel === '' ? null : parseFloat(btn.dataset.minRel);
+            btn.classList.toggle('active', this.minRelativeCost === val);
+        });
+
+        // Update category filter buttons
+        const catBtns = document.querySelectorAll('[data-category]');
+        const allOps = this.data.operations_by_category
+            ? Object.values(this.data.operations_by_category).flat()
+            : this.data.operations;
+
+        catBtns.forEach(btn => {
+            const cat = btn.dataset.category;
+            let isActive = false;
+
+            if (cat === 'all') {
+                isActive = this.selectedOperations.size === allOps.length;
+            } else {
+                const categoryOps = this.data.operations_by_category?.[cat] || [];
+                isActive = categoryOps.length > 0 &&
+                    categoryOps.every(op => this.selectedOperations.has(op)) &&
+                    this.selectedOperations.size === categoryOps.length;
+            }
+
+            btn.classList.toggle('active', isActive);
+        });
     }
 
     /**
@@ -793,6 +964,94 @@ class BenchmarkApp {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // URL State Management
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Serializes current state to URL query parameters.
+     */
+    serializeStateToURL() {
+        const params = new URLSearchParams();
+        const P = CONFIG.URL_PARAMS;
+
+        if (this.baselineTestId) params.set(P.BASELINE, this.baselineTestId);
+        if (this.selectedZkvmView !== VIEW.WORST) params.set(P.ZKVM_VIEW, this.selectedZkvmView);
+        if (this.elements.search?.value) params.set(P.SEARCH, this.elements.search.value);
+        if (this.elements.hideCrashed?.checked) params.set(P.HIDE_CRASHED, '1');
+        if (this.sortColumn !== 'name') params.set(P.SORT_COLUMN, this.sortColumn);
+        if (this.sortDirection !== 'asc') params.set(P.SORT_DIR, this.sortDirection);
+        if (this.currentPage !== 1) params.set(P.PAGE, this.currentPage.toString());
+        if (this.pageSize !== CONFIG.DEFAULT_PAGE_SIZE) params.set(P.PAGE_SIZE, this.pageSize.toString());
+        if (this.minRelativeCost !== null) params.set(P.MIN_RELATIVE, this.minRelativeCost.toString());
+
+        // Only serialize operations if not all are selected
+        const allOps = this.data?.operations_by_category
+            ? Object.values(this.data.operations_by_category).flat()
+            : (this.data?.operations || []);
+
+        if (this.selectedOperations.size !== allOps.length && this.selectedOperations.size > 0) {
+            params.set(P.OPERATIONS, Array.from(this.selectedOperations).join(','));
+        }
+
+        const queryString = params.toString();
+        const newURL = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+
+        window.history.replaceState(null, '', newURL);
+    }
+
+    /**
+     * Parses URL query parameters and returns state object.
+     * @returns {Object} Parsed state from URL.
+     */
+    parseStateFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const P = CONFIG.URL_PARAMS;
+
+        return {
+            baseline: params.get(P.BASELINE),
+            zkvmView: params.get(P.ZKVM_VIEW),
+            search: params.get(P.SEARCH),
+            hideCrashed: params.get(P.HIDE_CRASHED) === '1',
+            operations: params.get(P.OPERATIONS)?.split(',').filter(Boolean),
+            sortColumn: params.get(P.SORT_COLUMN),
+            sortDirection: params.get(P.SORT_DIR),
+            page: parseInt(params.get(P.PAGE), 10) || null,
+            pageSize: parseInt(params.get(P.PAGE_SIZE), 10) || null,
+            minRelative: parseFloat(params.get(P.MIN_RELATIVE)) || null,
+        };
+    }
+
+    /**
+     * Applies parsed URL state to the application.
+     * @param {Object} urlState - State object from parseStateFromURL.
+     */
+    applyURLState(urlState) {
+        if (urlState.baseline) this.baselineTestId = urlState.baseline;
+        if (urlState.zkvmView) this.selectedZkvmView = urlState.zkvmView;
+        if (urlState.sortColumn) this.sortColumn = urlState.sortColumn;
+        if (urlState.sortDirection) this.sortDirection = urlState.sortDirection;
+        if (urlState.page) this.currentPage = urlState.page;
+        if (urlState.pageSize && CONFIG.PAGE_SIZE_OPTIONS.includes(urlState.pageSize)) {
+            this.pageSize = urlState.pageSize;
+        }
+        if (urlState.minRelative) this.minRelativeCost = urlState.minRelative;
+
+        // Operations are applied after initialization when data is loaded
+        this._pendingURLOperations = urlState.operations;
+        this._pendingURLSearch = urlState.search;
+        this._pendingURLHideCrashed = urlState.hideCrashed;
+    }
+
+    /**
+     * Updates URL when state changes (debounced).
+     */
+    updateURL() {
+        if (this.initialized) {
+            this.serializeStateToURL();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Theme Management
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -850,6 +1109,7 @@ class BenchmarkApp {
             hardwareInfo: document.getElementById('hardware-info'),
             selectAllOpsBtn: document.getElementById('select-all-ops-btn'),
             clearAllOpsBtn: document.getElementById('clear-all-ops-btn'),
+            quickFilters: document.getElementById('quick-filters'),
         };
     }
 
@@ -979,6 +1239,32 @@ class BenchmarkApp {
     }
 
     /**
+     * Initializes quick filter buttons.
+     */
+    initializeQuickFilters() {
+        const container = this.elements.quickFilters;
+        if (!container) return;
+
+        // Add event listeners to min relative cost buttons
+        container.querySelectorAll('[data-min-rel]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.dataset.minRel === '' ? null : parseFloat(btn.dataset.minRel);
+                this.handleMinRelativeCostChange(val);
+            });
+        });
+
+        // Add event listeners to category filter buttons
+        container.querySelectorAll('[data-category]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.dataset.category;
+                this.handleCategoryFilter(cat === 'all' ? null : cat);
+            });
+        });
+
+        this.updateQuickFilterButtons();
+    }
+
+    /**
      * Initializes theme toggle.
      */
     initializeTheme() {
@@ -1028,6 +1314,10 @@ class BenchmarkApp {
         this.cacheElements();
         this.initializeTheme();
 
+        // Parse URL state early (before data loads)
+        const urlState = this.parseStateFromURL();
+        this.applyURLState(urlState);
+
         try {
             const response = await fetch('data/results.json');
             if (!response.ok) {
@@ -1047,6 +1337,10 @@ class BenchmarkApp {
             this.initializeZkvmViewSelector();
             this.initializeSearchAndFilters();
             this.initializeOperationFilters();
+            this.initializeQuickFilters();
+
+            // Apply pending URL state that depends on data being loaded
+            this.applyPendingURLState();
 
             // Initial render
             this.renderBaselineInfo();
@@ -1055,6 +1349,7 @@ class BenchmarkApp {
             this.renderTable();
             this.updateStats();
             this.updateFooter();
+            this.updateQuickFilterButtons();
 
             // Show app
             this.showApp();
@@ -1062,6 +1357,57 @@ class BenchmarkApp {
             console.error('Error loading data:', error);
             this.showError(`Error loading data: ${error.message}`);
         }
+    }
+
+    /**
+     * Applies URL state that requires data to be loaded.
+     */
+    applyPendingURLState() {
+        // Apply operations filter from URL
+        if (this._pendingURLOperations) {
+            const validOps = this._pendingURLOperations.filter(op =>
+                this.data.operations.includes(op)
+            );
+            if (validOps.length > 0) {
+                this.selectedOperations = new Set(validOps);
+                // Update checkboxes
+                this.elements.operationFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = this.selectedOperations.has(cb.value);
+                });
+            }
+        }
+
+        // Apply search from URL
+        if (this._pendingURLSearch) {
+            this.elements.search.value = this._pendingURLSearch;
+        }
+
+        // Apply hide crashed from URL
+        if (this._pendingURLHideCrashed) {
+            this.elements.hideCrashed.checked = true;
+        }
+
+        // Apply zkVM view to radio buttons
+        if (this.selectedZkvmView) {
+            const radio = this.elements.zkvmView.querySelector(`input[value="${this.selectedZkvmView}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // Apply baseline to select
+        if (this.baselineTestId) {
+            const option = this.elements.baseline.querySelector(`option[value="${this.baselineTestId}"]`);
+            if (option) {
+                this.elements.baseline.value = this.baselineTestId;
+            } else {
+                // If baseline from URL doesn't exist, reset to default
+                this.baselineTestId = this.elements.baseline.value;
+            }
+        }
+
+        // Clean up pending state
+        delete this._pendingURLOperations;
+        delete this._pendingURLSearch;
+        delete this._pendingURLHideCrashed;
     }
 }
 
