@@ -3,11 +3,12 @@
 Ethereum Proving Gas Repricing - Data Processing Script
 
 This script processes zkVM benchmark results and generates a consolidated JSON file
-for visualization in the interactive website.
+for visualization in the interactive repricing analysis website.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import re
@@ -20,10 +21,10 @@ from typing import Any
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-# Base paths
-BENCHMARK_BASE = Path("proving/1xL40s/10M-gas-limit/reth/eest-benchmark")
-HARDWARE_FILE = Path("proving/1xL40s/10M-gas-limit/hardware.json")
-OUTPUT_FILE = Path("website/data/results.json")
+# Base paths (relative to repo root)
+DEFAULT_BENCHMARK_BASE = Path("data/proving/1xL40s/10M-gas-limit/reth/eest-benchmark")
+DEFAULT_HARDWARE_FILE = Path("data/proving/1xL40s/10M-gas-limit/hardware.json")
+DEFAULT_OUTPUT_FILE = Path("dist/repricing/data/results.json")
 
 
 class Category(str, Enum):
@@ -441,13 +442,29 @@ def process_all_results(benchmark_base: Path, hardware_file: Path) -> dict[str, 
 
 def main():
     """Main entry point."""
-    logger.info("Generating benchmark data...")
+    parser = argparse.ArgumentParser(
+        description='Generate repricing analysis data for the interactive website.'
+    )
+    parser.add_argument(
+        '--output',
+        type=str,
+        default=None,
+        help='Output file path (default: dist/repricing/data/results.json)'
+    )
+
+    args = parser.parse_args()
+
+    logger.info("Generating repricing analysis data...")
 
     # Resolve paths relative to repo root
     repo_root = Path(__file__).parent.parent
-    benchmark_base = repo_root / BENCHMARK_BASE
-    hardware_file = repo_root / HARDWARE_FILE
-    output_file = repo_root / OUTPUT_FILE
+    benchmark_base = repo_root / DEFAULT_BENCHMARK_BASE
+    hardware_file = repo_root / DEFAULT_HARDWARE_FILE
+
+    if args.output:
+        output_file = Path(args.output)
+    else:
+        output_file = repo_root / DEFAULT_OUTPUT_FILE
 
     output = process_all_results(benchmark_base, hardware_file)
 

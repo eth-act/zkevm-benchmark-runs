@@ -28,21 +28,16 @@ jobs:
           python-version: '3.11'
 
       - name: Generate benchmarks website
-        run: |
-          cd scripts
-          python3 render_data.py --website
+        run: python3 scripts/generate_benchmarks_website.py --output dist/benchmarks
 
-      - name: Generate repricing data
+      - name: Generate repricing website
         run: |
-          cd website
-          python3 generate_data.py
+          mkdir -p dist/repricing/data
+          cp -r sites/repricing/* dist/repricing/
+          python3 scripts/generate_repricing_website.py --output dist/repricing/data/results.json
 
-      - name: Assemble deployment directory
-        run: |
-          mkdir -p deploy/benchmarks deploy/repricing
-          cp landing/index.html deploy/
-          cp -r docs/* deploy/benchmarks/
-          cp -r website/* deploy/repricing/
+      - name: Copy landing page
+        run: cp sites/landing/index.html dist/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -50,7 +45,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './deploy'
+          path: './dist'
 
   deploy:
     environment:

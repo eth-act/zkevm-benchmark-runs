@@ -8,32 +8,33 @@ You can see a website rendering of the results [here](https://eth-act.github.io/
 
 | Hardware Setup | Proving Results | Execution Results |
 |----------------|-----------------|-------------------|
-| **1x4090** | [1 gas limit](proving/1x4090/README.md) | — |
-| **1xL40s** | [1 gas limit, 1 mainnet range](proving/1xL40s/README.md) | [3 gas limits, 1 mainnet range](executions/1xL40s/README.md) |
+| **1x4090** | [1 gas limit](data/proving/1x4090/README.md) | — |
+| **1xL40s** | [1 gas limit, 1 mainnet range](data/proving/1xL40s/README.md) | [3 gas limits, 1 mainnet range](data/executions/1xL40s/README.md) |
 
 ## Folder Structure
 
 The benchmark results are organized in the following hierarchy:
 
 ```
-proving/                            # Proving benchmark results
-├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090
-│   ├── [Configuration]/           # Gas limit or mainnet range
-│   │   │
-│   │   ├── Gas Limits (EEST):
-│   │   │   ├── [EL Client]/       # e.g., reth, ethrex
-│   │   │   │   ├── [Benchmark]/   # e.g., eest-benchmark-v0.0.3
-│   │   │   │   │   └── [zkVM]/    # e.g., sp1-v5.1.0, risc0-v1.2.0
-│   │   │
-│   │   └── Mainnet Ranges:
-│   │       ├── [EL Client]/       # e.g., reth, ethrex
-│   │       │   └── [zkVM]/        # e.g., sp1-v5.1.0, risc0-v1.2.0
-
-executions/                         # Execution benchmark results
-├── [Hardware Setup]/              # e.g., 1xL40s, 1x4090
-│   ├── [Configuration]/           # Gas limit or mainnet range
-│   │   ├── [EL Client]/           # e.g., reth, ethrex
-│   │   │   └── [zkVM]/            # e.g., sp1-v5.1.0, risc0-v1.2.0
+data/
+├── proving/                        # Proving benchmark results
+│   ├── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
+│   │   ├── [Configuration]/        # Gas limit or mainnet range
+│   │   │   │
+│   │   │   ├── Gas Limits (EEST):
+│   │   │   │   ├── [EL Client]/    # e.g., reth, ethrex
+│   │   │   │   │   ├── [Benchmark]/# e.g., eest-benchmark-v0.0.3
+│   │   │   │   │   │   └── [zkVM]/ # e.g., sp1-v5.1.0, risc0-v1.2.0
+│   │   │   │
+│   │   │   └── Mainnet Ranges:
+│   │   │       ├── [EL Client]/    # e.g., reth, ethrex
+│   │   │       │   └── [zkVM]/     # e.g., sp1-v5.1.0, risc0-v1.2.0
+│
+└── executions/                     # Execution benchmark results
+    ├── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
+    │   ├── [Configuration]/        # Gas limit or mainnet range
+    │   │   ├── [EL Client]/        # e.g., reth, ethrex
+    │   │   │   └── [zkVM]/         # e.g., sp1-v5.1.0, risc0-v1.2.0
 ```
 
 ## Configuration Types
