@@ -427,7 +427,7 @@ class BenchmarkApp {
     }
 
     /**
-     * Renders a single zkVM cell for the table.
+     * Renders a single zkVM cell for the table (combined relative cost + time).
      * @param {Object} test - The test object.
      * @param {string} zkvm - The zkVM identifier.
      * @returns {string} HTML string for the cell.
@@ -437,13 +437,16 @@ class BenchmarkApp {
         if (result?.status === STATUS.SUCCESS) {
             const time = result.proving_time_ms;
             const relative = this.getRelativeCost(test, zkvm);
-            return `<td class="status-success">${this.formatTime(time)}</td><td class="${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</td>`;
+            return `<td class="combined-cell status-success">
+                <span class="cell-relative ${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</span>
+                <span class="cell-time">${this.formatTime(time)}</span>
+            </td>`;
         }
-        return '<td class="status-crashed">CRASHED</td><td class="status-crashed">-</td>';
+        return '<td class="combined-cell status-crashed">CRASHED</td>';
     }
 
     /**
-     * Renders the worst-case cell for the table.
+     * Renders the worst-case cell for the table (combined relative cost + time).
      * @param {Object} test - The test object.
      * @returns {string} HTML string for the cell.
      */
@@ -453,9 +456,13 @@ class BenchmarkApp {
         const worstZkvm = this.getWorstCaseZkvm(test);
 
         if (time !== null) {
-            return `<td class="status-success">${this.formatTime(time)} <span class="worst-zkvm-badge">${escapeHtml(worstZkvm)}</span></td><td class="${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</td>`;
+            return `<td class="combined-cell status-success">
+                <span class="cell-relative ${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</span>
+                <span class="cell-time">${this.formatTime(time)}</span>
+                <span class="worst-zkvm-badge">${escapeHtml(worstZkvm)}</span>
+            </td>`;
         }
-        return '<td class="status-crashed">ALL CRASHED</td><td class="status-crashed">-</td>';
+        return '<td class="combined-cell status-crashed">ALL CRASHED</td>';
     }
 
     /**
@@ -486,19 +493,16 @@ class BenchmarkApp {
         if (this.selectedZkvmView === VIEW.ALL) {
             for (const zkvm of this.data.zkvms) {
                 headerParts.push(
-                    `<th data-sort="${zkvm}-time" class="${this.getSortClass(zkvm + '-time')}">${escapeHtml(zkvm)} Time</th>`,
-                    `<th data-sort="${zkvm}-relative" class="${this.getSortClass(zkvm + '-relative')}">${escapeHtml(zkvm)} Rel.</th>`
+                    `<th data-sort="${zkvm}-time" class="${this.getSortClass(zkvm + '-time')}">${escapeHtml(zkvm)}</th>`
                 );
             }
         } else if (this.selectedZkvmView === VIEW.WORST) {
             headerParts.push(
-                `<th data-sort="worst-time" class="${this.getSortClass('worst-time')}">Worst Case Time</th>`,
-                `<th data-sort="worst-relative" class="${this.getSortClass('worst-relative')}">Relative Cost</th>`
+                `<th data-sort="worst-time" class="${this.getSortClass('worst-time')}">Worst Case</th>`
             );
         } else {
             headerParts.push(
-                `<th data-sort="${this.selectedZkvmView}-time" class="${this.getSortClass(this.selectedZkvmView + '-time')}">${escapeHtml(this.selectedZkvmView)} Time</th>`,
-                `<th data-sort="${this.selectedZkvmView}-relative" class="${this.getSortClass(this.selectedZkvmView + '-relative')}">Relative Cost</th>`
+                `<th data-sort="${this.selectedZkvmView}-time" class="${this.getSortClass(this.selectedZkvmView + '-time')}">${escapeHtml(this.selectedZkvmView)}</th>`
             );
         }
 
@@ -574,8 +578,8 @@ class BenchmarkApp {
      */
     renderExpandedRow(test) {
         const colSpan = this.selectedZkvmView === VIEW.ALL
-            ? 3 + this.data.zkvms.length * 2
-            : 5;
+            ? 3 + this.data.zkvms.length
+            : 4;
 
         const details = [];
         details.push(`<strong>Test ID:</strong> ${escapeHtml(test.id)}`);
