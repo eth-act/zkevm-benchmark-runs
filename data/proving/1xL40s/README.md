@@ -7,6 +7,7 @@ This folder contains benchmark results for the **1xL40s** hardware setup.
 | Configuration | Description | Details |
 |---------------|-------------|----------|
 | **10M-gas-limit** | EEST benchmarks with 10M gas limit | [View Results](10M-gas-limit/README.md) |
+| **1M-gas-limit** | EEST benchmarks with 1M gas limit | [View Results](1M-gas-limit/README.md) |
 
 ## Mainnet Block Range Configurations
 
@@ -17,5 +18,5 @@ This folder contains benchmark results for the **1xL40s** hardware setup.
 ## Hardware Information
 
 - **Setup**: 1xL40s
-- **Total Configurations**: 2 (1 gas limit, 1 mainnet range)
+- **Total Configurations**: 3 (2 gas limit, 1 mainnet range)
 

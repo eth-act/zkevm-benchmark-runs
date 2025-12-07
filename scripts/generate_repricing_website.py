@@ -22,9 +22,11 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 # Base paths (relative to repo root)
-DEFAULT_BENCHMARK_BASE = Path("data/proving/1xL40s/10M-gas-limit/reth")
-DEFAULT_HARDWARE_FILE = Path("data/proving/1xL40s/10M-gas-limit/hardware.json")
-DEFAULT_OUTPUT_FILE = Path("dist/repricing/data/results.json")
+DEFAULT_PROVING_BASE = Path("data/proving/1xL40s")
+DEFAULT_OUTPUT_DIR = Path("dist/repricing/data")
+
+# Pattern to match EEST configurations (e.g., "10M-gas-limit", "1M-gas-limit")
+EEST_CONFIG_PATTERN = re.compile(r"^\d+M-gas-limit$")
 
 
 class Category(str, Enum):
@@ -362,12 +364,43 @@ def load_hardware_info(hardware_file: Path) -> dict[str, Any]:
         return {}
 
 
-def process_all_results(benchmark_base: Path, hardware_file: Path) -> dict[str, Any]:
-    """Process all benchmark results and generate consolidated data."""
-    zkvms = discover_zkvms(benchmark_base)
-    logger.info("Discovered zkVMs: %s", zkvms)
+def discover_eest_configs(proving_base: Path) -> list[str]:
+    """Discover all EEST configurations in the proving directory."""
+    configs = []
+    if proving_base.exists():
+        for entry in sorted(proving_base.iterdir()):
+            if entry.is_dir() and EEST_CONFIG_PATTERN.match(entry.name):
+                # Check if it has at least one EL client subdirectory with zkVM data
+                has_el_client = any(
+                    subdir.is_dir() and any(subdir.iterdir())
+                    for subdir in entry.iterdir()
+                    if subdir.is_dir() and not subdir.name.startswith('.')
+                )
+                if has_el_client:
+                    configs.append(entry.name)
+    return configs
 
-    # Collect all unique test IDs across all zkVMs
+
+def discover_el_clients(config_path: Path) -> list[str]:
+    """Discover all EL clients in a configuration directory."""
+    el_clients = []
+    if config_path.exists():
+        for entry in sorted(config_path.iterdir()):
+            if entry.is_dir() and not entry.name.startswith('.'):
+                # Check if it has zkVM subdirectories
+                if any(e.is_dir() for e in entry.iterdir()):
+                    el_clients.append(entry.name)
+    return el_clients
+
+
+def process_all_results(config_path: Path, hardware_file: Path, config_name: str) -> dict[str, Any]:
+    """Process all benchmark results across all EL clients and generate consolidated data."""
+
+    # Discover all EL clients
+    el_clients = discover_el_clients(config_path)
+    logger.info("Discovered EL clients: %s", el_clients)
+
+    # Collect all unique test IDs across all EL clients and zkVMs
     all_tests: dict[str, dict[str, Any]] = {}
     op_buckets: dict[Category, set[str]] = {
         Category.OPCODE: set(),
@@ -375,45 +408,60 @@ def process_all_results(benchmark_base: Path, hardware_file: Path) -> dict[str, 
         Category.OTHER: set(),
     }
 
-    for zkvm in zkvms:
-        zkvm_path = benchmark_base / zkvm
-        json_files = list(zkvm_path.glob("*.json"))
-        logger.info("Processing %s: %d files", zkvm, len(json_files))
+    # Track all EL/zkVM combinations
+    all_el_zkvms: list[str] = []
 
-        for json_file in json_files:
-            result = parse_result_file(json_file)
-            if result is None:
-                continue
+    for el_client in el_clients:
+        el_path = config_path / el_client
+        zkvms = discover_zkvms(el_path)
+        logger.info("  %s zkVMs: %s", el_client, zkvms)
 
-            test_id = result["name"]
+        for zkvm in zkvms:
+            # Create combined identifier: el_client/zkvm
+            el_zkvm = f"{el_client}/{zkvm}"
+            all_el_zkvms.append(el_zkvm)
 
-            # Initialize test entry if not exists
-            if test_id not in all_tests:
-                raw_operation = extract_operation(test_id)
-                grouped_operation = normalize_operation(raw_operation)
-                canonical_operation = canonicalize_operation(grouped_operation)
-                op_category = categorize_operation(canonical_operation)
-                all_tests[test_id] = {
-                    "id": test_id,
-                    "name": extract_short_name(test_id),
-                    "operation": canonical_operation,
-                    "block_used_gas": result.get("block_used_gas"),
-                    "results": {},
-                }
-                op_buckets[op_category].add(canonical_operation)
+            zkvm_path = el_path / zkvm
+            json_files = list(zkvm_path.glob("*.json"))
+            logger.info("  Processing %s: %d files", el_zkvm, len(json_files))
 
-            # Add result for this zkVM
-            if result["status"] == "success":
-                all_tests[test_id]["results"][zkvm] = {
-                    "status": "success",
-                    "proving_time_ms": result["proving_time_ms"],
-                    "proof_size_bytes": result["proof_size_bytes"],
-                }
-            else:
-                all_tests[test_id]["results"][zkvm] = {
-                    "status": "crashed",
-                    "crash_reason": result.get("crash_reason", "Unknown"),
-                }
+            for json_file in json_files:
+                result = parse_result_file(json_file)
+                if result is None:
+                    continue
+
+                test_id = result["name"]
+
+                # Initialize test entry if not exists
+                if test_id not in all_tests:
+                    raw_operation = extract_operation(test_id)
+                    grouped_operation = normalize_operation(raw_operation)
+                    canonical_operation = canonicalize_operation(grouped_operation)
+                    op_category = categorize_operation(canonical_operation)
+                    all_tests[test_id] = {
+                        "id": test_id,
+                        "name": extract_short_name(test_id),
+                        "operation": canonical_operation,
+                        "block_used_gas": result.get("block_used_gas"),
+                        "results": {},
+                    }
+                    op_buckets[op_category].add(canonical_operation)
+
+                # Add result for this EL/zkVM combination
+                if result["status"] == "success":
+                    all_tests[test_id]["results"][el_zkvm] = {
+                        "status": "success",
+                        "proving_time_ms": result["proving_time_ms"],
+                        "proof_size_bytes": result["proof_size_bytes"],
+                    }
+                else:
+                    all_tests[test_id]["results"][el_zkvm] = {
+                        "status": "crashed",
+                        "crash_reason": result.get("crash_reason", "Unknown"),
+                    }
+
+    # Sort EL/zkVM combinations for consistent ordering
+    all_el_zkvms.sort()
 
     # Convert to list and sort by operation, then name
     tests_list = sorted(all_tests.values(), key=lambda x: (x["operation"], x["name"]))
@@ -425,13 +473,19 @@ def process_all_results(benchmark_base: Path, hardware_file: Path) -> dict[str, 
         cat.value: sorted(list(ops)) for cat, ops in op_buckets.items() if ops
     }
 
+    # Extract gas limit from config name (e.g., "10M-gas-limit" -> "10M")
+    gas_limit_match = re.match(r"^(\d+M)-gas-limit$", config_name)
+    gas_limit = gas_limit_match.group(1) if gas_limit_match else config_name
+
     # Build output
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "hardware": "1xL40s",
         "hardware_info": load_hardware_info(hardware_file),
-        "gas_limit": "10M",
-        "zkvms": zkvms,
+        "gas_limit": gas_limit,
+        "config": config_name,
+        "el_clients": el_clients,
+        "zkvms": all_el_zkvms,  # Now contains "el_client/zkvm" format
         "operations": operations,
         "operations_by_category": operations_by_category,
         "tests": tests_list,
@@ -449,7 +503,7 @@ def main():
         '--output',
         type=str,
         default=None,
-        help='Output file path (default: dist/repricing/data/results.json)'
+        help='Output directory path (default: dist/repricing/data)'
     )
 
     args = parser.parse_args()
@@ -458,33 +512,79 @@ def main():
 
     # Resolve paths relative to repo root
     repo_root = Path(__file__).parent.parent
-    benchmark_base = repo_root / DEFAULT_BENCHMARK_BASE
-    hardware_file = repo_root / DEFAULT_HARDWARE_FILE
+    proving_base = repo_root / DEFAULT_PROVING_BASE
 
     if args.output:
-        output_file = Path(args.output)
+        output_dir = Path(args.output)
     else:
-        output_file = repo_root / DEFAULT_OUTPUT_FILE
-
-    output = process_all_results(benchmark_base, hardware_file)
+        output_dir = repo_root / DEFAULT_OUTPUT_DIR
 
     # Ensure output directory exists
-    output_file.parent.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write output
-    with open(output_file, "w") as f:
-        json.dump(output, f, indent=2)
+    # Discover all EEST configurations
+    eest_configs = discover_eest_configs(proving_base)
+    if not eest_configs:
+        logger.error("No EEST configurations found in %s", proving_base)
+        return
 
-    logger.info("Generated %s", output_file)
-    logger.info("  - %d zkVMs", len(output["zkvms"]))
-    logger.info("  - %d operations", len(output["operations"]))
-    logger.info("  - %d tests", len(output["tests"]))
+    logger.info("Discovered EEST configurations: %s", eest_configs)
 
-    # Print summary stats
-    for zkvm in output["zkvms"]:
-        success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
-        crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
-        logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
+    # Process each configuration
+    manifest_datasets = []
+    for config_name in eest_configs:
+        logger.info("Processing configuration: %s", config_name)
+
+        config_path = proving_base / config_name
+        hardware_file = config_path / "hardware.json"
+
+        output = process_all_results(config_path, hardware_file, config_name)
+
+        # Write output file for this configuration
+        output_file = output_dir / f"results-{config_name}.json"
+        with open(output_file, "w") as f:
+            json.dump(output, f, indent=2)
+
+        logger.info("Generated %s", output_file)
+        logger.info("  - %d zkVMs", len(output["zkvms"]))
+        logger.info("  - %d operations", len(output["operations"]))
+        logger.info("  - %d tests", len(output["tests"]))
+
+        # Print summary stats
+        for zkvm in output["zkvms"]:
+            success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
+            crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
+            logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
+
+        # Add to manifest
+        manifest_datasets.append({
+            "id": config_name,
+            "name": f"EEST {output['gas_limit']} Gas Limit",
+            "file": f"results-{config_name}.json",
+            "gas_limit": output["gas_limit"],
+            "test_count": len(output["tests"]),
+            "zkvm_count": len(output["zkvms"]),
+        })
+
+    # Sort datasets by gas limit (numeric sort)
+    def sort_key(d):
+        match = re.match(r"(\d+)", d["gas_limit"])
+        return int(match.group(1)) if match else 0
+
+    manifest_datasets.sort(key=sort_key, reverse=True)
+
+    # Write manifest file
+    manifest = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "datasets": manifest_datasets,
+        "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
+    }
+
+    manifest_file = output_dir / "manifest.json"
+    with open(manifest_file, "w") as f:
+        json.dump(manifest, f, indent=2)
+
+    logger.info("Generated manifest: %s with %d datasets", manifest_file, len(manifest_datasets))
 
 
 if __name__ == "__main__":

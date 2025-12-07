@@ -12,6 +12,7 @@ const CONFIG = Object.freeze({
     PAGE_SIZE_OPTIONS: [25, 50, 100, 250],
     THEME_KEY: 'epra-theme',
     URL_PARAMS: {
+        DATASET: 'dataset',
         BASELINE: 'baseline',
         ZKVM_VIEW: 'view',
         SEARCH: 'q',
@@ -68,10 +69,14 @@ function debounce(func, wait) {
 class BenchmarkApp {
     constructor() {
         // Data state
+        this.manifest = null;
         this.data = null;
         this.filteredTests = [];
         this.sortedTests = [];
         this.initialized = false;
+
+        // Dataset state
+        this.selectedDataset = null;
 
         // UI state
         this.sortColumn = 'name';
@@ -974,6 +979,10 @@ class BenchmarkApp {
         const params = new URLSearchParams();
         const P = CONFIG.URL_PARAMS;
 
+        // Always include dataset if not the default
+        if (this.selectedDataset && this.selectedDataset !== this.manifest?.default_dataset) {
+            params.set(P.DATASET, this.selectedDataset);
+        }
         if (this.baselineTestId) params.set(P.BASELINE, this.baselineTestId);
         if (this.selectedZkvmView !== VIEW.WORST) params.set(P.ZKVM_VIEW, this.selectedZkvmView);
         if (this.elements.search?.value) params.set(P.SEARCH, this.elements.search.value);
@@ -1008,6 +1017,7 @@ class BenchmarkApp {
         const P = CONFIG.URL_PARAMS;
 
         return {
+            dataset: params.get(P.DATASET),
             baseline: params.get(P.BASELINE),
             zkvmView: params.get(P.ZKVM_VIEW),
             search: params.get(P.SEARCH),
@@ -1026,6 +1036,7 @@ class BenchmarkApp {
      * @param {Object} urlState - State object from parseStateFromURL.
      */
     applyURLState(urlState) {
+        if (urlState.dataset) this.selectedDataset = urlState.dataset;
         if (urlState.baseline) this.baselineTestId = urlState.baseline;
         if (urlState.zkvmView) this.selectedZkvmView = urlState.zkvmView;
         if (urlState.sortColumn) this.sortColumn = urlState.sortColumn;
@@ -1091,6 +1102,7 @@ class BenchmarkApp {
             loading: document.getElementById('loading'),
             error: document.getElementById('error'),
             app: document.getElementById('app'),
+            dataset: document.getElementById('dataset'),
             baseline: document.getElementById('baseline'),
             zkvmView: document.getElementById('zkvm-view'),
             search: document.getElementById('search'),
@@ -1107,10 +1119,124 @@ class BenchmarkApp {
             themeToggle: document.getElementById('theme-toggle'),
             generatedAt: document.getElementById('generated-at'),
             hardwareInfo: document.getElementById('hardware-info'),
+            rawDataLink: document.getElementById('raw-data-link'),
             selectAllOpsBtn: document.getElementById('select-all-ops-btn'),
             clearAllOpsBtn: document.getElementById('clear-all-ops-btn'),
             quickFilters: document.getElementById('quick-filters'),
         };
+    }
+
+    /**
+     * Initializes the dataset selector control.
+     */
+    initializeDatasetSelector() {
+        const select = this.elements.dataset;
+        select.innerHTML = '';
+
+        for (const dataset of this.manifest.datasets) {
+            const option = document.createElement('option');
+            option.value = dataset.id;
+            option.textContent = `${dataset.name} (${dataset.test_count} tests)`;
+            if (dataset.id === this.selectedDataset) option.selected = true;
+            select.appendChild(option);
+        }
+
+        select.addEventListener('change', (e) => this.handleDatasetChange(e.target.value));
+    }
+
+    /**
+     * Handles dataset change - reloads data and reinitializes UI.
+     * @param {string} datasetId - The selected dataset ID.
+     */
+    async handleDatasetChange(datasetId) {
+        if (datasetId === this.selectedDataset) return;
+
+        this.selectedDataset = datasetId;
+
+        // Show loading state
+        this.elements.app.classList.add('hidden');
+        this.elements.loading.classList.remove('hidden');
+        this.elements.loading.textContent = 'Loading dataset...';
+
+        try {
+            await this.loadDataset(datasetId);
+            this.reinitializeUI();
+            this.showApp();
+            this.updateURL();
+        } catch (error) {
+            console.error('Error loading dataset:', error);
+            this.showError(`Error loading dataset: ${error.message}`);
+        }
+    }
+
+    /**
+     * Loads a specific dataset by ID.
+     * @param {string} datasetId - The dataset ID to load.
+     */
+    async loadDataset(datasetId) {
+        const datasetInfo = this.manifest.datasets.find(d => d.id === datasetId);
+        if (!datasetInfo) {
+            throw new Error(`Dataset not found: ${datasetId}`);
+        }
+
+        const response = await fetch(`data/${datasetInfo.file}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load dataset: ${response.status} ${response.statusText}`);
+        }
+
+        this.data = await response.json();
+
+        // Clear caches when dataset changes
+        this.clearAllCaches();
+
+        // Pre-compute worst case times for all tests
+        for (const test of this.data.tests) {
+            this.getWorstCaseTime(test);
+        }
+
+        // Update raw data link
+        if (this.elements.rawDataLink) {
+            this.elements.rawDataLink.href = `data/${datasetInfo.file}`;
+        }
+    }
+
+    /**
+     * Clears all caches.
+     */
+    clearAllCaches() {
+        this.worstCaseCache.clear();
+        this.worstCaseZkvmCache.clear();
+        this.relativeCostCache.clear();
+    }
+
+    /**
+     * Reinitializes UI components after dataset change.
+     */
+    reinitializeUI() {
+        // Reset state that depends on the dataset
+        this.baselineTestId = null;
+        this.selectedOperations.clear();
+        this.expandedRows.clear();
+        this.currentPage = 1;
+
+        // Reinitialize UI components
+        this.elements.baseline.innerHTML = '';
+        this.initializeBaselineSelector();
+
+        this.elements.zkvmView.innerHTML = '';
+        this.initializeZkvmViewSelector();
+
+        this.initializeOperationFilters();
+        this.initializeQuickFilters();
+
+        // Render
+        this.renderBaselineInfo();
+        this.filterTests();
+        this.sortTests();
+        this.renderTable();
+        this.updateStats();
+        this.updateFooter();
+        this.updateQuickFilterButtons();
     }
 
     /**
@@ -1319,18 +1445,26 @@ class BenchmarkApp {
         this.applyURLState(urlState);
 
         try {
-            const response = await fetch('data/results.json');
-            if (!response.ok) {
-                throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+            // Load manifest first
+            const manifestResponse = await fetch('data/manifest.json');
+            if (!manifestResponse.ok) {
+                throw new Error(`Failed to load manifest: ${manifestResponse.status} ${manifestResponse.statusText}`);
             }
 
-            this.data = await response.json();
+            this.manifest = await manifestResponse.json();
+
+            // Determine which dataset to load
+            if (!this.selectedDataset || !this.manifest.datasets.find(d => d.id === this.selectedDataset)) {
+                this.selectedDataset = this.manifest.default_dataset;
+            }
+
+            // Initialize dataset selector
+            this.initializeDatasetSelector();
+
+            // Load the selected dataset
+            await this.loadDataset(this.selectedDataset);
+
             this.initialized = true;
-
-            // Pre-compute worst case times for all tests
-            for (const test of this.data.tests) {
-                this.getWorstCaseTime(test);
-            }
 
             // Initialize UI components
             this.initializeBaselineSelector();
