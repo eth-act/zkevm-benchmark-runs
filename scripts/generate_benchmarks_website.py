@@ -99,39 +99,15 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
             mode_data[hardware_name][config_name]['dataset_type'] = dataset_type
             mode_data[hardware_name][config_name]['el_clients'] = {}
 
-            # Handle different structures for mainnet vs gas limit
-            if config_name.startswith('mainnet-'):
-                # Mainnet: config -> EL client -> zkVM
-                el_client_folders = [item for item in config_folder.iterdir()
-                                   if item.is_dir() and not item.name.startswith('.')]
+            # All configurations: config -> EL client -> zkVM
+            el_client_folders = [item for item in config_folder.iterdir()
+                               if item.is_dir() and not item.name.startswith('.')]
 
-                for el_client_folder in el_client_folders:
-                    el_client_name = el_client_folder.name
-                    # Hardware info is always at config level
-                    el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
-                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
-            else:
-                # Gas limit: config -> EL client -> [eest-benchmark] -> zkVM
-                el_client_folders = [item for item in config_folder.iterdir()
-                                   if item.is_dir() and not item.name.startswith('.')]
-
-                for el_client_folder in el_client_folders:
-                    el_client_name = el_client_folder.name
-
-                    if mode == 'proving':
-                        # For proving, look inside eest-benchmark folder
-                        benchmark_folder = el_client_folder / "eest-benchmark"
-                        if benchmark_folder.exists():
-                            # Hardware info is always at config level
-                            el_client_data = collect_el_client_data(benchmark_folder, mode, config_folder)
-                        else:
-                            el_client_data = {'hardware_info': load_hardware_info(config_folder), 'zkvm_data': {}}
-                    else:
-                        # For execution, zkVMs are directly under el_client_folder
-                        # Hardware info is always at config level
-                        el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
-
-                    mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
+            for el_client_folder in el_client_folders:
+                el_client_name = el_client_folder.name
+                # Hardware info is always at config level
+                el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
+                mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
 
     return mode_data
 

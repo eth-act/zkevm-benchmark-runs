@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 # Base paths (relative to repo root)
-DEFAULT_BENCHMARK_BASE = Path("data/proving/1xL40s/10M-gas-limit/reth/eest-benchmark")
+DEFAULT_BENCHMARK_BASE = Path("data/proving/1xL40s/10M-gas-limit/reth")
 DEFAULT_HARDWARE_FILE = Path("data/proving/1xL40s/10M-gas-limit/hardware.json")
 DEFAULT_OUTPUT_FILE = Path("dist/repricing/data/results.json")
 

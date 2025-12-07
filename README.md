@@ -18,23 +18,16 @@ The benchmark results are organized in the following hierarchy:
 ```
 data/
 ├── proving/                        # Proving benchmark results
-│   ├── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
-│   │   ├── [Configuration]/        # Gas limit or mainnet range
-│   │   │   │
-│   │   │   ├── Gas Limits (EEST):
-│   │   │   │   ├── [EL Client]/    # e.g., reth, ethrex
-│   │   │   │   │   ├── [Benchmark]/# e.g., eest-benchmark-v0.0.3
-│   │   │   │   │   │   └── [zkVM]/ # e.g., sp1-v5.1.0, risc0-v1.2.0
-│   │   │   │
-│   │   │   └── Mainnet Ranges:
-│   │   │       ├── [EL Client]/    # e.g., reth, ethrex
-│   │   │       │   └── [zkVM]/     # e.g., sp1-v5.1.0, risc0-v1.2.0
+│   └── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
+│       └── [Configuration]/        # e.g., 10M-gas-limit, mainnet-A-B
+│           └── [EL Client]/        # e.g., reth, ethrex
+│               └── [zkVM]/         # e.g., sp1-v5.1.0, risc0-v1.2.0
 │
 └── executions/                     # Execution benchmark results
-    ├── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
-    │   ├── [Configuration]/        # Gas limit or mainnet range
-    │   │   ├── [EL Client]/        # e.g., reth, ethrex
-    │   │   │   └── [zkVM]/         # e.g., sp1-v5.1.0, risc0-v1.2.0
+    └── [Hardware Setup]/           # e.g., 1xL40s, 1x4090
+        └── [Configuration]/        # e.g., 10M-gas-limit, mainnet-A-B
+            └── [EL Client]/        # e.g., reth, ethrex
+                └── [zkVM]/         # e.g., sp1-v5.1.0, risc0-v1.2.0
 ```
 
 ## Configuration Types
