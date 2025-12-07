@@ -239,6 +239,16 @@ def match_rule_in_text(text: str, rules: list[dict[str, Any]]) -> str | None:
 
 def extract_operation(test_name: str) -> str:
     """Extract the operation name from test parameters."""
+    # First, check the function name - it's the most reliable indicator for precompiles
+    # (e.g., test_modexp tests have op_region starting with "mod_" which would wrongly match MOD opcode)
+    func_match = re.search(r"::test_([a-z0-9_]+)\[", test_name)
+    if func_match:
+        func_name = func_match.group(1).upper()
+        # Check precompiles first from function name
+        rule_match = match_rule_in_text(func_name, PRECOMPILE_RULES)
+        if rule_match:
+            return rule_match
+
     # Limit rule matching to the parameter section after "blockchain_test"
     params_match = re.search(r"\[(.*)\]", test_name)
     op_region = ""
@@ -256,14 +266,9 @@ def extract_operation(test_name: str) -> str:
         if rule_match:
             return rule_match
 
-    # Try to extract test function name after test_
-    func_match = re.search(r"::test_([a-z0-9_]+)\[", test_name)
+    # Fall back to function name for opcodes
     if func_match:
         func_name = func_match.group(1).upper()
-        # Try matching function name against rules before falling back to title case
-        rule_match = match_rule_in_text(func_name, PRECOMPILE_RULES)
-        if rule_match:
-            return rule_match
         rule_match = match_rule_in_text(func_name, OPCODE_RULES)
         if rule_match:
             return rule_match
