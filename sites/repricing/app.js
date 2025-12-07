@@ -11,9 +11,10 @@ const CONFIG = Object.freeze({
     DEBOUNCE_MS: 150,
     PAGE_SIZE_OPTIONS: [25, 50, 100, 250],
     THEME_KEY: 'epra-theme',
+    DEFAULT_TARGET_MGAS_PER_S: 7,
     URL_PARAMS: {
         DATASET: 'dataset',
-        BASELINE: 'baseline',
+        TARGET: 'target',
         ZKVM_VIEW: 'view',
         SEARCH: 'q',
         HIDE_CRASHED: 'hideCrashed',
@@ -83,7 +84,7 @@ class BenchmarkApp {
         this.sortDirection = 'asc';
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.WORST;
-        this.baselineTestId = null;
+        this.targetMGasPerS = CONFIG.DEFAULT_TARGET_MGAS_PER_S;
         this.minRelativeCost = null; // null means no filter
         this.expandedRows = new Set();
 
@@ -210,49 +211,70 @@ class BenchmarkApp {
     }
 
     /**
-     * Gets the baseline time for a zkVM view.
+     * Gets the actual throughput in MGas/s for a test on a specific zkVM.
+     * @param {Object} test - The test object.
      * @param {string} zkvm - The zkVM identifier or 'worst'.
-     * @returns {number|null} Baseline time in ms or null.
+     * @returns {number|null} Throughput in MGas/s or null.
      */
-    getBaselineTime(zkvm) {
-        if (!this.baselineTestId) return null;
-        const baselineTest = this.data.tests.find(t => t.id === this.baselineTestId);
-        if (!baselineTest) return null;
-        if (zkvm === VIEW.WORST) return this.getWorstCaseTime(baselineTest);
-        return this.getProvingTime(baselineTest, zkvm);
+    getActualMGasPerS(test, zkvm) {
+        const gasUsed = test.block_used_gas;
+        if (!gasUsed) return null;
+
+        const provingTimeMs = zkvm === VIEW.WORST
+            ? this.getWorstCaseTime(test)
+            : this.getProvingTime(test, zkvm);
+
+        if (!provingTimeMs) return null;
+
+        // Convert to MGas/s: (gas / time_ms) * 1000 / 1_000_000 = gas / time_ms / 1000
+        return gasUsed / provingTimeMs / 1000;
     }
 
     /**
-     * Gets the relative cost of a test compared to baseline.
+     * Gets the relative cost of a test based on target throughput.
+     * If target is 7 MGas/s and actual is 1 MGas/s, relative cost = 7x.
      * @param {Object} test - The test object.
      * @param {string} zkvm - The zkVM identifier or 'worst'.
      * @returns {number|null} Relative cost or null.
      */
     getRelativeCost(test, zkvm) {
-        const cacheKey = `${test.id}-${zkvm}-${this.baselineTestId}`;
+        const cacheKey = `${test.id}-${zkvm}-${this.targetMGasPerS}`;
         if (this.relativeCostCache.has(cacheKey)) {
             return this.relativeCostCache.get(cacheKey);
         }
 
-        const baselineTime = this.getBaselineTime(zkvm);
-        if (!baselineTime) return null;
+        const actualMGasPerS = this.getActualMGasPerS(test, zkvm);
+        if (!actualMGasPerS || actualMGasPerS <= 0) return null;
 
-        const testTime = zkvm === VIEW.WORST
-            ? this.getWorstCaseTime(test)
-            : this.getProvingTime(test, zkvm);
-
-        if (!testTime) return null;
-
-        const cost = testTime / baselineTime;
+        // Relative cost = target / actual
+        // If target is 7 MGas/s and actual is 1 MGas/s, cost = 7x
+        const cost = this.targetMGasPerS / actualMGasPerS;
         this.relativeCostCache.set(cacheKey, cost);
         return cost;
     }
 
     /**
-     * Clears the relative cost cache (needed when baseline changes).
+     * Clears the relative cost cache (needed when target changes).
      */
     clearRelativeCostCache() {
         this.relativeCostCache.clear();
+    }
+
+    /**
+     * Refreshes the UI after filter/sort changes.
+     * Resets to page 1, refilters, resorts, and re-renders everything.
+     * @param {Object} options - Refresh options.
+     * @param {boolean} [options.resetPage=true] - Whether to reset to page 1.
+     * @param {boolean} [options.updateUrl=true] - Whether to update URL state.
+     */
+    refresh({ resetPage = true, updateUrl = true } = {}) {
+        if (resetPage) this.currentPage = 1;
+        this.filterTests();
+        this.sortTests();
+        this.renderTable();
+        this.updateStats();
+        this.renderTargetInfo();
+        if (updateUrl) this.updateURL();
     }
 
     /**
@@ -356,73 +378,54 @@ class BenchmarkApp {
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Renders the baseline information panel.
+     * Renders the target throughput information panel.
      */
-    renderBaselineInfo() {
-        const container = this.elements.baselineInfo;
+    renderTargetInfo() {
+        const container = this.elements.targetInfo;
 
-        if (!this.baselineTestId) {
-            container.innerHTML = '<p class="text-secondary">No baseline selected</p>';
-            return;
-        }
+        // Calculate some stats about the current dataset relative to the target
+        const activeZkvm = this.selectedZkvmView === VIEW.ALL ? VIEW.WORST : this.selectedZkvmView;
+        let testsAboveTarget = 0;
+        let testsBelowTarget = 0;
+        let totalWithThroughput = 0;
 
-        const baselineTest = this.data.tests.find(t => t.id === this.baselineTestId);
-        if (!baselineTest) {
-            container.innerHTML = '<p class="text-secondary">Baseline test not found</p>';
-            return;
-        }
-
-        const parts = [
-            '<h2>Selected Baseline</h2>',
-            '<div class="baseline-details">',
-            `<div class="baseline-item operation">
-                <div class="label">Operation</div>
-                <div class="value">${escapeHtml(baselineTest.operation)}</div>
-                <div class="subtext">${escapeHtml(baselineTest.name)}</div>
-            </div>`,
-            `<div class="baseline-item">
-                <div class="label">Gas Used</div>
-                <div class="value">${baselineTest.block_used_gas ? (baselineTest.block_used_gas / 1000000).toFixed(1) + 'M' : '-'}</div>
-            </div>`,
-        ];
-
-        // Add proving time for each zkVM
-        for (const zkvm of this.data.zkvms) {
-            const result = baselineTest.results[zkvm];
-            if (result?.status === STATUS.SUCCESS) {
-                const throughput = this.formatThroughput(baselineTest.block_used_gas, result.proving_time_ms);
-                parts.push(`
-                    <div class="baseline-item">
-                        <div class="label">${escapeHtml(zkvm)}</div>
-                        <div class="value success">${this.formatTime(result.proving_time_ms)}</div>
-                        <div class="subtext">${result.proving_time_ms.toLocaleString()}ms${throughput !== '-' ? ` · ${throughput}` : ''}</div>
-                    </div>
-                `);
-            } else {
-                parts.push(`
-                    <div class="baseline-item">
-                        <div class="label">${escapeHtml(zkvm)}</div>
-                        <div class="value crashed">CRASHED</div>
-                    </div>
-                `);
+        for (const test of this.filteredTests) {
+            const throughput = this.getActualMGasPerS(test, activeZkvm);
+            if (throughput !== null) {
+                totalWithThroughput++;
+                if (throughput >= this.targetMGasPerS) {
+                    testsAboveTarget++;
+                } else {
+                    testsBelowTarget++;
+                }
             }
         }
 
-        // Add worst case time
-        const worstTime = this.getWorstCaseTime(baselineTest);
-        const worstThroughput = baselineTest.block_used_gas && worstTime
-            ? this.formatThroughput(baselineTest.block_used_gas, worstTime)
-            : '-';
+        const percentAbove = totalWithThroughput > 0
+            ? ((testsAboveTarget / totalWithThroughput) * 100).toFixed(1)
+            : 0;
 
-        parts.push(`
-            <div class="baseline-item">
-                <div class="label">Worst Case</div>
-                <div class="value ${worstTime !== null ? 'success' : 'crashed'}">${worstTime !== null ? this.formatTime(worstTime) : 'N/A'}</div>
-                ${worstTime !== null ? `<div class="subtext">${worstTime.toLocaleString()}ms${worstThroughput !== '-' ? ` · ${worstThroughput}` : ''}</div>` : ''}
-            </div>
-        `);
+        const parts = [
+            '<h2>Target Throughput Analysis</h2>',
+            '<div class="target-details">',
+            `<div class="target-item highlight">
+                <div class="label">Target</div>
+                <div class="value">${this.targetMGasPerS} MGas/s</div>
+                <div class="subtext">Operations meeting target show relative cost ~1x</div>
+            </div>`,
+            `<div class="target-item">
+                <div class="label">Meeting Target</div>
+                <div class="value success">${testsAboveTarget}</div>
+                <div class="subtext">${percentAbove}% of filtered tests</div>
+            </div>`,
+            `<div class="target-item">
+                <div class="label">Below Target</div>
+                <div class="value">${testsBelowTarget}</div>
+                <div class="subtext">May need gas repricing</div>
+            </div>`,
+            '</div>',
+        ];
 
-        parts.push('</div>');
         container.innerHTML = parts.join('');
     }
 
@@ -784,17 +787,14 @@ class BenchmarkApp {
     }
 
     /**
-     * Handles baseline selection change.
-     * @param {string} testId - The selected test ID.
+     * Handles target MGas/s change.
+     * @param {number} target - The new target in MGas/s.
      */
-    handleBaselineChange(testId) {
-        this.baselineTestId = testId;
+    handleTargetChange(target) {
+        if (target <= 0 || isNaN(target)) return;
+        this.targetMGasPerS = target;
         this.clearRelativeCostCache();
-        this.renderBaselineInfo();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh({ resetPage: false });
     }
 
     /**
@@ -803,34 +803,21 @@ class BenchmarkApp {
      */
     handleZkvmViewChange(view) {
         this.selectedZkvmView = view;
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh({ resetPage: false });
     }
 
     /**
      * Handles search input.
      */
     handleSearch() {
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh();
     }
 
     /**
      * Handles hide crashed checkbox change.
      */
     handleHideCrashedChange() {
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh();
     }
 
     /**
@@ -839,12 +826,7 @@ class BenchmarkApp {
      */
     handleMinRelativeCostChange(minCost) {
         this.minRelativeCost = minCost;
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh();
         this.updateQuickFilterButtons();
     }
 
@@ -858,25 +840,18 @@ class BenchmarkApp {
             : this.data.operations;
 
         if (category === null) {
-            // Select all
             this.selectedOperations = new Set(allOps);
         } else {
-            // Select only operations in the specified category
             const categoryOps = this.data.operations_by_category?.[category] || [];
             this.selectedOperations = new Set(categoryOps);
         }
 
-        // Update checkboxes
+        // Update checkboxes to match selection
         this.elements.operationFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = this.selectedOperations.has(cb.value);
         });
 
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
-        this.updateURL();
+        this.refresh();
         this.updateQuickFilterButtons();
     }
 
@@ -925,11 +900,7 @@ class BenchmarkApp {
         } else {
             this.selectedOperations.delete(operation);
         }
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
+        this.refresh({ updateUrl: false });
     }
 
     /**
@@ -944,14 +915,9 @@ class BenchmarkApp {
 
         this.elements.operationFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = true;
-            cb.indeterminate = false;
         });
 
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
+        this.refresh({ updateUrl: false });
     }
 
     /**
@@ -962,14 +928,9 @@ class BenchmarkApp {
 
         this.elements.operationFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = false;
-            cb.indeterminate = false;
         });
 
-        this.currentPage = 1;
-        this.filterTests();
-        this.sortTests();
-        this.renderTable();
-        this.updateStats();
+        this.refresh({ updateUrl: false });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -987,7 +948,9 @@ class BenchmarkApp {
         if (this.selectedDataset && this.selectedDataset !== this.manifest?.default_dataset) {
             params.set(P.DATASET, this.selectedDataset);
         }
-        if (this.baselineTestId) params.set(P.BASELINE, this.baselineTestId);
+        if (this.targetMGasPerS !== CONFIG.DEFAULT_TARGET_MGAS_PER_S) {
+            params.set(P.TARGET, this.targetMGasPerS.toString());
+        }
         if (this.selectedZkvmView !== VIEW.WORST) params.set(P.ZKVM_VIEW, this.selectedZkvmView);
         if (this.elements.search?.value) params.set(P.SEARCH, this.elements.search.value);
         if (this.elements.hideCrashed?.checked) params.set(P.HIDE_CRASHED, '1');
@@ -1022,7 +985,7 @@ class BenchmarkApp {
 
         return {
             dataset: params.get(P.DATASET),
-            baseline: params.get(P.BASELINE),
+            target: parseFloat(params.get(P.TARGET)) || null,
             zkvmView: params.get(P.ZKVM_VIEW),
             search: params.get(P.SEARCH),
             hideCrashed: params.get(P.HIDE_CRASHED) === '1',
@@ -1041,7 +1004,7 @@ class BenchmarkApp {
      */
     applyURLState(urlState) {
         if (urlState.dataset) this.selectedDataset = urlState.dataset;
-        if (urlState.baseline) this.baselineTestId = urlState.baseline;
+        if (urlState.target && urlState.target > 0) this.targetMGasPerS = urlState.target;
         if (urlState.zkvmView) this.selectedZkvmView = urlState.zkvmView;
         if (urlState.sortColumn) this.sortColumn = urlState.sortColumn;
         if (urlState.sortDirection) this.sortDirection = urlState.sortDirection;
@@ -1107,12 +1070,12 @@ class BenchmarkApp {
             error: document.getElementById('error'),
             app: document.getElementById('app'),
             dataset: document.getElementById('dataset'),
-            baseline: document.getElementById('baseline'),
+            target: document.getElementById('target'),
             zkvmView: document.getElementById('zkvm-view'),
             search: document.getElementById('search'),
             hideCrashed: document.getElementById('hide-crashed'),
             statsPanel: document.getElementById('stats-panel'),
-            baselineInfo: document.getElementById('baseline-info'),
+            targetInfo: document.getElementById('target-info'),
             operationFilters: document.getElementById('operation-filters'),
             tableHeader: document.getElementById('table-header'),
             tableBody: document.getElementById('table-body'),
@@ -1218,14 +1181,12 @@ class BenchmarkApp {
      */
     reinitializeUI() {
         // Reset state that depends on the dataset
-        this.baselineTestId = null;
         this.selectedOperations.clear();
         this.expandedRows.clear();
         this.currentPage = 1;
 
         // Reinitialize UI components
-        this.elements.baseline.innerHTML = '';
-        this.initializeBaselineSelector();
+        this.initializeTargetInput();
 
         this.elements.zkvmView.innerHTML = '';
         this.initializeZkvmViewSelector();
@@ -1234,7 +1195,7 @@ class BenchmarkApp {
         this.initializeQuickFilters();
 
         // Render
-        this.renderBaselineInfo();
+        this.renderTargetInfo();
         this.filterTests();
         this.sortTests();
         this.renderTable();
@@ -1244,25 +1205,21 @@ class BenchmarkApp {
     }
 
     /**
-     * Initializes the baseline selector control.
+     * Initializes the target input control.
      */
-    initializeBaselineSelector() {
-        const select = this.elements.baseline;
-        const successfulTests = this.data.tests.filter(t => this.anySuccess(t));
+    initializeTargetInput() {
+        const input = this.elements.target;
+        input.value = this.targetMGasPerS;
 
-        // Find default baseline (first ADD operation or first successful test)
-        const defaultBaseline = successfulTests.find(t => t.operation === 'ADD') || successfulTests[0];
-        this.baselineTestId = defaultBaseline?.id;
+        // Handle input changes (debounced)
+        const debouncedChange = debounce(() => {
+            const value = parseFloat(input.value);
+            if (value > 0) {
+                this.handleTargetChange(value);
+            }
+        }, CONFIG.DEBOUNCE_MS);
 
-        for (const test of successfulTests) {
-            const option = document.createElement('option');
-            option.value = test.id;
-            option.textContent = `${test.operation} - ${test.name}`;
-            if (test.id === this.baselineTestId) option.selected = true;
-            select.appendChild(option);
-        }
-
-        select.addEventListener('change', (e) => this.handleBaselineChange(e.target.value));
+        input.addEventListener('input', debouncedChange);
     }
 
     /**
@@ -1471,7 +1428,7 @@ class BenchmarkApp {
             this.initialized = true;
 
             // Initialize UI components
-            this.initializeBaselineSelector();
+            this.initializeTargetInput();
             this.initializeZkvmViewSelector();
             this.initializeSearchAndFilters();
             this.initializeOperationFilters();
@@ -1481,7 +1438,7 @@ class BenchmarkApp {
             this.applyPendingURLState();
 
             // Initial render
-            this.renderBaselineInfo();
+            this.renderTargetInfo();
             this.filterTests();
             this.sortTests();
             this.renderTable();
@@ -1529,17 +1486,6 @@ class BenchmarkApp {
         if (this.selectedZkvmView) {
             const radio = this.elements.zkvmView.querySelector(`input[value="${this.selectedZkvmView}"]`);
             if (radio) radio.checked = true;
-        }
-
-        // Apply baseline to select
-        if (this.baselineTestId) {
-            const option = this.elements.baseline.querySelector(`option[value="${this.baselineTestId}"]`);
-            if (option) {
-                this.elements.baseline.value = this.baselineTestId;
-            } else {
-                // If baseline from URL doesn't exist, reset to default
-                this.baselineTestId = this.elements.baseline.value;
-            }
         }
 
         // Clean up pending state
