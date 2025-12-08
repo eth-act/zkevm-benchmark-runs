@@ -787,7 +787,7 @@ class BenchmarkApp {
     }
 
     /**
-     * Handles target MGas/s change.
+     * Handles target Prover MGas/s change.
      * @param {number} target - The new target in MGas/s.
      */
     handleTargetChange(target) {
