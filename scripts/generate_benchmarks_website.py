@@ -194,6 +194,8 @@ def generate_index_html(output_dir: Path):
             <button class="tab-button" data-tab="proving">Proving</button>
         </div>
 
+        <div id="tab-info" class="info-box"></div>
+
         <div class="filters">
             <div class="filter-group">
                 <label for="hardware-filter">Machine:</label>
@@ -234,7 +236,7 @@ def generate_index_html(output_dir: Path):
                 <pre><code>$ git clone git@github.com:eth-act/zkevm-benchmark-workload.git
 $ cd zkevm-benchmark-workload
 # Change 60M to 10M or 45M as desired.
-$ RUST_LOG=info cargo run --release -p witness-generator-cli -- tests --include 60M- --include Prague --tag v5.1.0
+$ RUST_LOG=info cargo run --release -p witness-generator-cli -- tests --include 60M-
 # Change 'zisk' to any other zkvm name.
 $ RUST_LOG=info cargo run --release -p ere-hosts -- --zkvms zisk stateless-validator --execution-client reth</code></pre>
             </div>
@@ -717,6 +719,21 @@ let currentFilters = {
     crashesOnly: false
 };
 
+// Tab information text
+const TAB_INFO = {
+    'execution': 'Contains execution-only runs (i.e. no proving) to detect completeness faults usually related to zkVM limits (e.g. execution length, input length, or guest program OOM). These are shown in the "SDK Crashed" column. Non-crashed execution durations aren\\'t meaningful to compare proving performance.',
+    'cycles-gas': 'Contains the reported cycles over the used gas in each fixture. This is a low-signal proxy for efficiency, since cycles aren\\'t a good proxy for performance.',
+    'proving': 'Contains the wall-clock proving times of fixtures.'
+};
+
+// Update tab info box
+function updateTabInfo() {
+    const infoBox = document.getElementById('tab-info');
+    if (infoBox && TAB_INFO[currentMode]) {
+        infoBox.textContent = TAB_INFO[currentMode];
+    }
+}
+
 // Load filters from URL query parameters
 function loadFiltersFromURL() {
     const params = new URLSearchParams(window.location.search);
@@ -768,6 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupReproduceSection();
     populateFilters();
     renderResults();
+    updateTabInfo();
     updateReproduceSectionVisibility();
 });
 
@@ -801,6 +819,7 @@ function setupTabs() {
             // Update UI
             populateFilters();
             renderResults();
+            updateTabInfo();
             updateURL();
             updateReproduceSectionVisibility();
         });
