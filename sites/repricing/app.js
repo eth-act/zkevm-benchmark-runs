@@ -92,10 +92,15 @@ class BenchmarkApp {
         this.currentPage = 1;
         this.pageSize = CONFIG.DEFAULT_PAGE_SIZE;
 
+        // Grouping state
+        this.groupedData = [];
+        this.expandedOperations = new Set();
+
         // Caches
         this.worstCaseCache = new Map();
         this.worstCaseZkvmCache = new Map();
         this.relativeCostCache = new Map();
+        this.groupWorstCaseCache = new Map();
 
         // DOM element references (populated in init)
         this.elements = {};
@@ -258,6 +263,139 @@ class BenchmarkApp {
      */
     clearRelativeCostCache() {
         this.relativeCostCache.clear();
+        this.groupWorstCaseCache.clear();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Grouping Methods
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Groups filtered tests by operation and calculates worst-case for each group.
+     */
+    groupTestsByOperation() {
+        const groups = new Map();
+
+        for (const test of this.filteredTests) {
+            if (!groups.has(test.operation)) {
+                groups.set(test.operation, []);
+            }
+            groups.get(test.operation).push(test);
+        }
+
+        // Convert to array and calculate group stats
+        this.groupedData = Array.from(groups.entries()).map(([operation, tests]) => {
+            return {
+                operation,
+                tests,
+                testCount: tests.length,
+            };
+        });
+    }
+
+    /**
+     * Gets the worst-case proving time for a group of tests on a specific zkVM.
+     * @param {Object} group - The group object with tests array.
+     * @param {string} zkvm - The zkVM identifier or 'worst'.
+     * @returns {Object} Object with { time, test, zkvm } for the worst case.
+     */
+    getGroupWorstCase(group, zkvm) {
+        const cacheKey = `${group.operation}-${zkvm}`;
+        if (this.groupWorstCaseCache.has(cacheKey)) {
+            return this.groupWorstCaseCache.get(cacheKey);
+        }
+
+        let worstTime = null;
+        let worstTest = null;
+        let worstZkvm = null;
+
+        for (const test of group.tests) {
+            if (zkvm === VIEW.WORST) {
+                const time = this.getWorstCaseTime(test);
+                if (time !== null && (worstTime === null || time > worstTime)) {
+                    worstTime = time;
+                    worstTest = test;
+                    worstZkvm = this.getWorstCaseZkvm(test);
+                }
+            } else {
+                const time = this.getProvingTime(test, zkvm);
+                if (time !== null && (worstTime === null || time > worstTime)) {
+                    worstTime = time;
+                    worstTest = test;
+                    worstZkvm = zkvm;
+                }
+            }
+        }
+
+        const result = { time: worstTime, test: worstTest, zkvm: worstZkvm };
+        this.groupWorstCaseCache.set(cacheKey, result);
+        return result;
+    }
+
+    /**
+     * Gets the relative cost for a group based on worst-case test.
+     * @param {Object} group - The group object.
+     * @param {string} zkvm - The zkVM identifier or 'worst'.
+     * @returns {number|null} Relative cost or null.
+     */
+    getGroupRelativeCost(group, zkvm) {
+        const worst = this.getGroupWorstCase(group, zkvm);
+        if (!worst.test) return null;
+
+        if (zkvm === VIEW.WORST) {
+            return this.getRelativeCost(worst.test, VIEW.WORST);
+        }
+        return this.getRelativeCost(worst.test, zkvm);
+    }
+
+    /**
+     * Sorts grouped data based on current sort settings.
+     */
+    sortGroupedData() {
+        const activeZkvm = this.selectedZkvmView === VIEW.ALL ? VIEW.WORST : this.selectedZkvmView;
+
+        this.groupedData.sort((a, b) => {
+            let valA, valB;
+
+            switch (this.sortColumn) {
+                case 'operation':
+                    valA = a.operation;
+                    valB = b.operation;
+                    break;
+                case 'name':
+                    valA = a.testCount;
+                    valB = b.testCount;
+                    break;
+                case 'worst-time':
+                    valA = this.getGroupWorstCase(a, VIEW.WORST).time ?? Infinity;
+                    valB = this.getGroupWorstCase(b, VIEW.WORST).time ?? Infinity;
+                    break;
+                case 'worst-relative':
+                    valA = this.getGroupRelativeCost(a, VIEW.WORST) ?? Infinity;
+                    valB = this.getGroupRelativeCost(b, VIEW.WORST) ?? Infinity;
+                    break;
+                default:
+                    if (this.sortColumn.endsWith('-time')) {
+                        const zkvm = this.sortColumn.replace('-time', '');
+                        valA = this.getGroupWorstCase(a, zkvm).time ?? Infinity;
+                        valB = this.getGroupWorstCase(b, zkvm).time ?? Infinity;
+                    } else if (this.sortColumn.endsWith('-relative')) {
+                        const zkvm = this.sortColumn.replace('-relative', '');
+                        valA = this.getGroupRelativeCost(a, zkvm) ?? Infinity;
+                        valB = this.getGroupRelativeCost(b, zkvm) ?? Infinity;
+                    } else {
+                        // Default: sort by worst case relative cost
+                        valA = this.getGroupRelativeCost(a, activeZkvm) ?? Infinity;
+                        valB = this.getGroupRelativeCost(b, activeZkvm) ?? Infinity;
+                    }
+            }
+
+            if (typeof valA === 'string') {
+                const cmp = valA.localeCompare(valB);
+                return this.sortDirection === 'asc' ? cmp : -cmp;
+            }
+            return this.sortDirection === 'asc' ? valA - valB : valB - valA;
+        });
     }
 
     /**
@@ -269,8 +407,11 @@ class BenchmarkApp {
      */
     refresh({ resetPage = true, updateUrl = true } = {}) {
         if (resetPage) this.currentPage = 1;
+        this.groupWorstCaseCache.clear();
         this.filterTests();
         this.sortTests();
+        this.groupTestsByOperation();
+        this.sortGroupedData();
         this.renderTable();
         this.updateStats();
         this.renderTargetInfo();
@@ -479,18 +620,19 @@ class BenchmarkApp {
     }
 
     /**
-     * Renders the data table.
+     * Renders the data table with grouped operations.
      */
     renderTable() {
         const thead = this.elements.tableHeader;
         const tbody = this.elements.tableBody;
-        // Update count
-        this.elements.tableCount.textContent = `(${this.sortedTests.length} tests)`;
+
+        // Update count - show operations and total tests
+        this.elements.tableCount.textContent = `(${this.groupedData.length} operations, ${this.filteredTests.length} tests)`;
 
         // Build header
         const headerParts = [
             `<th data-sort="operation" class="${this.getSortClass('operation')}">Operation</th>`,
-            `<th data-sort="name" class="${this.getSortClass('name')}">Test Name</th>`,
+            `<th data-sort="name" class="${this.getSortClass('name')}">Fixtures</th>`,
         ];
 
         if (this.selectedZkvmView === VIEW.ALL) {
@@ -501,7 +643,7 @@ class BenchmarkApp {
             }
         } else if (this.selectedZkvmView === VIEW.WORST) {
             headerParts.push(
-                `<th data-sort="worst-time" class="${this.getSortClass('worst-time')}">Worst Case</th>`
+                `<th data-sort="worst-time" class="${this.getSortClass('worst-time')}">Slowest</th>`
             );
         } else {
             headerParts.push(
@@ -509,7 +651,6 @@ class BenchmarkApp {
             );
         }
 
-        headerParts.push('<th>Test ID</th>');
         thead.innerHTML = headerParts.join('');
 
         // Add sort handlers
@@ -517,25 +658,129 @@ class BenchmarkApp {
             th.addEventListener('click', () => this.handleSort(th.dataset.sort));
         });
 
-        // Pagination
-        const totalPages = Math.ceil(this.sortedTests.length / this.pageSize);
+        // Pagination based on groups
+        const totalPages = Math.ceil(this.groupedData.length / this.pageSize);
         if (this.currentPage > totalPages) {
             this.currentPage = Math.max(1, totalPages);
         }
 
         const startIdx = (this.currentPage - 1) * this.pageSize;
-        const endIdx = Math.min(startIdx + this.pageSize, this.sortedTests.length);
-        const pageTests = this.sortedTests.slice(startIdx, endIdx);
+        const endIdx = Math.min(startIdx + this.pageSize, this.groupedData.length);
+        const pageGroups = this.groupedData.slice(startIdx, endIdx);
 
-        // Build body
-        const rows = pageTests.map(test => {
-            const isExpanded = this.expandedRows.has(test.id);
+        // Build body with grouped rows
+        const rows = [];
+        for (const group of pageGroups) {
+            const isExpanded = this.expandedOperations.has(group.operation);
+
+            // Render group header row
+            rows.push(this.renderGroupRow(group, isExpanded));
+
+            // If expanded, render individual fixture rows
+            if (isExpanded) {
+                rows.push(this.renderGroupFixtures(group));
+            }
+        }
+
+        tbody.innerHTML = rows.join('');
+
+        // Add click handlers for group expansion
+        tbody.querySelectorAll('.group-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const operation = row.dataset.operation;
+                this.toggleOperationExpansion(operation);
+            });
+        });
+
+        // Render pagination
+        this.renderPagination(totalPages);
+    }
+
+    /**
+     * Renders a group row for an operation.
+     * @param {Object} group - The group object.
+     * @param {boolean} isExpanded - Whether the group is expanded.
+     * @returns {string} HTML string for the row.
+     */
+    renderGroupRow(group, isExpanded) {
+        const rowParts = [
+            `<td class="expandable-cell">
+                <span class="expand-icon">${isExpanded ? '▼' : '▶'}</span>
+                <span class="category-badge">${escapeHtml(group.operation)}</span>
+            </td>`,
+            `<td><span class="fixture-count">${group.testCount} fixture${group.testCount !== 1 ? 's' : ''}</span></td>`,
+        ];
+
+        if (this.selectedZkvmView === VIEW.ALL) {
+            for (const zkvm of this.data.zkvms) {
+                rowParts.push(this.renderGroupZkvmCell(group, zkvm));
+            }
+        } else if (this.selectedZkvmView === VIEW.WORST) {
+            rowParts.push(this.renderGroupWorstCaseCell(group));
+        } else {
+            rowParts.push(this.renderGroupZkvmCell(group, this.selectedZkvmView));
+        }
+
+        return `<tr class="group-row ${isExpanded ? 'expanded' : ''}" data-operation="${escapeHtml(group.operation)}">${rowParts.join('')}</tr>`;
+    }
+
+    /**
+     * Renders a zkVM cell for a group (showing worst case within group).
+     * @param {Object} group - The group object.
+     * @param {string} zkvm - The zkVM identifier.
+     * @returns {string} HTML string for the cell.
+     */
+    renderGroupZkvmCell(group, zkvm) {
+        const worst = this.getGroupWorstCase(group, zkvm);
+        if (worst.time !== null) {
+            const relative = this.getRelativeCost(worst.test, zkvm);
+            return `<td class="combined-cell status-success">
+                <span class="cell-relative ${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</span>
+                <span class="cell-time">${this.formatTime(worst.time)}</span>
+            </td>`;
+        }
+        return '<td class="combined-cell status-crashed">ALL CRASHED</td>';
+    }
+
+    /**
+     * Renders the worst-case cell for a group.
+     * @param {Object} group - The group object.
+     * @returns {string} HTML string for the cell.
+     */
+    renderGroupWorstCaseCell(group) {
+        const worst = this.getGroupWorstCase(group, VIEW.WORST);
+        if (worst.time !== null) {
+            const relative = this.getRelativeCost(worst.test, VIEW.WORST);
+            return `<td class="combined-cell status-success">
+                <span class="cell-relative ${this.getRelativeClass(relative)}">${this.formatRelativeCost(relative)}</span>
+                <span class="cell-time">${this.formatTime(worst.time)}</span>
+                <span class="worst-zkvm-badge">${escapeHtml(worst.zkvm)}</span>
+            </td>`;
+        }
+        return '<td class="combined-cell status-crashed">ALL CRASHED</td>';
+    }
+
+    /**
+     * Renders the expanded fixtures for a group.
+     * @param {Object} group - The group object.
+     * @returns {string} HTML string for fixture rows.
+     */
+    renderGroupFixtures(group) {
+        // Sort fixtures within the group by worst case time
+        const sortedFixtures = [...group.tests].sort((a, b) => {
+            const timeA = this.selectedZkvmView === VIEW.WORST || this.selectedZkvmView === VIEW.ALL
+                ? this.getWorstCaseTime(a) ?? Infinity
+                : this.getProvingTime(a, this.selectedZkvmView) ?? Infinity;
+            const timeB = this.selectedZkvmView === VIEW.WORST || this.selectedZkvmView === VIEW.ALL
+                ? this.getWorstCaseTime(b) ?? Infinity
+                : this.getProvingTime(b, this.selectedZkvmView) ?? Infinity;
+            return timeB - timeA; // Descending by default (worst first)
+        });
+
+        const rows = sortedFixtures.map(test => {
             const rowParts = [
-                `<td><span class="category-badge">${escapeHtml(test.operation)}</span></td>`,
-                `<td class="expandable-cell" data-test-id="${escapeHtml(test.id)}">
-                    <span class="expand-icon">${isExpanded ? '▼' : '▶'}</span>
-                    ${escapeHtml(test.name)}
-                </td>`,
+                `<td class="fixture-indent"></td>`,
+                `<td class="fixture-name" title="${escapeHtml(test.id)}">${escapeHtml(test.name)}</td>`,
             ];
 
             if (this.selectedZkvmView === VIEW.ALL) {
@@ -548,72 +793,21 @@ class BenchmarkApp {
                 rowParts.push(this.renderZkvmCell(test, this.selectedZkvmView));
             }
 
-            rowParts.push(`<td class="test-name" title="${escapeHtml(test.id)}">${escapeHtml(test.id)}</td>`);
-
-            let html = `<tr class="data-row ${isExpanded ? 'expanded' : ''}" data-test-id="${escapeHtml(test.id)}">${rowParts.join('')}</tr>`;
-
-            // Add expanded details row
-            if (isExpanded) {
-                html += this.renderExpandedRow(test);
-            }
-
-            return html;
+            return `<tr class="fixture-row">${rowParts.join('')}</tr>`;
         });
 
-        tbody.innerHTML = rows.join('');
-
-        // Add click handlers for row expansion
-        tbody.querySelectorAll('.expandable-cell').forEach(cell => {
-            cell.addEventListener('click', () => {
-                const testId = cell.dataset.testId;
-                this.toggleRowExpansion(testId);
-            });
-        });
-
-        // Render pagination
-        this.renderPagination(totalPages);
+        return rows.join('');
     }
 
     /**
-     * Renders expanded row details for a single test.
-     * @param {Object} test - Test object.
-     * @returns {string} HTML string.
+     * Toggles operation group expansion.
+     * @param {string} operation - The operation name.
      */
-    renderExpandedRow(test) {
-        const colSpan = this.selectedZkvmView === VIEW.ALL
-            ? 3 + this.data.zkvms.length
-            : 4;
-
-        const details = [];
-        details.push(`<strong>Test ID:</strong> ${escapeHtml(test.id)}`);
-        details.push(`<strong>Gas Used:</strong> ${test.block_used_gas ? (test.block_used_gas / 1_000_000).toFixed(2) + 'M' : '-'}`);
-
-        // Show all zkVM results
-        details.push('<div class="expanded-zkvms">');
-        for (const zkvm of this.data.zkvms) {
-            const result = test.results[zkvm];
-            if (result?.status === STATUS.SUCCESS) {
-                const throughput = this.formatThroughput(test.block_used_gas, result.proving_time_ms);
-                details.push(`<div class="zkvm-detail"><strong>${escapeHtml(zkvm)}:</strong> ${this.formatTime(result.proving_time_ms)} (${throughput})</div>`);
-            } else {
-                const reason = result?.crash_reason || 'Unknown';
-                details.push(`<div class="zkvm-detail crashed"><strong>${escapeHtml(zkvm)}:</strong> CRASHED - ${escapeHtml(reason)}</div>`);
-            }
-        }
-        details.push('</div>');
-
-        return `<tr class="expanded-row"><td colspan="${colSpan}"><div class="expanded-content">${details.join('')}</div></td></tr>`;
-    }
-
-    /**
-     * Toggles row expansion.
-     * @param {string} id - Row identifier.
-     */
-    toggleRowExpansion(id) {
-        if (this.expandedRows.has(id)) {
-            this.expandedRows.delete(id);
+    toggleOperationExpansion(operation) {
+        if (this.expandedOperations.has(operation)) {
+            this.expandedOperations.delete(operation);
         } else {
-            this.expandedRows.add(id);
+            this.expandedOperations.add(operation);
         }
         this.renderTable();
     }
@@ -760,6 +954,7 @@ class BenchmarkApp {
             this.sortDirection = 'asc';
         }
         this.sortTests();
+        this.sortGroupedData();
         this.renderTable();
         this.updateURL();
     }
@@ -1174,6 +1369,7 @@ class BenchmarkApp {
         this.worstCaseCache.clear();
         this.worstCaseZkvmCache.clear();
         this.relativeCostCache.clear();
+        this.groupWorstCaseCache.clear();
     }
 
     /**
@@ -1183,6 +1379,7 @@ class BenchmarkApp {
         // Reset state that depends on the dataset
         this.selectedOperations.clear();
         this.expandedRows.clear();
+        this.expandedOperations.clear();
         this.currentPage = 1;
 
         // Reinitialize UI components
@@ -1198,6 +1395,8 @@ class BenchmarkApp {
         this.renderTargetInfo();
         this.filterTests();
         this.sortTests();
+        this.groupTestsByOperation();
+        this.sortGroupedData();
         this.renderTable();
         this.updateStats();
         this.updateFooter();
@@ -1228,7 +1427,7 @@ class BenchmarkApp {
     initializeZkvmViewSelector() {
         const container = this.elements.zkvmView;
         const views = [
-            { value: VIEW.WORST, label: 'Worst Case' },
+            { value: VIEW.WORST, label: 'Slowest' },
             ...this.data.zkvms.map(zkvm => ({ value: zkvm, label: zkvm })),
             { value: VIEW.ALL, label: 'All' },
         ];
@@ -1441,6 +1640,8 @@ class BenchmarkApp {
             this.renderTargetInfo();
             this.filterTests();
             this.sortTests();
+            this.groupTestsByOperation();
+            this.sortGroupedData();
             this.renderTable();
             this.updateStats();
             this.updateFooter();
