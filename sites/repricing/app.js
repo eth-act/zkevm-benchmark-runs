@@ -1043,7 +1043,7 @@ class BenchmarkApp {
         root.style.colorScheme = theme;
 
         if (this.elements.themeToggle) {
-            this.elements.themeToggle.textContent = theme === 'dark' ? '☀️ Light mode' : '🌙 Dark mode';
+            this.elements.themeToggle.textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
         }
 
         localStorage.setItem(CONFIG.THEME_KEY, theme);
@@ -1355,7 +1355,7 @@ class BenchmarkApp {
      * Initializes theme toggle.
      */
     initializeTheme() {
-        const savedTheme = localStorage.getItem(CONFIG.THEME_KEY) || 'dark';
+        const savedTheme = localStorage.getItem(CONFIG.THEME_KEY) || 'light';
         this.applyTheme(savedTheme);
 
         if (this.elements.themeToggle) {
