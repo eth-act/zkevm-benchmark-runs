@@ -580,7 +580,7 @@ EEST benchmarks with 5M-gas-limit gas limit (proving results) on **1xL40s** hard
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
 - **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
 
-| Test Case | sp1-v5.2.3<br/>(1.41MiB) | zisk-v0.13.0<br/>(244.02KiB) | Avg |
+| Test Case | sp1-v5.2.3<br/>(1.41MiB) | zisk-v0.14.0<br/>(244.02KiB) | Avg |
 |-----------|-----------|-----------|----------|
 | test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_5_qube] | ❌ SDK Crash | ❌ SDK Crash | — |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_4_qube] | 1h 57m 27.82s | ❌ SDK Crash | 1h 57m 27.82s |
@@ -616,505 +616,505 @@ EEST benchmarks with 5M-gas-limit gas limit (proving results) on **1xL40s** hard
 | test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_guido_2_even] | 29m 19.51s | ❌ SDK Crash | 29m 19.51s |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_2_exp_heavy] | 28m 56.91s | ❌ SDK Crash | 28m 56.91s |
 | test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_marius_1_even] | 25m 55.30s | ❌ SDK Crash | 25m 55.30s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_fp_to_g1] | 39m 31.87s | 7m 55.37s | 23m 43.62s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_2_square] | 36m 43.58s | 10m 34.00s | 23m 38.79s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_pairing_check] | 36m 42.59s | 8m 25.30s | 22m 33.95s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_24b_exp_168] | 25m 42.93s | 9m 41.09s | 17m 42.01s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_765_gas_exp_heavy] | 25m 51.29s | 9m 20.25s | 17m 35.77s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_fp_to_g2] | 28m 20.05s | 5m 58.73s | 17m 9.39s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_pawel_3] | 24m 42.00s | 8m 56.27s | 16m 49.13s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_256] | 24m 38.00s | 8m 30.63s | 16m 34.32s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_256] | 24m 41.54s | 8m 20.51s | 16m 31.03s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_example_1] | 24m 16.01s | 8m 15.72s | 16m 15.86s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_1360_gas_balanced] | 24m 16.33s | 8m 11.56s | 16m 13.94s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_3_exp_heavy] | 23m 25.40s | 8m 1.90s | 15m 43.65s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_96] | 23m 7.08s | 8m 20.06s | 15m 43.57s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_zkevm_worst_case] | 23m 44.68s | 7m 27.81s | 15m 36.25s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_677_gas_base_heavy] | 22m 55.20s | 7m 56.08s | 15m 25.64s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_3_exp_8] | 21m 59.71s | 8m 47.17s | 15m 23.44s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_128] | 22m 45.25s | 7m 52.09s | 15m 18.67s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_96] | 22m 22.19s | 7m 40.18s | 15m 1.18s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_example_2] | 22m 52.33s | 7m 6.16s | 14m 59.25s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_pawel_4] | 22m 12.42s | 7m 34.83s | 14m 53.62s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_65] | 21m 57.79s | 7m 31.41s | 14m 44.60s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_64b_exp_512] | 22m 57.20s | 6m 29.35s | 14m 43.27s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_64b_exp_512] | 22m 39.00s | 6m 33.12s | 14m 36.06s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g2add] | 22m 46.93s | 6m 13.24s | 14m 30.09s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-blake2f] | 20m 45.11s | 8m 8.25s | 14m 26.68s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1360n1] | 21m 22.55s | 7m 8.77s | 14m 15.66s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_996_gas_balanced] | 21m 59.19s | 6m 29.88s | 14m 14.53s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_600_gas_balanced] | 21m 27.51s | 6m 54.59s | 14m 11.05s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_767_gas_balanced] | 21m 45.21s | 6m 29.05s | 14m 7.13s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_4_exp_heavy] | 21m 15.24s | 6m 40.66s | 13m 57.95s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_64] | 20m 37.03s | 7m 9.14s | 13m 53.09s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_408_gas_balanced] | 20m 59.13s | 6m 46.21s | 13m 52.67s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_40] | 20m 3.85s | 7m 32.97s | 13m 48.41s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g1add] | 21m 16.91s | 5m 57.94s | 13m 37.42s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_min_gas_balanced] | 20m 8.63s | 6m 43.24s | 13m 25.93s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_128b_exp_1024] | 20m 59.27s | 5m 40.44s | 13m 19.85s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_128b_exp_1024] | 20m 41.24s | 5m 37.73s | 13m 9.49s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_guido_1_even] | 16m 46.23s | 9m 8.28s | 12m 57.25s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1349n1] | 19m 22.58s | 6m 28.77s | 12m 55.67s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1360n2] | 19m 11.06s | 6m 35.18s | 12m 53.12s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_256b_exp_1024] | 20m 10.36s | 5m 19.11s | 12m 44.73s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_256b_exp_1024] | 20m 7.72s | 5m 19.49s | 12m 43.61s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_40] | 18m 42.36s | 6m 34.28s | 12m 38.32s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_exp_208_gas_balanced] | 18m 41.79s | 6m 33.07s | 12m 37.43s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_36] | 18m 11.88s | 6m 20.37s | 12m 16.12s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_cover_windows] | 17m 39.12s | 6m 7.92s | 11m 53.52s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_2_pow_0x10001] | 17m 56.43s | 5m 16.38s | 11m 36.41s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g1msm] | 19m 5.60s | 4m 1.84s | 11m 33.72s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_3_pow_0x10001] | 17m 56.16s | 5m 0.00s | 11m 28.08s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_pow_0x10001] | 17m 10.39s | 5m 23.40s | 11m 16.89s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_4_pow_0x10001] | 17m 36.50s | 4m 47.30s | 11m 11.90s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_5_pow_0x10001] | 16m 57.85s | 4m 37.83s | 10m 47.84s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_512b_exp_1024] | 16m 58.76s | 4m 27.42s | 10m 43.09s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_512b_exp_1024] | 16m 58.48s | 4m 27.20s | 10m 42.84s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_32] | 15m 51.03s | 5m 33.55s | 10m 42.29s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n3] | 13m 43.60s | 4m 38.94s | 9m 11.27s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n2] | 13m 41.61s | 4m 38.78s | 9m 10.19s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1152n1] | 13m 9.58s | 4m 42.51s | 8m 56.04s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_5_pair] | 8m 40.65s | ❌ SDK Crash | 8m 40.65s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_qube] | 12m 48.33s | 3m 55.47s | 8m 21.90s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_square] | 12m 7.96s | 3m 42.22s | 7m 55.09s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g2msm] | 11m 37.84s | 2m 41.49s | 7m 9.67s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n1] | 10m 33.70s | 3m 43.41s | 7m 8.56s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_DELEGATECALL] | 7m 36.01s | 5m 52.34s | 6m 44.18s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_CALL] | 7m 28.75s | 5m 56.15s | 6m 42.45s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_STATICCALL] | 7m 32.22s | 5m 52.13s | 6m 42.18s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_CALLCODE] | 7m 27.85s | 5m 56.14s | 6m 42.00s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODESIZE] | 7m 33.85s | 5m 50.11s | 6m 41.98s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODEHASH] | 7m 28.14s | 5m 48.90s | 6m 38.52s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_191] | 9m 52.41s | 3m 14.66s | 6m 33.54s |
-| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODECOPY] | 7m 20.82s | 5m 43.17s | 6m 31.99s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_255] | 9m 39.07s | 3m 10.23s | 6m 24.65s |
-| test_worst_stateful_opcodes.py::test_worst_selfbalance[fork_Prague-blockchain_test-contract_balance_1] | 7m 31.84s | 4m 56.45s | 6m 14.14s |
-| test_worst_stateful_opcodes.py::test_worst_selfbalance[fork_Prague-blockchain_test-contract_balance_0] | 7m 28.64s | 4m 56.28s | 6m 12.46s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul] | 11m 19.61s | 15.42s | 5m 47.51s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_1_2_32_byte_scalar] | 10m 58.90s | 15.69s | 5m 37.29s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_32_byte_coord_and_scalar] | 10m 53.50s | 15.49s | 5m 34.50s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_127] | 7m 2.93s | 2m 24.73s | 4m 43.83s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_191] | 6m 49.84s | 2m 21.65s | 4m 35.74s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_4_pair] | 8m 33.63s | 36.80s | 4m 35.21s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_2_pair] | 8m 9.24s | 42.44s | 4m 25.84s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_two_pairings] | 8m 8.23s | 42.90s | 4m 25.56s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_191] | 6m 27.45s | 2m 16.18s | 4m 21.82s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_one_pairing] | 7m 53.60s | 49.08s | 4m 21.34s |
-| test_worst_compute.py::test_amortized_bn128_pairings[fork_Prague-blockchain_test] | 8m 3.29s | 29.72s | 4m 16.50s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SDIV-1] | 6m 10.25s | 2m 5.94s | 4m 8.10s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SDIV-0] | 6m 4.73s | 2m 2.44s | 4m 3.59s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_63] | 5m 21.10s | 2m 3.95s | 3m 42.53s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_DIV-0] | 5m 23.64s | 1m 51.31s | 3m 37.48s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_127] | 5m 18.73s | 1m 43.83s | 3m 31.28s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_255] | 5m 0.73s | 1m 54.47s | 3m 27.60s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_127] | 5m 8.80s | 1m 37.27s | 3m 23.03s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_DIV-1] | 4m 58.97s | 1m 46.36s | 3m 22.67s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_191] | 4m 48.26s | 1m 55.54s | 3m 21.90s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_255] | 4m 50.96s | 1m 48.66s | 3m 19.81s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_infinities_32_byte_scalar] | 6m 24.80s | 9.92s | 3m 17.36s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_PREVRANDAO] | 2m 51.59s | 2m 48.76s | 2m 50.17s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_255] | 3m 53.78s | 1m 45.75s | 2m 49.77s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_127] | 3m 50.83s | 1m 33.13s | 2m 41.98s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_63] | 3m 33.63s | 1m 20.66s | 2m 27.15s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add] | 2m 31.19s | 2m 9.67s | 2m 20.43s |
-| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_63] | 3m 22.74s | 1m 15.27s | 2m 19.00s |
-| test_worst_compute.py::test_worst_keccak[fork_Prague-blockchain_test] | 2m 12.03s | 2m 20.84s | 2m 16.44s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add_1_2] | 2m 26.30s | 2m 0.28s | 2m 13.29s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ecrecover] | 3m 42.06s | 41.65s | 2m 11.85s |
-| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-SHA2-256] | 3m 40.93s | 40.91s | 2m 10.92s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP5] | 2m 10.11s | 2m 1.00s | 2m 5.55s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP16] | 2m 8.79s | 2m 1.25s | 2m 5.02s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP2] | 2m 8.34s | 2m 1.48s | 2m 4.91s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP12] | 2m 9.47s | 1m 59.85s | 2m 4.66s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP3] | 2m 8.51s | 2m 0.63s | 2m 4.57s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP6] | 2m 8.44s | 2m 0.65s | 2m 4.54s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP13] | 2m 9.29s | 1m 59.70s | 2m 4.50s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP15] | 2m 7.88s | 1m 59.96s | 2m 3.92s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP7] | 2m 8.34s | 1m 59.16s | 2m 3.75s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP4] | 2m 8.38s | 1m 58.24s | 2m 3.31s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP14] | 2m 9.29s | 1m 56.84s | 2m 3.06s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP1] | 2m 9.82s | 1m 55.64s | 2m 2.73s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP9] | 2m 7.10s | 1m 55.36s | 2m 1.23s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP10] | 2m 7.41s | 1m 55.00s | 2m 1.20s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP8] | 2m 8.06s | 1m 52.36s | 2m 0.21s |
-| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP11] | 2m 8.62s | 1m 50.70s | 1m 59.66s |
-| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_63] | 2m 40.32s | 1m 18.69s | 1m 59.51s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SGT-] | 2m 35.29s | 1m 22.17s | 1m 58.73s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_COINBASE] | 2m 5.68s | 1m 43.37s | 1m 54.53s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_ORIGIN] | 2m 4.40s | 1m 43.77s | 1m 54.08s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-empty-opcode_REVERT] | 2m 15.59s | 1m 31.57s | 1m 53.58s |
-| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-zero-loop] | 2m 20.43s | 1m 25.13s | 1m 52.78s |
-| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-one-loop] | 2m 17.74s | 1m 27.22s | 1m 52.48s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_EQ-] | 2m 27.65s | 1m 17.14s | 1m 52.39s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_EXP-] | 3m 8.33s | 34.25s | 1m 51.29s |
-| test_worst_compute.py::test_worst_unop[fork_Prague-blockchain_test-opcode_ISZERO] | 2m 22.39s | 1m 17.77s | 1m 50.08s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_ADDRESS] | 2m 4.86s | 1m 30.65s | 1m 47.75s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CALLER] | 2m 7.98s | 1m 25.95s | 1m 46.97s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH32] | 1m 42.05s | 1m 50.44s | 1m 46.25s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_STATICCALL] | 2m 5.38s | 1m 24.95s | 1m 45.16s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_CALL] | 2m 5.92s | 1m 24.06s | 1m 44.99s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_CALLCODE] | 2m 4.78s | 1m 22.98s | 1m 43.88s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-empty-opcode_RETURN] | 2m 4.39s | 1m 22.62s | 1m 43.51s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH31] | 1m 41.67s | 1m 44.35s | 1m 43.01s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH30] | 1m 40.46s | 1m 41.87s | 1m 41.17s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH29] | 1m 39.86s | 1m 37.95s | 1m 38.90s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SMOD-] | 2m 10.21s | 1m 4.97s | 1m 37.59s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH27] | 1m 35.22s | 1m 35.77s | 1m 35.50s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH28] | 1m 35.11s | 1m 35.68s | 1m 35.40s |
-| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-empty] | 1m 53.85s | 1m 14.92s | 1m 34.39s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_STATICCALL] | 1m 50.73s | 1m 14.32s | 1m 32.53s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_CALLCODE] | 1m 51.71s | 1m 12.99s | 1m 32.35s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_CALL] | 1m 52.44s | 1m 12.26s | 1m 32.35s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_DELEGATECALL] | 1m 50.39s | 1m 13.87s | 1m 32.13s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH26] | 1m 31.37s | 1m 29.81s | 1m 30.59s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH25] | 1m 27.69s | 1m 28.63s | 1m 28.16s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_MOD-] | 1m 56.31s | 58.99s | 1m 27.65s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH24] | 1m 27.59s | 1m 26.52s | 1m 27.06s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH23] | 1m 28.73s | 1m 21.48s | 1m 25.11s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH22] | 1m 27.69s | 1m 19.39s | 1m 23.54s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of zero data-opcode_REVERT] | 1m 43.99s | 1m 2.88s | 1m 23.43s |
-| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-six blobs, access latest] | 1m 23.44s | 1m 21.28s | 1m 22.36s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SSTORE new value] | 1m 42.84s | 1m 1.69s | 1m 22.26s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SAR-] | 1m 58.20s | 46.21s | 1m 22.20s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_DELEGATECALL] | 1m 36.84s | 1m 4.66s | 1m 20.75s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH21] | 1m 22.37s | 1m 16.19s | 1m 19.28s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_BLOBBASEFEE] | 1m 44.64s | 49.58s | 1m 17.11s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH19] | 1m 20.62s | 1m 12.79s | 1m 16.70s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH20] | 1m 20.64s | 1m 12.72s | 1m 16.68s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add_infinities] | 1m 19.43s | 1m 13.59s | 1m 16.51s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of zero data-opcode_RETURN] | 1m 35.37s | 57.63s | 1m 16.50s |
-| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-one blob and accessed] | 1m 22.80s | 1m 9.72s | 1m 16.26s |
-| test_worst_compute.py::test_worst_shifts[fork_Prague-blockchain_test-shift_right_SAR] | 1m 48.57s | 42.16s | 1m 15.36s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GASPRICE] | 1m 41.75s | 46.45s | 1m 14.10s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH18] | 1m 16.35s | 1m 6.86s | 1m 11.60s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SHR-] | 1m 41.31s | 39.03s | 1m 10.17s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH17] | 1m 13.82s | 1m 5.27s | 1m 9.55s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SHL-] | 1m 41.60s | 37.33s | 1m 9.46s |
-| test_worst_compute.py::test_worst_shifts[fork_Prague-blockchain_test-shift_right_SHR] | 1m 40.41s | 38.16s | 1m 9.28s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH16] | 1m 13.59s | 1m 4.92s | 1m 9.25s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_MUL-] | 1m 46.62s | 29.29s | 1m 7.96s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH15] | 1m 14.84s | 1m 0.59s | 1m 7.72s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_NUMBER] | 1m 31.78s | 42.50s | 1m 7.14s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MSTORE] | 1m 26.11s | 46.84s | 1m 6.47s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MSTORE] | 1m 25.27s | 46.48s | 1m 5.88s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_TIMESTAMP] | 1m 28.44s | 43.21s | 1m 5.82s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MSTORE] | 1m 24.72s | 46.62s | 1m 5.67s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-0 bytes] | 1m 31.68s | 39.41s | 1m 5.54s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MSTORE] | 1m 24.64s | 46.19s | 1m 5.41s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH14] | 1m 11.53s | 59.21s | 1m 5.37s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MSTORE] | 1m 24.19s | 46.49s | 1m 5.34s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MSTORE] | 1m 24.23s | 46.45s | 1m 5.34s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-0 bytes-call] | 1m 32.50s | 38.13s | 1m 5.31s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MSTORE] | 1m 24.02s | 46.49s | 1m 5.26s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-0 bytes-transaction] | 1m 32.20s | 38.22s | 1m 5.21s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MSTORE] | 1m 24.20s | 46.19s | 1m 5.19s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MLOAD] | 1m 12.27s | 57.99s | 1m 5.13s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MSTORE] | 1m 24.04s | 46.22s | 1m 5.13s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MSTORE] | 1m 23.80s | 46.27s | 1m 5.03s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MSTORE] | 1m 24.05s | 45.91s | 1m 4.98s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MSTORE] | 1m 23.88s | 46.07s | 1m 4.98s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MLOAD] | 1m 11.87s | 57.65s | 1m 4.76s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MLOAD] | 1m 11.49s | 57.28s | 1m 4.39s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MLOAD] | 1m 10.66s | 57.88s | 1m 4.27s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MLOAD] | 1m 10.61s | 57.62s | 1m 4.11s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of non-zero data-opcode_REVERT] | 1m 19.71s | 48.42s | 1m 4.06s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MLOAD] | 1m 11.14s | 56.98s | 1m 4.06s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MLOAD] | 1m 10.55s | 57.52s | 1m 4.04s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of non-zero data-opcode_RETURN] | 1m 22.43s | 45.33s | 1m 3.88s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MLOAD] | 1m 9.99s | 57.60s | 1m 3.80s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MLOAD] | 1m 9.70s | 57.65s | 1m 3.67s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MLOAD] | 1m 9.49s | 57.73s | 1m 3.61s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MLOAD] | 1m 9.56s | 57.40s | 1m 3.48s |
-| test_worst_compute.py::test_worst_jumpi_fallthrough[fork_Prague-blockchain_test] | 1m 24.41s | 42.52s | 1m 3.47s |
-| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_True-key_mut_True] | 1m 19.39s | 47.37s | 1m 3.38s |
-| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_True-key_mut_False] | 1m 19.29s | 47.08s | 1m 3.18s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MLOAD] | 1m 9.02s | 57.18s | 1m 3.10s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0 bytes] | 1m 30.24s | 35.92s | 1m 3.08s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CHAINID] | 1m 22.85s | 42.52s | 1m 2.68s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CODESIZE] | 1m 20.83s | 43.83s | 1m 2.33s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_BASEFEE] | 1m 21.66s | 42.61s | 1m 2.13s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-0 bytes] | 1m 28.78s | 35.44s | 1m 2.11s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH13] | 1m 8.06s | 56.09s | 1m 2.07s |
-| test_worst_compute.py::test_worst_returndatasize_zero[fork_Prague-blockchain_test] | 1m 21.17s | 42.47s | 1m 1.82s |
-| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_0] | 1m 20.67s | 42.78s | 1m 1.73s |
-| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1] | 1m 20.11s | 42.91s | 1m 1.51s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SIGNEXTEND-] | 1m 28.44s | 33.50s | 1m 0.97s |
-| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1000] | 1m 19.64s | 41.78s | 1m 0.71s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GAS] | 1m 20.19s | 40.94s | 1m 0.56s |
-| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GASLIMIT] | 1m 19.86s | 41.06s | 1m 0.46s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH12] | 1m 5.71s | 53.25s | 59.48s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH0] | 1m 17.72s | 40.88s | 59.30s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH11] | 1m 6.71s | 51.05s | 58.88s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SSTORE same value] | 1m 11.72s | 44.07s | 57.89s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-100 bytes] | 1m 17.14s | 36.72s | 56.93s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-100 bytes-call] | 1m 13.94s | 39.39s | 56.66s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-100 bytes-transaction] | 1m 14.36s | 38.58s | 56.47s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-0 bytes] | 1m 15.45s | 34.72s | 55.09s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-100 bytes-call] | 1m 12.30s | 36.69s | 54.50s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-100 bytes] | 1m 8.60s | 38.32s | 53.46s |
-| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_True-non_zero_value_False] | 1m 14.80s | 31.94s | 53.37s |
-| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_False-non_zero_value_False] | 1m 13.69s | 32.29s | 52.99s |
-| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_False-non_zero_value_True] | 1m 13.49s | 32.09s | 52.79s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH10] | 58.49s | 46.88s | 52.68s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH7] | 1m 1.53s | 43.38s | 52.46s |
-| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_True-non_zero_value_True] | 1m 13.07s | 31.84s | 52.46s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH9] | 57.69s | 46.22s | 51.95s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH8] | 56.77s | 46.16s | 51.47s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-100 bytes-transaction] | 1m 9.59s | 31.83s | 50.71s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SLT-] | 1m 7.79s | 32.57s | 50.18s |
-| test_worst_compute.py::test_worst_jumpdests[fork_Prague-blockchain_test] | 1m 7.26s | 31.58s | 49.42s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH6] | 55.98s | 41.75s | 48.86s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_EXTCODEHASH] | 59.25s | 38.36s | 48.81s |
-| test_worst_stateful_opcodes.py::test_worst_blockhash[fork_Prague-blockchain_test] | 53.90s | 42.79s | 48.34s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-5b] | 58.41s | 37.42s | 47.91s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-0 bytes-call] | 1m 5.21s | 30.14s | 47.67s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-0 bytes-transaction] | 1m 5.25s | 29.39s | 47.32s |
-| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_False-empty_authority_True] | 46.63s | ❌ SDK Crash | 46.63s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.RETURN] | 1m 1.28s | 30.91s | 46.10s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.RETURN] | 1m 1.39s | 30.78s | 46.08s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.REVERT] | 1m 1.33s | 30.80s | 46.06s |
-| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_1000] | 1m 1.57s | 30.39s | 45.98s |
-| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_10000] | 1m 1.52s | 30.40s | 45.96s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SUB-] | 1m 4.37s | 27.52s | 45.95s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.REVERT] | 1m 1.23s | 30.56s | 45.89s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.IDENTITY] | 59.93s | 30.68s | 45.31s |
-| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_0] | 1m 0.04s | 30.55s | 45.30s |
-| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.IDENTITY] | 59.95s | 30.58s | 45.26s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH4] | 55.28s | 34.97s | 45.12s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH5] | 52.37s | 37.82s | 45.10s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-10KiB] | 1m 1.09s | 27.62s | 44.35s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_LT-] | 1m 3.05s | 25.38s | 44.22s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MSTORE8] | 1m 1.32s | 25.91s | 43.62s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_BYTE-] | 1m 0.72s | 26.20s | 43.46s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_GT-] | 1m 1.60s | 25.21s | 43.40s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MSTORE8] | 1m 0.62s | 26.16s | 43.39s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_ADD-] | 58.88s | 27.47s | 43.18s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0 bytes] | 59.65s | 26.37s | 43.01s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MSTORE8] | 59.20s | 26.66s | 42.93s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MSTORE8] | 58.86s | 26.66s | 42.76s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MSTORE8] | 58.79s | 26.58s | 42.69s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MSTORE8] | 58.68s | 26.57s | 42.62s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MSTORE8] | 58.33s | 26.63s | 42.48s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MSTORE8] | 58.52s | 26.34s | 42.43s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MSTORE8] | 58.12s | 26.33s | 42.22s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MSTORE8] | 58.09s | 26.14s | 42.11s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MSTORE8] | 57.77s | 26.34s | 42.05s |
-| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MSTORE8] | 57.82s | 26.20s | 42.01s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_XOR-] | 59.31s | 24.05s | 41.68s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_AND-] | 58.93s | 24.09s | 41.51s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-0 bytes] | 57.01s | 25.80s | 41.41s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH3] | 49.64s | 33.05s | 41.34s |
-| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_OR-] | 58.25s | 24.12s | 41.19s |
-| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_diff_acc_to_diff_acc] | 1m 5.77s | 16.44s | 41.10s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-100 bytes] | 55.58s | 26.03s | 40.80s |
-| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-one blob but access non-existent index] | 49.10s | 32.18s | 40.64s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP4] | 54.94s | 25.60s | 40.27s |
-| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-no blobs] | 49.69s | 30.60s | 40.14s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP3] | 54.11s | 25.84s | 39.98s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP10] | 54.06s | 25.85s | 39.95s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP13] | 53.65s | 26.13s | 39.89s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP9] | 53.70s | 25.95s | 39.83s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP16] | 53.95s | 25.65s | 39.80s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP11] | 53.86s | 25.73s | 39.80s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP8] | 53.80s | 25.71s | 39.75s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_EXTCODESIZE] | 48.27s | 31.23s | 39.75s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP2] | 53.60s | 25.71s | 39.66s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP7] | 53.66s | 25.62s | 39.64s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP5] | 53.15s | 25.94s | 39.55s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP12] | 53.20s | 25.85s | 39.53s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_BALANCE] | 47.73s | 31.21s | 39.47s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP1] | 53.41s | 25.50s | 39.45s |
-| test_worst_compute.py::test_worst_unop[fork_Prague-blockchain_test-opcode_NOT] | 55.91s | 22.89s | 39.40s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP14] | 52.69s | 25.92s | 39.30s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP6] | 52.75s | 25.85s | 39.30s |
-| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-IDENTITY] | 1m 0.98s | 17.62s | 39.30s |
-| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP15] | 53.17s | 25.42s | 39.29s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH2] | 51.92s | 26.35s | 39.13s |
-| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_diff_acc_to_b] | 1m 2.26s | 15.49s | 38.87s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-100 bytes] | 49.45s | 28.17s | 38.81s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-100 bytes-transaction] | 51.38s | 25.95s | 38.66s |
-| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_diff_acc] | 1m 2.26s | 14.06s | 38.16s |
-| test_worst_compute.py::test_worst_jumpis[fork_Prague-blockchain_test] | 51.21s | 24.53s | 37.87s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-100 bytes-call] | 50.37s | 24.80s | 37.59s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-100 bytes-call] | 47.55s | 27.53s | 37.54s |
-| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH1] | 48.65s | 24.75s | 36.70s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.25x max code size] | 42.33s | 30.38s | 36.35s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-00] | 48.28s | 23.97s | 36.13s |
-| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_b] | 58.84s | 12.77s | 35.80s |
-| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_a] | 58.22s | 12.60s | 35.41s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-10KiB] | 44.49s | 26.18s | 35.34s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.75x max code size] | 39.77s | 30.31s | 35.04s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-605b5b] | 44.76s | 24.53s | 34.65s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-100 bytes-transaction] | 46.17s | 23.08s | 34.62s |
-| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_False-key_mut_False] | 43.10s | 25.74s | 34.42s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.50x max code size] | 38.07s | 30.49s | 34.28s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-10KiB-transaction] | 37.76s | 30.75s | 34.25s |
-| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_False-key_mut_True] | 42.72s | 25.46s | 34.09s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-max code size] | 37.78s | 30.20s | 33.99s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-10KiB-call] | 37.16s | 30.49s | 33.83s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_EXTCODEHASH] | 39.72s | 27.68s | 33.70s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SLOAD] | 42.78s | 24.41s | 33.59s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-10KiB-call] | 38.62s | 26.68s | 32.65s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-1MiB] | 45.98s | 18.33s | 32.16s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_EXTCODESIZE] | 38.82s | 24.99s | 31.91s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_BALANCE] | 38.23s | 25.12s | 31.68s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-10KiB] | 44.91s | 18.23s | 31.57s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-615b5b5b] | 39.95s | 21.98s | 30.96s |
-| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-1KiB] | 38.58s | 22.41s | 30.50s |
-| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-RIPEMD-160] | 37.18s | 23.67s | 30.43s |
-| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-512] | 37.17s | 23.16s | 30.16s |
-| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_False-empty_authority_False] | 46.46s | 13.79s | 30.13s |
-| test_worst_compute.py::test_worst_jumps[fork_Prague-blockchain_test] | 39.40s | 20.24s | 29.82s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value, out of gas] | 37.43s | 22.07s | 29.75s |
-| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_True-empty_authority_False] | 45.52s | 13.98s | 29.75s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value, revert] | 36.95s | 22.26s | 29.61s |
-| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_True-empty_authority_True] | 44.05s | 14.09s | 29.07s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value] | 35.53s | 21.77s | 28.65s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-605b] | 38.46s | 18.56s | 28.51s |
-| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_True-key_mut_False] | 36.15s | 20.65s | 28.40s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSLOAD] | 35.10s | 20.76s | 27.93s |
-| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_True-key_mut_True] | 34.58s | 19.48s | 27.03s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_cold[fork_Prague-blockchain_test-absent_accounts_False-opcode_BALANCE] | 33.41s | 20.22s | 26.82s |
-| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-615b5b] | 35.91s | 16.42s | 26.16s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value] | 33.44s | 17.34s | 25.39s |
-| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-1MiB] | 37.62s | 13.16s | 25.39s |
-| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-5KiB] | 32.42s | 17.83s | 25.12s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.25x max code size] | 30.86s | 16.70s | 23.78s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-10KiB-call] | 31.06s | 16.49s | 23.77s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.75x max code size] | 30.56s | 16.73s | 23.64s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.50x max code size] | 30.53s | 16.43s | 23.48s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-10KiB-call] | 29.70s | 16.99s | 23.34s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-10KiB-transaction] | 29.79s | 16.84s | 23.32s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-10KiB] | 30.02s | 16.54s | 23.28s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_existing[fork_Prague-blockchain_test-value_bearing_True] | 29.26s | 17.21s | 23.24s |
-| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-max code size] | 29.77s | 16.56s | 23.17s |
-| test_worst_blocks.py::test_block_full_data[fork_Prague-blockchain_test-zero_byte_True] | 25.49s | 15.90s | 20.70s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_existing[fork_Prague-blockchain_test-value_bearing_False] | 25.44s | 14.86s | 20.15s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSLOAD] | 25.58s | 14.12s | 19.85s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value, revert] | 23.04s | 13.97s | 18.50s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-10KiB-transaction] | 23.74s | 13.23s | 18.49s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value, out of gas] | 22.94s | 13.55s | 18.25s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-10KiB-transaction] | 21.41s | 13.33s | 17.37s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_32_byte_coord_and_2_scalar] | 23.48s | 11.16s | 17.32s |
-| test_worst_stateful_opcodes.py::test_worst_address_state_cold[fork_Prague-blockchain_test-absent_accounts_True-opcode_BALANCE] | 22.59s | 11.77s | 17.18s |
-| test_worst_blocks.py::test_block_full_access_list_and_data[fork_Prague-blockchain_test] | 20.98s | 12.96s | 16.97s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_1_2_2_scalar] | 22.39s | 11.03s | 16.71s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_infinities_2_scalar] | 21.35s | 10.07s | 15.71s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-1MiB-call] | 21.46s | 9.80s | 15.63s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-1MiB-transaction] | 21.59s | 9.42s | 15.50s |
-| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_100000] | 20.02s | 10.72s | 15.37s |
-| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_False-key_mut_False] | 19.44s | 10.90s | 15.17s |
-| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_False-key_mut_True] | 18.83s | 11.32s | 15.07s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-1MiB] | 20.18s | 9.44s | 14.81s |
-| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-1MiB] | 20.12s | 8.48s | 14.30s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-1MiB-call] | 19.64s | 8.83s | 14.24s |
-| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-1MiB-transaction] | 18.70s | 9.43s | 14.06s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value] | 16.12s | 9.09s | 12.61s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log1] | 16.32s | 8.77s | 12.55s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of non-zero data-opcode_REVERT] | 16.45s | 8.59s | 12.52s |
-| test_worst_blocks.py::test_block_full_data[fork_Prague-blockchain_test-zero_byte_False] | 14.72s | 10.17s | 12.44s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of non-zero data-opcode_RETURN] | 16.15s | 8.72s | 12.44s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log0] | 16.16s | 8.64s | 12.40s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log0] | 15.99s | 8.71s | 12.35s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log3] | 15.32s | 9.08s | 12.20s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log2] | 15.29s | 8.64s | 11.97s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log2] | 15.30s | 8.61s | 11.95s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value] | 14.75s | 9.01s | 11.88s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log3] | 14.56s | 9.18s | 11.87s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes with value-opcode_CREATE] | 15.74s | 7.94s | 11.84s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_2_sets] | 15.72s | 7.91s | 11.81s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log1] | 14.61s | 8.64s | 11.63s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with zero data-opcode_CREATE] | 15.29s | 7.87s | 11.58s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of zero data-opcode_REVERT] | 15.30s | 7.86s | 11.58s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log0] | 14.41s | 8.71s | 11.56s |
-| test_worst_bytecode.py::test_worst_creates_collisions[fork_Prague-blockchain_test-opcode_CREATE] | 14.60s | 8.48s | 11.54s |
-| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of zero data-opcode_RETURN] | 15.18s | 7.84s | 11.51s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log0] | 14.08s | 8.64s | 11.36s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_created[fork_Prague-blockchain_test_from_state_test-value_bearing_False] | 13.94s | 8.67s | 11.30s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with zero data-opcode_CREATE] | 14.53s | 7.87s | 11.20s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log1] | 14.46s | 7.82s | 11.14s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log2] | 14.19s | 7.99s | 11.09s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log4] | 13.97s | 8.18s | 11.07s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log4] | 14.10s | 7.98s | 11.04s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_created[fork_Prague-blockchain_test_from_state_test-value_bearing_True] | 13.55s | 8.50s | 11.03s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log2] | 14.01s | 7.97s | 10.99s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes with value-opcode_CREATE2] | 14.28s | 7.68s | 10.98s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log3] | 13.71s | 8.17s | 10.94s |
-| test_worst_bytecode.py::test_worst_creates_collisions[fork_Prague-blockchain_test-opcode_CREATE2] | 13.99s | 7.77s | 10.88s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes without value-opcode_CREATE] | 13.95s | 7.78s | 10.86s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log4] | 13.81s | 7.91s | 10.86s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log4] | 13.54s | 8.09s | 10.81s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log3] | 13.56s | 8.06s | 10.81s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value, out of gas] | 13.49s | 7.96s | 10.73s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log1] | 13.71s | 7.72s | 10.72s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes without value-opcode_CREATE2] | 13.63s | 7.78s | 10.71s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_initcode[fork_Prague-blockchain_test_from_state_test-value_bearing_False] | 13.63s | 7.76s | 10.70s |
-| test_worst_stateful_opcodes.py::test_worst_selfdestruct_initcode[fork_Prague-blockchain_test_from_state_test-value_bearing_True] | 13.61s | 7.77s | 10.69s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log4] | 13.36s | 7.89s | 10.63s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value, revert] | 13.38s | 7.80s | 10.59s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value, revert] | 13.37s | 7.79s | 10.58s |
-| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value, out of gas] | 13.34s | 7.81s | 10.58s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with non-zero data-opcode_CREATE2] | 13.45s | 7.70s | 10.57s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with non-zero data-opcode_CREATE2] | 13.18s | 7.88s | 10.53s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log4] | 13.31s | 7.71s | 10.51s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log1] | 12.99s | 7.97s | 10.48s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log2] | 12.65s | 8.17s | 10.41s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with non-zero data-opcode_CREATE] | 12.88s | 7.89s | 10.38s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with zero data-opcode_CREATE2] | 12.68s | 8.09s | 10.38s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with non-zero data-opcode_CREATE] | 12.81s | 7.95s | 10.38s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with zero data-opcode_CREATE2] | 13.01s | 7.70s | 10.35s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with non-zero data-opcode_CREATE2] | 13.16s | 7.49s | 10.33s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with non-zero data-opcode_CREATE2] | 12.89s | 7.68s | 10.29s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with zero data-opcode_CREATE2] | 12.77s | 7.77s | 10.27s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with zero data-opcode_CREATE] | 12.62s | 7.87s | 10.25s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log2] | 12.41s | 8.06s | 10.23s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log4] | 12.56s | 7.90s | 10.23s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_zero_input] | 12.71s | 7.75s | 10.23s |
-| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1000000] | 12.66s | 7.79s | 10.23s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log3] | 12.46s | 7.92s | 10.19s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log4] | 12.35s | 7.98s | 10.16s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log2] | 12.57s | 7.74s | 10.15s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with non-zero data-opcode_CREATE] | 12.45s | 7.85s | 10.15s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log0] | 12.40s | 7.89s | 10.15s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log3] | 12.40s | 7.88s | 10.14s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_1_pair] | 12.50s | 7.77s | 10.13s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with zero data-opcode_CREATE2] | 12.29s | 7.96s | 10.12s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log0] | 12.51s | 7.71s | 10.11s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log1] | 12.47s | 7.64s | 10.06s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log1] | 12.39s | 7.72s | 10.06s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log3] | 12.32s | 7.78s | 10.05s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log4] | 12.20s | 7.89s | 10.04s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with non-zero data-opcode_CREATE] | 12.39s | 7.70s | 10.04s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log0] | 12.28s | 7.81s | 10.04s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log1] | 12.43s | 7.66s | 10.04s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log0] | 12.37s | 7.70s | 10.04s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log4] | 12.22s | 7.84s | 10.03s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_3_pair] | 12.45s | 7.59s | 10.02s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log0] | 12.09s | 7.95s | 10.02s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log1] | 12.35s | 7.66s | 10.01s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log1] | 12.33s | 7.67s | 10.00s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log2] | 12.29s | 7.71s | 10.00s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log2] | 12.39s | 7.60s | 9.99s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log0] | 12.08s | 7.86s | 9.97s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log0] | 12.21s | 7.71s | 9.96s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log1] | 12.02s | 7.89s | 9.95s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_1024b_exp_1024] | 12.01s | 7.84s | 9.92s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log3] | 12.04s | 7.78s | 9.91s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log0] | 11.87s | 7.95s | 9.91s |
-| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_1024b_exp_1024] | 11.93s | 7.85s | 9.89s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log2] | 12.08s | 7.68s | 9.88s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log4] | 11.96s | 7.78s | 9.87s |
-| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_1_pair_empty] | 11.90s | 7.82s | 9.86s |
-| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with zero data-opcode_CREATE] | 11.98s | 7.74s | 9.86s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log2] | 11.75s | 7.92s | 9.84s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log1] | 11.81s | 7.85s | 9.83s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log3] | 11.85s | 7.79s | 9.82s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log3] | 11.75s | 7.82s | 9.78s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log4] | 11.71s | 7.80s | 9.75s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log3] | 11.80s | 7.65s | 9.72s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log2] | 11.24s | 7.88s | 9.56s |
-| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log3] | 11.36s | 7.66s | 9.51s |
-| test_worst_compute.py::test_empty_block[fork_Prague-blockchain_test] | 8.96s | 7.12s | 8.04s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_fp_to_g1] | 39m 31.87s | 6m 32.53s | 23m 2.20s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_2_square] | 36m 43.58s | 8m 43.72s | 22m 43.65s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_pairing_check] | 36m 42.59s | 6m 53.05s | 21m 47.82s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_24b_exp_168] | 25m 42.93s | 7m 58.37s | 16m 50.65s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_765_gas_exp_heavy] | 25m 51.29s | 7m 43.33s | 16m 47.31s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_fp_to_g2] | 28m 20.05s | 4m 54.93s | 16m 37.49s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_pawel_3] | 24m 42.00s | 7m 20.65s | 16m 1.32s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_256] | 24m 38.00s | 7m 1.78s | 15m 49.89s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_256] | 24m 41.54s | 6m 48.81s | 15m 45.17s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_example_1] | 24m 16.01s | 6m 49.24s | 15m 32.63s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_1360_gas_balanced] | 24m 16.33s | 6m 45.10s | 15m 30.71s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_3_exp_heavy] | 23m 25.40s | 6m 36.05s | 15m 0.73s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_96] | 23m 7.08s | 6m 53.52s | 15m 0.30s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_zkevm_worst_case] | 23m 44.68s | 6m 11.77s | 14m 58.23s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_677_gas_base_heavy] | 22m 55.20s | 6m 26.48s | 14m 40.84s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_128] | 22m 45.25s | 6m 30.98s | 14m 38.11s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_3_exp_8] | 21m 59.71s | 7m 12.31s | 14m 36.01s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_example_2] | 22m 52.33s | 5m 52.28s | 14m 22.31s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_96] | 22m 22.19s | 6m 21.46s | 14m 21.83s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_pawel_4] | 22m 12.42s | 6m 13.00s | 14m 12.71s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_64b_exp_512] | 22m 57.20s | 5m 22.62s | 14m 9.91s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_65] | 21m 57.79s | 6m 13.57s | 14m 5.68s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_64b_exp_512] | 22m 39.00s | 5m 22.03s | 14m 0.51s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g2add] | 22m 46.93s | 5m 4.78s | 13m 55.86s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-blake2f] | 20m 45.11s | 6m 38.33s | 13m 41.72s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_996_gas_balanced] | 21m 59.19s | 5m 24.14s | 13m 41.66s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1360n1] | 21m 22.55s | 5m 54.44s | 13m 38.49s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_600_gas_balanced] | 21m 27.51s | 5m 38.52s | 13m 33.01s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_767_gas_balanced] | 21m 45.21s | 5m 16.79s | 13m 31.00s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_pawel_4_exp_heavy] | 21m 15.24s | 5m 33.33s | 13m 24.29s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_408_gas_balanced] | 20m 59.13s | 5m 35.71s | 13m 17.42s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_64] | 20m 37.03s | 5m 55.13s | 13m 16.08s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_32b_exp_40] | 20m 3.85s | 6m 13.27s | 13m 8.56s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g1add] | 21m 16.91s | 4m 51.75s | 13m 4.33s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_min_gas_balanced] | 20m 8.63s | 5m 34.62s | 12m 51.63s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_128b_exp_1024] | 20m 59.27s | 4m 40.14s | 12m 49.70s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_128b_exp_1024] | 20m 41.24s | 4m 37.76s | 12m 39.50s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1349n1] | 19m 22.58s | 5m 20.47s | 12m 21.52s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1360n2] | 19m 11.06s | 5m 25.87s | 12m 18.46s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_256b_exp_1024] | 20m 10.36s | 4m 22.57s | 12m 16.46s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_256b_exp_1024] | 20m 7.72s | 4m 21.37s | 12m 14.54s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_guido_1_even] | 16m 46.23s | 7m 35.93s | 12m 11.08s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_40] | 18m 42.36s | 5m 23.29s | 12m 2.82s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_exp_208_gas_balanced] | 18m 41.79s | 5m 22.65s | 12m 2.22s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_36] | 18m 11.88s | 5m 14.47s | 11m 43.17s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_32b_exp_cover_windows] | 17m 39.12s | 5m 3.86s | 11m 21.49s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g1msm] | 19m 5.60s | 3m 18.69s | 11m 12.14s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_2_pow_0x10001] | 17m 56.43s | 4m 20.06s | 11m 8.25s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_3_pow_0x10001] | 17m 56.16s | 4m 6.65s | 11m 1.40s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_pow_0x10001] | 17m 10.39s | 4m 26.13s | 10m 48.26s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_4_pow_0x10001] | 17m 36.50s | 3m 56.74s | 10m 46.62s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_5_pow_0x10001] | 16m 57.85s | 3m 49.30s | 10m 23.58s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_512b_exp_1024] | 16m 58.76s | 3m 39.20s | 10m 18.98s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_512b_exp_1024] | 16m 58.48s | 3m 38.73s | 10m 18.61s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_32_exp_32] | 15m 51.03s | 4m 36.29s | 10m 13.66s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n3] | 13m 43.60s | 3m 51.06s | 8m 47.33s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n2] | 13m 41.61s | 3m 49.32s | 8m 45.46s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_1152n1] | 13m 9.58s | 3m 52.00s | 8m 30.79s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_qube] | 12m 48.33s | 3m 13.34s | 8m 0.84s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_nagydani_1_square] | 12m 7.96s | 3m 3.15s | 7m 35.56s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bls12_g2msm] | 11m 37.84s | 2m 13.09s | 6m 55.47s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_vul_common_200n1] | 10m 33.70s | 3m 3.75s | 6m 48.73s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_DELEGATECALL] | 7m 36.01s | 5m 5.71s | 6m 20.86s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODESIZE] | 7m 33.85s | 5m 6.01s | 6m 19.93s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_STATICCALL] | 7m 32.22s | 5m 5.95s | 6m 19.08s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_CALLCODE] | 7m 27.85s | 5m 8.63s | 6m 18.24s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_CALL] | 7m 28.75s | 5m 7.71s | 6m 18.23s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODEHASH] | 7m 28.14s | 5m 2.83s | 6m 15.49s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_191] | 9m 52.41s | 2m 38.18s | 6m 15.29s |
+| test_worst_bytecode.py::test_worst_bytecode_single_opcode[fork_Prague-blockchain_test-opcode_EXTCODECOPY] | 7m 20.82s | 4m 57.50s | 6m 9.16s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_255] | 9m 39.07s | 2m 34.11s | 6m 6.59s |
+| test_worst_stateful_opcodes.py::test_worst_selfbalance[fork_Prague-blockchain_test-contract_balance_1] | 7m 31.84s | 4m 7.73s | 5m 49.78s |
+| test_worst_stateful_opcodes.py::test_worst_selfbalance[fork_Prague-blockchain_test-contract_balance_0] | 7m 28.64s | 4m 7.98s | 5m 48.31s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul] | 11m 19.61s | 14.13s | 5m 46.87s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_1_2_32_byte_scalar] | 10m 58.90s | 14.05s | 5m 36.47s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_32_byte_coord_and_scalar] | 10m 53.50s | 13.94s | 5m 33.72s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_5_pair] | 8m 40.65s | 32.98s | 4m 36.81s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_4_pair] | 8m 33.63s | 33.30s | 4m 33.46s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_127] | 7m 2.93s | 1m 58.26s | 4m 30.60s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_2_pair] | 8m 9.24s | 38.79s | 4m 24.01s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_two_pairings] | 8m 8.23s | 37.80s | 4m 23.01s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_191] | 6m 49.84s | 1m 55.87s | 4m 22.85s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_one_pairing] | 7m 53.60s | 45.19s | 4m 19.40s |
+| test_worst_compute.py::test_amortized_bn128_pairings[fork_Prague-blockchain_test] | 8m 3.29s | 26.47s | 4m 14.88s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_191] | 6m 27.45s | 1m 51.68s | 4m 9.57s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SDIV-1] | 6m 10.25s | 1m 43.21s | 3m 56.73s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SDIV-0] | 6m 4.73s | 1m 40.37s | 3m 52.55s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_MULMOD-mod_bits_63] | 5m 21.10s | 1m 41.53s | 3m 31.32s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_DIV-0] | 5m 23.64s | 1m 31.45s | 3m 27.54s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_127] | 5m 18.73s | 1m 25.19s | 3m 21.96s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_255] | 5m 0.73s | 1m 34.83s | 3m 17.78s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_infinities_32_byte_scalar] | 6m 24.80s | 8.83s | 3m 16.82s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_127] | 5m 8.80s | 1m 19.53s | 3m 14.17s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_DIV-1] | 4m 58.97s | 1m 27.93s | 3m 13.45s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_191] | 4m 48.26s | 1m 34.29s | 3m 11.28s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_255] | 4m 50.96s | 1m 29.22s | 3m 10.09s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_255] | 3m 53.78s | 1m 26.63s | 2m 40.21s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_PREVRANDAO] | 2m 51.59s | 2m 20.98s | 2m 36.28s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_127] | 3m 50.83s | 1m 16.12s | 2m 33.47s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_SMOD-mod_bits_63] | 3m 33.63s | 1m 6.43s | 2m 20.03s |
+| test_worst_compute.py::test_worst_mod[fork_Prague-blockchain_test-op_MOD-mod_bits_63] | 3m 22.74s | 1m 1.90s | 2m 12.31s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ecrecover] | 3m 42.06s | 38.28s | 2m 10.17s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add] | 2m 31.19s | 1m 47.19s | 2m 9.19s |
+| test_worst_compute.py::test_worst_keccak[fork_Prague-blockchain_test] | 2m 12.03s | 2m 5.86s | 2m 8.95s |
+| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-SHA2-256] | 3m 40.93s | 36.87s | 2m 8.90s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add_1_2] | 2m 26.30s | 1m 40.64s | 2m 3.47s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP15] | 2m 7.88s | 1m 49.10s | 1m 58.49s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP6] | 2m 8.44s | 1m 48.04s | 1m 58.24s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP12] | 2m 9.47s | 1m 46.64s | 1m 58.05s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP5] | 2m 10.11s | 1m 45.54s | 1m 57.83s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP2] | 2m 8.34s | 1m 47.27s | 1m 57.80s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP3] | 2m 8.51s | 1m 46.90s | 1m 57.70s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP4] | 2m 8.38s | 1m 46.53s | 1m 57.45s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP9] | 2m 7.10s | 1m 47.44s | 1m 57.27s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP14] | 2m 9.29s | 1m 45.16s | 1m 57.22s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP7] | 2m 8.34s | 1m 45.54s | 1m 56.94s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP16] | 2m 8.79s | 1m 44.85s | 1m 56.82s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP1] | 2m 9.82s | 1m 42.84s | 1m 56.33s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP13] | 2m 9.29s | 1m 43.26s | 1m 56.27s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP11] | 2m 8.62s | 1m 43.07s | 1m 55.84s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP8] | 2m 8.06s | 1m 43.43s | 1m 55.74s |
+| test_worst_compute.py::test_worst_swap[fork_Prague-blockchain_test-opcode_SWAP10] | 2m 7.41s | 1m 43.92s | 1m 55.66s |
+| test_worst_compute.py::test_worst_modarith[fork_Prague-blockchain_test-op_ADDMOD-mod_bits_63] | 2m 40.32s | 1m 5.09s | 1m 52.71s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SGT-] | 2m 35.29s | 1m 8.90s | 1m 52.09s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_EXP-] | 3m 8.33s | 28.66s | 1m 48.49s |
+| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-zero-loop] | 2m 20.43s | 1m 12.35s | 1m 46.39s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-empty-opcode_REVERT] | 2m 15.59s | 1m 17.02s | 1m 46.31s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_EQ-] | 2m 27.65s | 1m 4.12s | 1m 45.89s |
+| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-one-loop] | 2m 17.74s | 1m 13.81s | 1m 45.78s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_COINBASE] | 2m 5.68s | 1m 25.37s | 1m 45.53s |
+| test_worst_compute.py::test_worst_unop[fork_Prague-blockchain_test-opcode_ISZERO] | 2m 22.39s | 1m 8.25s | 1m 45.32s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_ORIGIN] | 2m 4.40s | 1m 25.38s | 1m 44.89s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_ADDRESS] | 2m 4.86s | 1m 15.33s | 1m 40.10s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CALLER] | 2m 7.98s | 1m 11.11s | 1m 39.55s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_CALL] | 2m 5.92s | 1m 10.87s | 1m 38.39s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_STATICCALL] | 2m 5.38s | 1m 10.70s | 1m 38.04s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_CALLCODE] | 2m 4.78s | 1m 9.58s | 1m 37.18s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-empty-opcode_RETURN] | 2m 4.39s | 1m 9.42s | 1m 36.91s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH32] | 1m 42.05s | 1m 31.46s | 1m 36.76s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH31] | 1m 41.67s | 1m 26.04s | 1m 33.85s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SMOD-] | 2m 10.21s | 56.19s | 1m 33.20s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH30] | 1m 40.46s | 1m 24.62s | 1m 32.54s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH29] | 1m 39.86s | 1m 22.65s | 1m 31.25s |
+| test_worst_compute.py::test_worst_calldataload[fork_Prague-blockchain_test-empty] | 1m 53.85s | 1m 2.19s | 1m 28.02s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH28] | 1m 35.11s | 1m 20.54s | 1m 27.83s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH27] | 1m 35.22s | 1m 18.72s | 1m 26.97s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_CALL] | 1m 52.44s | 1m 0.79s | 1m 26.61s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_STATICCALL] | 1m 50.73s | 1m 2.41s | 1m 26.57s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_CALLCODE] | 1m 51.71s | 1m 1.10s | 1m 26.41s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_DELEGATECALL] | 1m 50.39s | 1m 2.20s | 1m 26.30s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_MOD-] | 1m 56.31s | 49.59s | 1m 22.95s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH26] | 1m 31.37s | 1m 14.11s | 1m 22.74s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH25] | 1m 27.69s | 1m 14.00s | 1m 20.84s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH24] | 1m 27.59s | 1m 13.73s | 1m 20.66s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SAR-] | 1m 58.20s | 38.66s | 1m 18.43s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of zero data-opcode_REVERT] | 1m 43.99s | 52.21s | 1m 18.10s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH23] | 1m 28.73s | 1m 7.19s | 1m 17.96s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SSTORE new value] | 1m 42.84s | 51.48s | 1m 17.16s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH22] | 1m 27.69s | 1m 6.31s | 1m 17.00s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_DELEGATECALL] | 1m 36.84s | 54.22s | 1m 15.53s |
+| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-six blobs, access latest] | 1m 23.44s | 1m 6.29s | 1m 14.86s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_BLOBBASEFEE] | 1m 44.64s | 41.19s | 1m 12.91s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH21] | 1m 22.37s | 1m 3.02s | 1m 12.69s |
+| test_worst_compute.py::test_worst_shifts[fork_Prague-blockchain_test-shift_right_SAR] | 1m 48.57s | 35.17s | 1m 11.87s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of zero data-opcode_RETURN] | 1m 35.37s | 48.07s | 1m 11.72s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GASPRICE] | 1m 41.75s | 39.68s | 1m 10.72s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH20] | 1m 20.64s | 1m 0.76s | 1m 10.70s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH19] | 1m 20.62s | 1m 0.40s | 1m 10.51s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_add_infinities] | 1m 19.43s | 1m 1.41s | 1m 10.42s |
+| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-one blob and accessed] | 1m 22.80s | 57.80s | 1m 10.30s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SHR-] | 1m 41.31s | 33.15s | 1m 7.23s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SHL-] | 1m 41.60s | 31.08s | 1m 6.34s |
+| test_worst_compute.py::test_worst_shifts[fork_Prague-blockchain_test-shift_right_SHR] | 1m 40.41s | 31.96s | 1m 6.19s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH18] | 1m 16.35s | 55.88s | 1m 6.12s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_MUL-] | 1m 46.62s | 24.95s | 1m 5.78s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH17] | 1m 13.82s | 54.91s | 1m 4.37s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_NUMBER] | 1m 31.78s | 36.46s | 1m 4.12s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH16] | 1m 13.59s | 53.28s | 1m 3.44s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MSTORE] | 1m 26.11s | 39.77s | 1m 2.94s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-0 bytes] | 1m 31.68s | 33.27s | 1m 2.48s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH15] | 1m 14.84s | 50.08s | 1m 2.46s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MSTORE] | 1m 24.64s | 40.18s | 1m 2.41s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MSTORE] | 1m 25.27s | 39.47s | 1m 2.37s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_TIMESTAMP] | 1m 28.44s | 36.26s | 1m 2.35s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MSTORE] | 1m 24.02s | 40.47s | 1m 2.25s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-0 bytes-call] | 1m 32.50s | 31.96s | 1m 2.23s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MSTORE] | 1m 24.04s | 40.38s | 1m 2.21s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-0 bytes-transaction] | 1m 32.20s | 32.06s | 1m 2.13s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MSTORE] | 1m 24.20s | 39.97s | 1m 2.08s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MSTORE] | 1m 24.05s | 39.97s | 1m 2.01s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MSTORE] | 1m 24.72s | 39.18s | 1m 1.95s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MSTORE] | 1m 24.19s | 39.38s | 1m 1.78s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MSTORE] | 1m 23.88s | 39.66s | 1m 1.77s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MSTORE] | 1m 23.80s | 39.70s | 1m 1.74s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MSTORE] | 1m 24.23s | 38.99s | 1m 1.61s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH14] | 1m 11.53s | 48.92s | 1m 0.23s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of non-zero data-opcode_RETURN] | 1m 22.43s | 37.97s | 1m 0.20s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0 bytes] | 1m 30.24s | 30.15s | 1m 0.20s |
+| test_worst_compute.py::test_worst_jumpi_fallthrough[fork_Prague-blockchain_test] | 1m 24.41s | 35.87s | 1m 0.13s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1KiB of non-zero data-opcode_REVERT] | 1m 19.71s | 40.28s | 59.99s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MLOAD] | 1m 12.27s | 47.69s | 59.98s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MLOAD] | 1m 11.87s | 47.78s | 59.83s |
+| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_True-key_mut_True] | 1m 19.39s | 40.09s | 59.74s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-0 bytes] | 1m 28.78s | 30.37s | 59.58s |
+| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_True-key_mut_False] | 1m 19.29s | 39.58s | 59.44s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MLOAD] | 1m 11.49s | 47.38s | 59.43s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CHAINID] | 1m 22.85s | 35.66s | 59.26s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MLOAD] | 1m 10.66s | 47.77s | 59.22s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MLOAD] | 1m 10.55s | 47.89s | 59.22s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MLOAD] | 1m 11.14s | 47.28s | 59.21s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MLOAD] | 1m 10.61s | 47.69s | 59.15s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MLOAD] | 1m 9.99s | 48.28s | 59.13s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MLOAD] | 1m 9.49s | 48.27s | 58.88s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MLOAD] | 1m 9.70s | 47.89s | 58.79s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_CODESIZE] | 1m 20.83s | 36.57s | 58.70s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MLOAD] | 1m 9.56s | 47.69s | 58.62s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_BASEFEE] | 1m 21.66s | 35.56s | 58.61s |
+| test_worst_compute.py::test_worst_returndatasize_zero[fork_Prague-blockchain_test] | 1m 21.17s | 35.95s | 58.56s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SIGNEXTEND-] | 1m 28.44s | 28.45s | 58.44s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MLOAD] | 1m 9.02s | 47.60s | 58.31s |
+| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_0] | 1m 20.67s | 35.76s | 58.22s |
+| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1] | 1m 20.11s | 36.06s | 58.08s |
+| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1000] | 1m 19.64s | 35.36s | 57.50s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH13] | 1m 8.06s | 46.69s | 57.37s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GAS] | 1m 20.19s | 34.47s | 57.33s |
+| test_worst_compute.py::test_worst_zero_param[fork_Prague-blockchain_test-opcode_GASLIMIT] | 1m 19.86s | 34.26s | 57.06s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH0] | 1m 17.72s | 34.16s | 55.94s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH12] | 1m 5.71s | 44.46s | 55.09s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH11] | 1m 6.71s | 42.57s | 54.64s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SSTORE same value] | 1m 11.72s | 36.66s | 54.19s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-100 bytes] | 1m 17.14s | 31.05s | 54.09s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-100 bytes-call] | 1m 13.94s | 32.87s | 53.40s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-100 bytes-transaction] | 1m 14.36s | 32.25s | 53.31s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-0 bytes] | 1m 15.45s | 29.06s | 52.26s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-100 bytes-call] | 1m 12.30s | 31.05s | 51.68s |
+| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_True-non_zero_value_False] | 1m 14.80s | 27.15s | 50.98s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-100 bytes] | 1m 8.60s | 32.26s | 50.43s |
+| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_False-non_zero_value_False] | 1m 13.69s | 27.05s | 50.37s |
+| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_False-non_zero_value_True] | 1m 13.49s | 27.15s | 50.32s |
+| test_worst_compute.py::test_worst_callvalue[fork_Prague-blockchain_test-from_origin_True-non_zero_value_True] | 1m 13.07s | 27.18s | 50.12s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH7] | 1m 1.53s | 36.56s | 49.05s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH10] | 58.49s | 39.29s | 48.89s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-100 bytes-transaction] | 1m 9.59s | 26.76s | 48.17s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH9] | 57.69s | 38.47s | 48.08s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH8] | 56.77s | 38.50s | 47.64s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SLT-] | 1m 7.79s | 27.15s | 47.47s |
+| test_worst_compute.py::test_worst_jumpdests[fork_Prague-blockchain_test] | 1m 7.26s | 26.55s | 46.91s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_EXTCODEHASH] | 59.25s | 32.27s | 45.76s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-0 bytes-call] | 1m 5.21s | 25.55s | 45.38s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH6] | 55.98s | 34.47s | 45.22s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-0 bytes-transaction] | 1m 5.25s | 24.95s | 45.10s |
+| test_worst_stateful_opcodes.py::test_worst_blockhash[fork_Prague-blockchain_test] | 53.90s | 36.27s | 45.09s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-5b] | 58.41s | 31.27s | 44.84s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_SUB-] | 1m 4.37s | 23.34s | 43.86s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.RETURN] | 1m 1.39s | 25.85s | 43.62s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.REVERT] | 1m 1.33s | 25.75s | 43.54s |
+| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_1000] | 1m 1.57s | 25.46s | 43.52s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.REVERT] | 1m 1.23s | 25.76s | 43.50s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.RETURN] | 1m 1.28s | 25.65s | 43.47s |
+| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_10000] | 1m 1.52s | 25.27s | 43.40s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_1-return_data_style_ReturnDataStyle.IDENTITY] | 59.93s | 25.88s | 42.90s |
+| test_worst_compute.py::test_worst_returndatasize_nonzero[fork_Prague-blockchain_test-returned_size_0-return_data_style_ReturnDataStyle.IDENTITY] | 59.95s | 25.76s | 42.85s |
+| test_worst_compute.py::test_worst_calldatasize[fork_Prague-blockchain_test-calldata_length_0] | 1m 0.04s | 25.58s | 42.81s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH4] | 55.28s | 29.35s | 42.32s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-10KiB] | 1m 1.09s | 23.36s | 42.23s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_LT-] | 1m 3.05s | 21.25s | 42.15s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH5] | 52.37s | 31.69s | 42.03s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_0-opcode_MSTORE8] | 1m 1.32s | 22.46s | 41.89s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_BYTE-] | 1m 0.72s | 22.35s | 41.54s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_31-opcode_MSTORE8] | 1m 0.62s | 22.25s | 41.43s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_GT-] | 1m 1.60s | 20.84s | 41.22s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0 bytes] | 59.65s | 22.25s | 40.95s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_ADD-] | 58.88s | 22.94s | 40.91s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_31-opcode_MSTORE8] | 59.20s | 22.45s | 40.82s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_1-opcode_MSTORE8] | 58.86s | 22.26s | 40.56s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_31-opcode_MSTORE8] | 58.52s | 22.55s | 40.53s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_1-opcode_MSTORE8] | 58.68s | 22.34s | 40.51s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_1-opcode_MSTORE8] | 58.79s | 22.16s | 40.48s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_False-offset_0-opcode_MSTORE8] | 58.33s | 22.45s | 40.39s |
+| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_diff_acc_to_diff_acc] | 1m 5.77s | 14.44s | 40.10s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_False-offset_initialized_True-offset_0-opcode_MSTORE8] | 57.82s | 22.36s | 40.09s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_0-opcode_MSTORE8] | 58.12s | 22.04s | 40.08s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_True-offset_31-opcode_MSTORE8] | 57.77s | 22.34s | 40.05s |
+| test_worst_compute.py::test_worst_memory_access[fork_Prague-blockchain_test-big_memory_expansion_True-offset_initialized_False-offset_1-opcode_MSTORE8] | 58.09s | 21.96s | 40.02s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_XOR-] | 59.31s | 20.55s | 39.93s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_AND-] | 58.93s | 20.46s | 39.69s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-0 bytes] | 57.01s | 21.95s | 39.48s |
+| test_worst_compute.py::test_worst_binop_simple[fork_Prague-blockchain_test-opcode_OR-] | 58.25s | 20.44s | 39.34s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-100 bytes] | 55.58s | 22.25s | 38.91s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH3] | 49.64s | 27.98s | 38.81s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP4] | 54.94s | 21.75s | 38.34s |
+| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-one blob but access non-existent index] | 49.10s | 27.45s | 38.27s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP3] | 54.11s | 22.14s | 38.13s |
+| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-IDENTITY] | 1m 0.98s | 15.24s | 38.11s |
+| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_diff_acc_to_b] | 1m 2.26s | 13.63s | 37.94s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP10] | 54.06s | 21.78s | 37.92s |
+| test_worst_compute.py::test_worst_blobhash[fork_Prague-blockchain_test-no blobs] | 49.69s | 26.05s | 37.87s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP7] | 53.66s | 22.05s | 37.85s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP16] | 53.95s | 21.75s | 37.85s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP8] | 53.80s | 21.85s | 37.82s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP11] | 53.86s | 21.64s | 37.75s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP9] | 53.70s | 21.75s | 37.73s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP2] | 53.60s | 21.75s | 37.67s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP13] | 53.65s | 21.64s | 37.64s |
+| test_worst_compute.py::test_worst_unop[fork_Prague-blockchain_test-opcode_NOT] | 55.91s | 19.36s | 37.63s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP1] | 53.41s | 21.85s | 37.63s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP12] | 53.20s | 21.95s | 37.58s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP5] | 53.15s | 21.84s | 37.50s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP15] | 53.17s | 21.75s | 37.46s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_EXTCODESIZE] | 48.27s | 26.56s | 37.41s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP14] | 52.69s | 22.04s | 37.36s |
+| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_diff_acc] | 1m 2.26s | 12.45s | 37.35s |
+| test_worst_compute.py::test_worst_dup[fork_Prague-blockchain_test-opcode_DUP6] | 52.75s | 21.95s | 37.35s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_True-opcode_BALANCE] | 47.73s | 26.85s | 37.29s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH2] | 51.92s | 22.16s | 37.04s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-100 bytes-transaction] | 51.38s | 22.05s | 36.72s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-100 bytes] | 49.45s | 23.75s | 36.60s |
+| test_worst_compute.py::test_worst_jumpis[fork_Prague-blockchain_test] | 51.21s | 20.64s | 35.92s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-100 bytes-call] | 50.37s | 20.65s | 35.51s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-100 bytes-call] | 47.55s | 23.15s | 35.35s |
+| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_b] | 58.84s | 10.94s | 34.89s |
+| test_worst_compute.py::test_worst_push[fork_Prague-blockchain_test-opcode_PUSH1] | 48.65s | 21.06s | 34.85s |
+| test_worst_blocks.py::test_block_full_of_ether_transfers[fork_Prague-blockchain_test-case_id_a_to_a] | 58.22s | 11.03s | 34.63s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-00] | 48.28s | 20.15s | 34.21s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.25x max code size] | 42.33s | 25.55s | 33.94s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-10KiB] | 44.49s | 21.54s | 33.02s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-100 bytes-transaction] | 46.17s | 19.54s | 32.85s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-605b5b] | 44.76s | 20.84s | 32.80s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.75x max code size] | 39.77s | 25.77s | 32.77s |
+| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_False-key_mut_False] | 43.10s | 22.25s | 32.67s |
+| test_worst_compute.py::test_worst_tstore[fork_Prague-blockchain_test-dense_val_mut_False-key_mut_True] | 42.72s | 22.05s | 32.39s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-0.50x max code size] | 38.07s | 25.36s | 31.72s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_warm[fork_Prague-blockchain_test-SLOAD] | 42.78s | 20.65s | 31.72s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_False-max code size] | 37.78s | 25.24s | 31.51s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-10KiB-transaction] | 37.76s | 25.05s | 31.41s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_EXTCODEHASH] | 39.72s | 22.95s | 31.33s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_False-10KiB-call] | 37.16s | 25.05s | 31.11s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_False-1MiB] | 45.98s | 16.13s | 31.06s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-10KiB-call] | 38.62s | 22.65s | 30.64s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-10KiB] | 44.91s | 15.85s | 30.38s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_EXTCODESIZE] | 38.82s | 21.57s | 30.19s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_warm[fork_Prague-blockchain_test-absent_target_False-opcode_BALANCE] | 38.23s | 21.15s | 29.69s |
+| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_False-empty_authority_True] | 46.63s | 12.64s | 29.64s |
+| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_False-empty_authority_False] | 46.46s | 12.64s | 29.55s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-615b5b5b] | 39.95s | 18.56s | 29.25s |
+| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_True-empty_authority_False] | 45.52s | 12.34s | 28.93s |
+| test_worst_compute.py::test_worst_precompile_only_data_input[fork_Prague-blockchain_test-RIPEMD-160] | 37.18s | 19.84s | 28.51s |
+| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-512] | 37.17s | 19.64s | 28.41s |
+| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-1KiB] | 38.58s | 18.12s | 28.35s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value, out of gas] | 37.43s | 19.15s | 28.29s |
+| test_worst_blocks.py::test_worst_case_auth_block[fork_Prague-blockchain_test-zero_delegation_True-empty_authority_True] | 44.05s | 12.23s | 28.14s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value, revert] | 36.95s | 19.25s | 28.10s |
+| test_worst_compute.py::test_worst_jumps[fork_Prague-blockchain_test] | 39.40s | 16.74s | 28.07s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE same value] | 35.53s | 18.84s | 27.18s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-605b] | 38.46s | 15.74s | 27.10s |
+| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_True-key_mut_False] | 36.15s | 17.27s | 26.71s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSLOAD] | 35.10s | 17.94s | 26.52s |
+| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_True-key_mut_True] | 34.58s | 17.04s | 25.81s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_cold[fork_Prague-blockchain_test-absent_accounts_False-opcode_BALANCE] | 33.41s | 17.65s | 25.53s |
+| test_worst_bytecode.py::test_worst_initcode_jumpdest_analysis[fork_Prague-blockchain_test-615b5b] | 35.91s | 13.93s | 24.92s |
+| test_worst_memory.py::test_worst_mcopy[fork_Prague-blockchain_test-fixed_src_dst_True-1MiB] | 37.62s | 11.53s | 24.57s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value] | 33.44s | 15.15s | 24.30s |
+| test_worst_stateful_opcodes.py::test_worst_extcodecopy_warm[fork_Prague-blockchain_test-5KiB] | 32.42s | 15.23s | 23.83s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.25x max code size] | 30.86s | 14.55s | 22.71s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-10KiB-call] | 31.06s | 14.13s | 22.59s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.75x max code size] | 30.56s | 14.34s | 22.45s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_existing[fork_Prague-blockchain_test-value_bearing_True] | 29.26s | 15.15s | 22.21s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-max code size] | 29.77s | 14.64s | 22.20s |
+| test_worst_memory.py::test_worst_codecopy[fork_Prague-blockchain_test-fixed_src_dst_True-0.50x max code size] | 30.53s | 13.83s | 22.18s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-10KiB] | 30.02s | 14.33s | 22.17s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-10KiB-call] | 29.70s | 14.34s | 22.02s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_True-fixed_src_dst_True-10KiB-transaction] | 29.79s | 14.13s | 21.96s |
+| test_worst_blocks.py::test_block_full_data[fork_Prague-blockchain_test-zero_byte_True] | 25.49s | 14.04s | 19.76s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_existing[fork_Prague-blockchain_test-value_bearing_False] | 25.44s | 12.94s | 19.19s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSLOAD] | 25.58s | 12.73s | 19.16s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value, revert] | 23.04s | 12.24s | 17.64s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_False-SSTORE new value, out of gas] | 22.94s | 12.14s | 17.54s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-10KiB-transaction] | 23.74s | 11.34s | 17.54s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_32_byte_coord_and_2_scalar] | 23.48s | 9.73s | 16.61s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-10KiB-transaction] | 21.41s | 11.64s | 16.52s |
+| test_worst_stateful_opcodes.py::test_worst_address_state_cold[fork_Prague-blockchain_test-absent_accounts_True-opcode_BALANCE] | 22.59s | 10.43s | 16.51s |
+| test_worst_blocks.py::test_block_full_access_list_and_data[fork_Prague-blockchain_test] | 20.98s | 11.33s | 16.15s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_1_2_2_scalar] | 22.39s | 9.43s | 15.91s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-1MiB-transaction] | 21.59s | 8.63s | 15.11s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-bn128_mul_infinities_2_scalar] | 21.35s | 8.72s | 15.04s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-1MiB-call] | 21.46s | 8.54s | 15.00s |
+| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_100000] | 20.02s | 9.73s | 14.88s |
+| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_False-key_mut_False] | 19.44s | 9.73s | 14.58s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_False-1MiB] | 20.18s | 8.42s | 14.30s |
+| test_worst_compute.py::test_worst_tload[fork_Prague-blockchain_test-val_mut_False-key_mut_True] | 18.83s | 9.53s | 14.18s |
+| test_worst_memory.py::test_worst_returndatacopy[fork_Prague-blockchain_test-fixed_dst_True-1MiB] | 20.12s | 7.62s | 13.87s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_True-1MiB-call] | 19.64s | 7.62s | 13.63s |
+| test_worst_memory.py::test_worst_calldatacopy[fork_Prague-blockchain_test-non_zero_data_False-fixed_src_dst_False-1MiB-transaction] | 18.70s | 8.23s | 13.46s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log1] | 16.32s | 7.93s | 12.13s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of non-zero data-opcode_REVERT] | 16.45s | 7.62s | 12.04s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log0] | 16.16s | 7.82s | 11.99s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value] | 16.12s | 7.83s | 11.98s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log0] | 15.99s | 7.72s | 11.86s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of non-zero data-opcode_RETURN] | 16.15s | 7.43s | 11.79s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log3] | 15.32s | 8.03s | 11.68s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log2] | 15.29s | 7.86s | 11.57s |
+| test_worst_blocks.py::test_block_full_data[fork_Prague-blockchain_test-zero_byte_False] | 14.72s | 8.33s | 11.52s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log2] | 15.30s | 7.72s | 11.51s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value] | 14.75s | 8.04s | 11.39s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes with value-opcode_CREATE] | 15.74s | 7.03s | 11.38s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_2_sets] | 15.72s | 7.04s | 11.38s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log3] | 14.56s | 8.02s | 11.29s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with zero data-opcode_CREATE] | 15.29s | 7.13s | 11.21s |
+| test_worst_bytecode.py::test_worst_creates_collisions[fork_Prague-blockchain_test-opcode_CREATE] | 14.60s | 7.82s | 11.21s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log0] | 14.41s | 7.83s | 11.12s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log1] | 14.61s | 7.62s | 11.12s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of zero data-opcode_REVERT] | 15.30s | 6.92s | 11.11s |
+| test_worst_compute.py::test_worst_return_revert[fork_Prague-blockchain_test-1MiB of zero data-opcode_RETURN] | 15.18s | 7.03s | 11.11s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log0] | 14.08s | 7.93s | 11.00s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_created[fork_Prague-blockchain_test_from_state_test-value_bearing_False] | 13.94s | 7.82s | 10.88s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with zero data-opcode_CREATE] | 14.53s | 7.03s | 10.78s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_created[fork_Prague-blockchain_test_from_state_test-value_bearing_True] | 13.55s | 7.84s | 10.69s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log2] | 14.19s | 7.12s | 10.66s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes with value-opcode_CREATE2] | 14.28s | 7.02s | 10.65s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log4] | 13.97s | 7.32s | 10.64s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log1] | 14.46s | 6.82s | 10.64s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log4] | 14.10s | 7.12s | 10.61s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-0_bytes_data-log4] | 13.81s | 7.36s | 10.59s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log2] | 14.01s | 7.02s | 10.51s |
+| test_worst_bytecode.py::test_worst_creates_collisions[fork_Prague-blockchain_test-opcode_CREATE2] | 13.99s | 6.92s | 10.46s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-0_bytes_data-log4] | 13.54s | 7.32s | 10.43s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log3] | 13.56s | 7.28s | 10.42s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes without value-opcode_CREATE] | 13.95s | 6.82s | 10.38s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_initcode[fork_Prague-blockchain_test_from_state_test-value_bearing_True] | 13.61s | 7.13s | 10.37s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-0_bytes_data-log3] | 13.71s | 7.02s | 10.37s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0 bytes without value-opcode_CREATE2] | 13.63s | 7.02s | 10.32s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-0_bytes_data-log1] | 13.71s | 6.82s | 10.27s |
+| test_worst_stateful_opcodes.py::test_worst_selfdestruct_initcode[fork_Prague-blockchain_test_from_state_test-value_bearing_False] | 13.63s | 6.82s | 10.22s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value, out of gas] | 13.49s | 6.92s | 10.21s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with non-zero data-opcode_CREATE2] | 13.45s | 6.82s | 10.14s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value, revert] | 13.38s | 6.83s | 10.10s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE new value, revert] | 13.37s | 6.82s | 10.09s |
+| test_worst_stateful_opcodes.py::test_worst_storage_access_cold[fork_Prague-blockchain_test-absent_slots_True-SSTORE same value, out of gas] | 13.34s | 6.82s | 10.08s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log4] | 13.31s | 6.84s | 10.07s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with zero data-opcode_CREATE2] | 13.01s | 7.12s | 10.07s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with non-zero data-opcode_CREATE2] | 13.18s | 6.92s | 10.05s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with non-zero data-opcode_CREATE2] | 13.16s | 6.92s | 10.04s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log1] | 12.99s | 7.03s | 10.01s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log4] | 13.36s | 6.63s | 9.99s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_zero_input] | 12.71s | 7.17s | 9.94s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with zero data-opcode_CREATE2] | 12.68s | 7.13s | 9.91s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with non-zero data-opcode_CREATE2] | 12.89s | 6.83s | 9.86s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with non-zero data-opcode_CREATE] | 12.88s | 6.82s | 9.85s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with zero data-opcode_CREATE2] | 12.77s | 6.92s | 9.84s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with non-zero data-opcode_CREATE] | 12.81s | 6.83s | 9.82s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log2] | 12.65s | 6.93s | 9.79s |
+| test_worst_compute.py::test_worst_msize[fork_Prague-blockchain_test-mem_size_1000000] | 12.66s | 6.92s | 9.79s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.50x max code size with zero data-opcode_CREATE] | 12.62s | 6.94s | 9.78s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log2] | 12.41s | 7.13s | 9.77s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log0] | 12.51s | 7.03s | 9.77s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log1] | 12.47s | 7.03s | 9.75s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.75x max code size with non-zero data-opcode_CREATE] | 12.45s | 7.02s | 9.73s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log2] | 12.29s | 7.12s | 9.71s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log2] | 12.57s | 6.82s | 9.70s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log0] | 12.37s | 7.02s | 9.70s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log4] | 12.56s | 6.83s | 9.70s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log4] | 12.35s | 7.02s | 9.68s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log1] | 12.43s | 6.93s | 9.68s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log3] | 12.40s | 6.92s | 9.66s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_1_pair] | 12.50s | 6.82s | 9.66s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log2] | 12.39s | 6.93s | 9.66s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log1] | 12.39s | 6.92s | 9.66s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-max code size with zero data-opcode_CREATE2] | 12.29s | 7.02s | 9.65s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log0] | 12.28s | 7.03s | 9.65s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_3_pair] | 12.45s | 6.83s | 9.64s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log1] | 12.35s | 6.92s | 9.64s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log0] | 12.40s | 6.84s | 9.62s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log0] | 12.21s | 7.02s | 9.62s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with non-zero data-opcode_CREATE] | 12.39s | 6.82s | 9.61s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log3] | 12.46s | 6.72s | 9.59s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log1] | 12.33s | 6.82s | 9.58s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log3] | 12.32s | 6.82s | 9.57s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log4] | 12.20s | 6.92s | 9.56s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log4] | 12.22s | 6.82s | 9.52s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log0] | 12.09s | 6.95s | 9.52s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log2] | 12.08s | 6.93s | 9.51s |
+| test_worst_bytecode.py::test_worst_create[fork_Prague-blockchain_test-0.25x max code size with zero data-opcode_CREATE] | 11.98s | 7.03s | 9.50s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_zeros_data-log0] | 12.08s | 6.92s | 9.50s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log4] | 11.96s | 7.03s | 9.50s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_zeros_data-log1] | 12.02s | 6.92s | 9.47s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_odd_1024b_exp_1024] | 11.93s | 6.94s | 9.43s |
+| test_worst_compute.py::test_worst_modexp[fork_Prague-blockchain_test-mod_even_1024b_exp_1024] | 12.01s | 6.82s | 9.41s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log3] | 12.04s | 6.74s | 9.39s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-zeros_topic-1_MiB_non_zero_data-log3] | 11.85s | 6.92s | 9.39s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-zeros_topic-1_MiB_non_zero_data-log3] | 11.75s | 7.03s | 9.39s |
+| test_worst_compute.py::test_worst_precompile_fixed_cost[fork_Prague-blockchain_test-ec_pairing_1_pair_empty] | 11.90s | 6.82s | 9.36s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log3] | 11.80s | 6.92s | 9.36s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log2] | 11.75s | 6.93s | 9.34s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log4] | 11.71s | 6.93s | 9.32s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_zeros_data-log1] | 11.81s | 6.82s | 9.31s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_False-non_zero_topic-1_MiB_non_zero_data-log0] | 11.87s | 6.72s | 9.29s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_zeros_data-log3] | 11.36s | 6.82s | 9.09s |
+| test_worst_opcode.py::test_worst_log_opcodes[fork_Prague-blockchain_test-fixed_offset_True-non_zero_topic-1_MiB_non_zero_data-log2] | 11.24s | 6.92s | 9.08s |
+| test_worst_compute.py::test_empty_block[fork_Prague-blockchain_test] | 8.96s | 6.22s | 7.59s |
 
 ## Summary
 
@@ -1125,7 +1125,7 @@ EEST benchmarks with 5M-gas-limit gas limit (proving results) on **1xL40s** hard
 | zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
 |------|-------|---------------|----------------|--------------------|
 | sp1-v5.2.3 | 533 | 532 | 1 | 0 |
-| zisk-v0.13.0 | 533 | 497 | 36 | 0 |
+| zisk-v0.14.0 | 533 | 499 | 34 | 0 |
 
 ---
 
