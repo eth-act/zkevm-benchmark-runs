@@ -189,67 +189,109 @@ GROUP_PATTERNS = [
 ]
 
 
-def _match_rules(text: str, rules: list[dict[str, Any]]) -> str | None:
-    """Return canonical rule name if text matches any pattern in the rules."""
-    for rule in rules:
-        for pattern in rule["patterns"]:
-            if pattern.match(text):
-                return rule["name"]
-    return None
+def match_operation(text: str, rules: list[dict[str, Any]], strategy: str = "exact") -> str | None:
+    """
+    Match text against operation rules using the specified strategy.
 
+    Args:
+        text: The text to match against rules
+        rules: List of rule dictionaries with 'name' and 'patterns' keys
+        strategy: Matching strategy:
+            - "exact": Pattern must match the entire text (uses regex.match)
+            - "search": Pattern can match anywhere in text (uses regex.search)
+            - "tokens": Split text into tokens, match each token exactly
 
-def _search_rules(text: str, rules: list[dict[str, Any]]) -> str | None:
-    """Return canonical rule name if any pattern is found within the text."""
-    for rule in rules:
-        for pattern in rule["patterns"]:
-            if pattern.search(text):
-                return rule["name"]
-    return None
+    Returns:
+        Canonical operation name if matched, None otherwise
+    """
+    if strategy == "exact":
+        for rule in rules:
+            for pattern in rule["patterns"]:
+                if pattern.match(text):
+                    return rule["name"]
+        return None
 
+    if strategy == "search":
+        for rule in rules:
+            for pattern in rule["patterns"]:
+                if pattern.search(text):
+                    return rule["name"]
+        return None
 
-def _match_rules_in_tokens(text: str, rules: list[dict[str, Any]]) -> str | None:
-    """Split text into tokens and try to match each against rules."""
-    tokens = [t for t in re.split(r"[^A-Za-z0-9]+", text) if t]
-    for token in tokens:
-        match = _match_rules(token, rules)
-        if match:
-            return match
-    return None
+    if strategy == "tokens":
+        tokens = [t for t in re.split(r"[^A-Za-z0-9]+", text) if t]
+        for token in tokens:
+            result = match_operation(token, rules, strategy="exact")
+            if result:
+                return result
+        return None
+
+    raise ValueError(f"Unknown matching strategy: {strategy}")
 
 
 def categorize_operation(op: str) -> Category:
     """Bucket operation into Opcode / Precompile / Other."""
-    if _match_rules(op, PRECOMPILE_RULES):
+    if match_operation(op, PRECOMPILE_RULES, strategy="exact"):
         return Category.PRECOMPILE
-    if _match_rules(op, OPCODE_RULES):
+    if match_operation(op, OPCODE_RULES, strategy="exact"):
         return Category.OPCODE
     return Category.OTHER
 
 
 def match_rule_in_text(text: str, rules: list[dict[str, Any]]) -> str | None:
-    """Return canonical rule name if any of its patterns appear in the text."""
-    # Direct search across whole string
-    result = _search_rules(text, rules)
+    """
+    Return canonical rule name if any of its patterns appear in the text.
+
+    Tries two strategies in order:
+    1. Search: Look for pattern anywhere in the text
+    2. Tokens: Split into tokens and match each exactly
+
+    The token fallback handles anchored patterns like ^BN128_ADD.*$ that
+    won't match via search in longer strings.
+    """
+    # First try: search anywhere in text
+    result = match_operation(text, rules, strategy="search")
     if result:
         return result
 
-    # Fallback: scan tokens to satisfy anchored patterns like ^BN128_ADD.*$
-    return _match_rules_in_tokens(text, rules)
+    # Fallback: tokenize and match each token
+    return match_operation(text, rules, strategy="tokens")
 
 
 def extract_operation(test_name: str) -> str:
-    """Extract the operation name from test parameters."""
-    # First, check the function name - it's the most reliable indicator for precompiles
-    # (e.g., test_modexp tests have op_region starting with "mod_" which would wrongly match MOD opcode)
+    """
+    Extract the operation name from test parameters.
+
+    This function uses a priority-based extraction strategy to identify
+    which EVM operation (opcode or precompile) a test is benchmarking.
+
+    Extraction priority (stops at first match):
+        1. Function name for precompiles (e.g., test_modexp -> MODEXP)
+        2. Parameter region after "blockchain_test" for precompiles
+        3. Parameter region for opcodes
+        4. Function name for opcodes
+        5. Variant info from test name
+        6. Fallback: "Unknown"
+
+    This ordering prioritizes precompile detection to avoid false positives.
+    For example, MODEXP tests have "mod_" in params which could wrongly
+    match the MOD opcode if we checked opcodes first.
+
+    Args:
+        test_name: Full test identifier string (e.g., "test_foo.py::test_bar[...]")
+
+    Returns:
+        Canonical operation name (e.g., "MODEXP", "KECCAK256", "ADD")
+    """
+    # Step 1: Extract function name (most reliable for precompiles)
     func_match = re.search(r"::test_([a-z0-9_]+)\[", test_name)
     if func_match:
         func_name = func_match.group(1).upper()
-        # Check precompiles first from function name
         rule_match = match_rule_in_text(func_name, PRECOMPILE_RULES)
         if rule_match:
             return rule_match
 
-    # Limit rule matching to the parameter section after "blockchain_test"
+    # Step 2: Extract parameter region after "blockchain_test"
     params_match = re.search(r"\[(.*)\]", test_name)
     op_region = ""
     if params_match:
@@ -257,6 +299,7 @@ def extract_operation(test_name: str) -> str:
         if "blockchain_test" in params:
             op_region = params.split("blockchain_test", 1)[1].lstrip("-")
 
+    # Step 3: Check parameter region for precompiles, then opcodes
     if op_region:
         rule_match = match_rule_in_text(op_region, PRECOMPILE_RULES)
         if rule_match:
@@ -266,19 +309,21 @@ def extract_operation(test_name: str) -> str:
         if rule_match:
             return rule_match
 
-    # Fall back to function name for opcodes
+    # Step 4: Fall back to function name for opcodes
     if func_match:
         func_name = func_match.group(1).upper()
         rule_match = match_rule_in_text(func_name, OPCODE_RULES)
         if rule_match:
             return rule_match
+        # Use function name as-is (title case)
         return func_match.group(1).replace("_", " ").title()
 
-    # Try to extract specific test variant info
+    # Step 5: Try to extract variant info from test name
     variant_match = re.search(r"\[.*?-([\w\s]+)\]\.json$", test_name)
     if variant_match:
         return variant_match.group(1)
 
+    # Step 6: Unknown operation
     return "Unknown"
 
 
@@ -291,11 +336,16 @@ def normalize_operation(operation: str) -> str:
 
 
 def canonicalize_operation(operation: str) -> str:
-    """Return canonical name if operation matches a known precompile or opcode rule."""
-    result = _match_rules(operation, PRECOMPILE_RULES)
+    """
+    Return canonical name if operation matches a known precompile or opcode rule.
+
+    This ensures consistent naming even if the input uses an alias
+    (e.g., SHA3 -> KECCAK256, DIFFICULTY -> PREVRANDAO).
+    """
+    result = match_operation(operation, PRECOMPILE_RULES, strategy="exact")
     if result:
         return result
-    result = _match_rules(operation, OPCODE_RULES)
+    result = match_operation(operation, OPCODE_RULES, strategy="exact")
     if result:
         return result
     return operation
@@ -330,8 +380,39 @@ def discover_zkvms(benchmark_base: Path) -> list[str]:
     return zkvms
 
 
-def parse_result_file(file_path: Path) -> dict[str, Any] | None:
-    """Parse a single result JSON file."""
+def validate_result(result: dict[str, Any], file_path: Path) -> list[str]:
+    """
+    Validate a parsed result and return list of warnings.
+
+    Args:
+        result: Parsed result dictionary
+        file_path: Source file path (for warning messages)
+
+    Returns:
+        List of warning messages (empty if valid)
+    """
+    warnings = []
+
+    if result.get("block_used_gas") is None:
+        warnings.append(f"{file_path.name}: missing block_used_gas")
+
+    if result.get("status") == "success":
+        if not result.get("proving_time_ms"):
+            warnings.append(f"{file_path.name}: success status but no proving_time_ms")
+
+    return warnings
+
+
+def parse_result_file(file_path: Path) -> tuple[dict[str, Any] | None, list[str]]:
+    """
+    Parse a single result JSON file.
+
+    Args:
+        file_path: Path to the JSON result file
+
+    Returns:
+        Tuple of (parsed result or None, list of warnings)
+    """
     try:
         with open(file_path) as f:
             data = json.load(f)
@@ -353,10 +434,12 @@ def parse_result_file(file_path: Path) -> dict[str, Any] | None:
         else:
             result["status"] = "unknown"
 
-        return result
+        warnings = validate_result(result, file_path)
+        return result, warnings
+
     except (json.JSONDecodeError, OSError) as e:
         logger.error("Error parsing %s: %s", file_path, e)
-        return None
+        return None, [f"{file_path.name}: parse error - {e}"]
 
 
 def load_hardware_info(hardware_file: Path) -> dict[str, Any]:
@@ -398,9 +481,24 @@ def discover_el_clients(config_path: Path) -> list[str]:
     return el_clients
 
 
-def process_all_results(config_path: Path, hardware_file: Path, config_name: str) -> dict[str, Any]:
-    """Process all benchmark results across all EL clients and generate consolidated data."""
+def process_all_results(
+    config_path: Path,
+    hardware_file: Path,
+    config_name: str,
+    hardware_id: str,
+) -> dict[str, Any]:
+    """
+    Process all benchmark results across all EL clients and generate consolidated data.
 
+    Args:
+        config_path: Path to the configuration directory (e.g., .../10M-gas-limit)
+        hardware_file: Path to hardware.json
+        config_name: Name of the configuration (e.g., "10M-gas-limit")
+        hardware_id: Hardware identifier (e.g., "1xL40s")
+
+    Returns:
+        Consolidated data structure ready for JSON serialization
+    """
     # Discover all EL clients
     el_clients = discover_el_clients(config_path)
     logger.info("Discovered EL clients: %s", el_clients)
@@ -415,6 +513,7 @@ def process_all_results(config_path: Path, hardware_file: Path, config_name: str
 
     # Track all EL/zkVM combinations
     all_el_zkvms: list[str] = []
+    all_warnings: list[str] = []
 
     for el_client in el_clients:
         el_path = config_path / el_client
@@ -431,7 +530,9 @@ def process_all_results(config_path: Path, hardware_file: Path, config_name: str
             logger.info("  Processing %s: %d files", el_zkvm, len(json_files))
 
             for json_file in json_files:
-                result = parse_result_file(json_file)
+                result, warnings = parse_result_file(json_file)
+                all_warnings.extend(warnings)
+
                 if result is None:
                     continue
 
@@ -465,6 +566,14 @@ def process_all_results(config_path: Path, hardware_file: Path, config_name: str
                         "crash_reason": result.get("crash_reason", "Unknown"),
                     }
 
+    # Log data validation warnings
+    if all_warnings:
+        logger.warning("Data validation warnings (%d):", len(all_warnings))
+        for warning in all_warnings[:10]:  # Show first 10
+            logger.warning("  %s", warning)
+        if len(all_warnings) > 10:
+            logger.warning("  ... and %d more warnings", len(all_warnings) - 10)
+
     # Sort EL/zkVM combinations for consistent ordering
     all_el_zkvms.sort()
 
@@ -485,12 +594,12 @@ def process_all_results(config_path: Path, hardware_file: Path, config_name: str
     # Build output
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "hardware": "1xL40s",
+        "hardware": hardware_id,
         "hardware_info": load_hardware_info(hardware_file),
         "gas_limit": gas_limit,
         "config": config_name,
         "el_clients": el_clients,
-        "zkvms": all_el_zkvms,  # Now contains "el_client/zkvm" format
+        "zkvms": all_el_zkvms,  # Contains "el_client/zkvm" format
         "operations": operations,
         "operations_by_category": operations_by_category,
         "tests": tests_list,
@@ -535,6 +644,10 @@ def main():
 
     logger.info("Discovered EEST configurations: %s", eest_configs)
 
+    # Extract hardware ID from path (e.g., "1xL40s" from ".../proving/1xL40s")
+    hardware_id = proving_base.name
+    logger.info("Hardware: %s", hardware_id)
+
     # Process each configuration
     manifest_datasets = []
     for config_name in eest_configs:
@@ -543,7 +656,7 @@ def main():
         config_path = proving_base / config_name
         hardware_file = config_path / "hardware.json"
 
-        output = process_all_results(config_path, hardware_file, config_name)
+        output = process_all_results(config_path, hardware_file, config_name, hardware_id)
 
         # Write output file for this configuration
         output_file = output_dir / f"results-{config_name}.json"
