@@ -41,8 +41,8 @@ export class BenchmarkApp {
         // ====================================================================
         // Sort State
         // ====================================================================
-        this.sortColumn = 'name';
-        this.sortDirection = 'asc';
+        this.sortColumn = 'worst-time';
+        this.sortDirection = 'desc';
 
         // ====================================================================
         // Pagination State
@@ -256,10 +256,10 @@ export class BenchmarkApp {
                 if (!searchStr.includes(searchTerm)) return false;
             }
 
-            // Min relative cost filter
+            // Min relative cost filter (crashed tests = infinite cost, always pass)
             if (this.minRelativeCost !== null) {
                 const relativeCost = this.dataAccessor.getRelativeCost(test, activeZkvm);
-                if (relativeCost === null || relativeCost < this.minRelativeCost) return false;
+                if (relativeCost !== null && relativeCost < this.minRelativeCost) return false;
             }
 
             return true;
@@ -287,6 +287,20 @@ export class BenchmarkApp {
     }
 
     /**
+     * Checks if any test in a group crashed for a specific zkVM.
+     * Matches the display logic in renderer.hasAnyCrashed.
+     */
+    hasAnyCrashed(group, zkvm) {
+        return group.tests.some(test => {
+            if (zkvm === VIEW.WORST) {
+                return this.dataAccessor.isAllCrashed(test);
+            }
+            const result = test.results[zkvm];
+            return !result || result.status !== STATUS.SUCCESS;
+        });
+    }
+
+    /**
      * Sorts grouped data based on current sort settings.
      */
     sortGroupedData() {
@@ -300,14 +314,19 @@ export class BenchmarkApp {
                 case 'name':
                     return group.testCount;
                 case 'worst-time':
+                    if (this.hasAnyCrashed(group, VIEW.WORST)) return Infinity;
                     return this.dataAccessor.getGroupWorstCase(group, VIEW.WORST).time ?? Infinity;
                 case 'worst-relative':
+                    if (this.hasAnyCrashed(group, VIEW.WORST)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, VIEW.WORST) ?? Infinity;
                 case 'zkvm-time':
+                    if (this.hasAnyCrashed(group, zkvm)) return Infinity;
                     return this.dataAccessor.getGroupWorstCase(group, zkvm).time ?? Infinity;
                 case 'zkvm-relative':
+                    if (this.hasAnyCrashed(group, zkvm)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, zkvm) ?? Infinity;
                 default:
+                    if (this.hasAnyCrashed(group, activeZkvm)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, activeZkvm) ?? Infinity;
             }
         };

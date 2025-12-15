@@ -73,12 +73,12 @@ export const URLState = {
         }
 
         // Sort column (only if not default)
-        if (state.sortColumn !== 'name') {
+        if (state.sortColumn !== 'worst-time') {
             params.set(URL_PARAMS.SORT_COLUMN, state.sortColumn);
         }
 
         // Sort direction (only if not default)
-        if (state.sortDirection !== 'asc') {
+        if (state.sortDirection !== 'desc') {
             params.set(URL_PARAMS.SORT_DIR, state.sortDirection);
         }
 
