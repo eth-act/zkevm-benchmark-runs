@@ -72,6 +72,43 @@ export class DataAccessor {
         this.data = data;
         this.cache = cache;
         this.targetMGasPerS = 7; // Default, will be updated
+
+        // Baseline data for marginal cost calculations
+        this.baselineData = null;
+        this.baselineConfig = null;
+        this.marginalGas = null; // Gas difference between current and baseline
+    }
+
+    /**
+     * Sets the baseline dataset for marginal cost calculations.
+     * @param {Object} baselineData - The baseline dataset
+     * @param {string} baselineConfig - The baseline config name (e.g., "10M-gas-limit")
+     * @param {number} marginalGas - Gas difference between current and baseline datasets
+     */
+    setBaselineData(baselineData, baselineConfig, marginalGas) {
+        this.baselineData = baselineData;
+        this.baselineConfig = baselineConfig;
+        this.marginalGas = marginalGas;
+        // Clear caches since marginal calculations depend on baseline
+        this.cache.clearAll();
+    }
+
+    /**
+     * Clears the baseline data (switches back to absolute mode).
+     */
+    clearBaselineData() {
+        this.baselineData = null;
+        this.baselineConfig = null;
+        this.marginalGas = null;
+        this.cache.clearAll();
+    }
+
+    /**
+     * Checks if baseline data is loaded for marginal calculations.
+     * @returns {boolean}
+     */
+    hasBaselineData() {
+        return this.baselineData !== null;
     }
 
     /**
@@ -217,6 +254,117 @@ export class DataAccessor {
         const cost = this.targetMGasPerS / actualMGasPerS;
         this.cache.relativeCost.set(cacheKey, cost);
         return cost;
+    }
+
+    // ========================================================================
+    // Marginal Cost Calculations
+    // ========================================================================
+
+    /**
+     * Normalizes a test ID by removing the gas limit value.
+     * e.g., "test_arithmetic[fork_Prague-benchmark-gas-value_30M-..."
+     *    -> "test_arithmetic[fork_Prague-benchmark-gas-value_XXM-..."
+     * @private
+     */
+    normalizeTestId(testId) {
+        // Replace gas-value_XXM pattern with a normalized placeholder
+        return testId.replace(/gas-value_\d+M/g, 'gas-value_XXM');
+    }
+
+    /**
+     * Finds the matching test in the baseline dataset.
+     * Matches by normalized test ID (ignoring gas limit differences).
+     *
+     * @param {Object} test - The test object from current dataset
+     * @returns {Object|null} Matching test from baseline, or null if not found
+     */
+    findBaselineTest(test) {
+        if (!this.baselineData) return null;
+        const normalizedId = this.normalizeTestId(test.id);
+        return this.baselineData.tests.find(t => this.normalizeTestId(t.id) === normalizedId) || null;
+    }
+
+    /**
+     * Gets the marginal proving time (current - baseline) for a test.
+     *
+     * @param {Object} test - The test object from current dataset
+     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
+     * @returns {number|null} Marginal time in ms, or null if unavailable
+     */
+    getMarginalProvingTime(test, zkvm) {
+        const baselineTest = this.findBaselineTest(test);
+        if (!baselineTest) return null;
+
+        const currentTime = zkvm === VIEW.WORST
+            ? this.getWorstCaseTime(test)
+            : this.getProvingTime(test, zkvm);
+
+        // For baseline worst case, we need to use the same zkvm as current
+        // to get a fair comparison
+        const baselineTime = zkvm === VIEW.WORST
+            ? this.getBaselineWorstCaseTime(baselineTest)
+            : this.getBaselineProvingTime(baselineTest, zkvm);
+
+        if (currentTime === null || baselineTime === null) return null;
+
+        return currentTime - baselineTime;
+    }
+
+    /**
+     * Gets the proving time for a test in the baseline dataset.
+     * @private
+     */
+    getBaselineProvingTime(baselineTest, zkvm) {
+        const result = baselineTest.results[zkvm];
+        if (!result || result.status !== STATUS.SUCCESS) return null;
+        return result.proving_time_ms;
+    }
+
+    /**
+     * Gets the worst-case proving time for a test in the baseline dataset.
+     * @private
+     */
+    getBaselineWorstCaseTime(baselineTest) {
+        let maxTime = null;
+        for (const zkvm of this.baselineData.zkvms) {
+            const result = baselineTest.results[zkvm];
+            if (result && result.status === STATUS.SUCCESS) {
+                const time = result.proving_time_ms;
+                if (time !== null && (maxTime === null || time > maxTime)) {
+                    maxTime = time;
+                }
+            }
+        }
+        return maxTime;
+    }
+
+    /**
+     * Gets the marginal relative cost for a test.
+     * Uses marginal gas (difference between datasets) instead of absolute gas.
+     *
+     * @param {Object} test - The test object from current dataset
+     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
+     * @returns {number|null} Marginal relative cost multiplier, or null if unavailable
+     */
+    getMarginalRelativeCost(test, zkvm) {
+        const marginalTime = this.getMarginalProvingTime(test, zkvm);
+        if (marginalTime === null || marginalTime <= 0 || !this.marginalGas) return null;
+
+        // Calculate marginal throughput: marginal_gas / marginal_time
+        const marginalMGasPerS = this.marginalGas / marginalTime / 1000;
+        if (marginalMGasPerS <= 0) return null;
+
+        return this.targetMGasPerS / marginalMGasPerS;
+    }
+
+    /**
+     * Checks if a test has valid marginal data (exists in both datasets).
+     *
+     * @param {Object} test - The test object from current dataset
+     * @returns {boolean} True if marginal data is available
+     */
+    hasMarginalData(test) {
+        return this.findBaselineTest(test) !== null;
     }
 
     // ========================================================================

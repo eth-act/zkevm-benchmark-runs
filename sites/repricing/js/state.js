@@ -4,7 +4,7 @@
  * This enables shareable links that preserve the current view.
  */
 
-import { CONFIG, URL_PARAMS, VIEW, HARDWARE_TARGET_DEFAULTS } from './constants.js';
+import { CONFIG, URL_PARAMS, VIEW, VALUE_MODE, HARDWARE_TARGET_DEFAULTS } from './constants.js';
 
 // ============================================================================
 // URL State Manager
@@ -26,6 +26,7 @@ export const URLState = {
             dataset: params.get(URL_PARAMS.DATASET),
             target: parseFloat(params.get(URL_PARAMS.TARGET)) || null,
             zkvmView: params.get(URL_PARAMS.ZKVM_VIEW),
+            valueMode: params.get(URL_PARAMS.VALUE_MODE),
             search: params.get(URL_PARAMS.SEARCH),
             hideCrashed: params.get(URL_PARAMS.HIDE_CRASHED) === '1',
             operations: params.get(URL_PARAMS.OPERATIONS)?.split(',').filter(Boolean) || null,
@@ -67,6 +68,11 @@ export const URLState = {
         // zkVM view mode
         if (state.zkvmView !== VIEW.WORST) {
             params.set(URL_PARAMS.ZKVM_VIEW, state.zkvmView);
+        }
+
+        // Value mode (absolute vs marginal)
+        if (state.valueMode && state.valueMode !== VALUE_MODE.ABSOLUTE) {
+            params.set(URL_PARAMS.VALUE_MODE, state.valueMode);
         }
 
         // Search query
@@ -139,6 +145,9 @@ export function applyURLStateToApp(urlState, appState) {
     if (urlState.dataset) appState.selectedDataset = urlState.dataset;
     if (urlState.target && urlState.target > 0) appState.targetMGasPerS = urlState.target;
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;
+    if (urlState.valueMode && Object.values(VALUE_MODE).includes(urlState.valueMode)) {
+        appState.valueMode = urlState.valueMode;
+    }
     if (urlState.sortColumn) appState.sortColumn = urlState.sortColumn;
     if (urlState.sortDirection) appState.sortDirection = urlState.sortDirection;
     if (urlState.page) appState.currentPage = urlState.page;

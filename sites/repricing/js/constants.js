@@ -51,6 +51,17 @@ export const VIEW = Object.freeze({
 });
 
 // ============================================================================
+// Value Mode Constants (Absolute vs Marginal)
+// ============================================================================
+
+export const VALUE_MODE = Object.freeze({
+    // Show absolute proving times for the selected dataset
+    ABSOLUTE: 'absolute',
+    // Show marginal costs (delta from previous dataset)
+    MARGINAL: 'marginal',
+});
+
+// ============================================================================
 // Thresholds
 // ============================================================================
 
@@ -93,6 +104,7 @@ export const URL_PARAMS = Object.freeze({
     DATASET: 'dataset',
     TARGET: 'target',
     ZKVM_VIEW: 'view',
+    VALUE_MODE: 'mode',  // 'absolute' or 'marginal'
     SEARCH: 'q',
     HIDE_CRASHED: 'hideCrashed',
     OPERATIONS: 'ops',
@@ -109,3 +121,53 @@ export const URL_PARAMS = Object.freeze({
 
 // Order in which categories appear in the UI
 export const CATEGORY_ORDER = ['Opcode', 'Precompile', 'Other'];
+
+// ============================================================================
+// Dataset Utilities (for marginal cost calculations)
+// ============================================================================
+
+/**
+ * Extracts the gas limit number from a dataset config name.
+ * @param {string} config - Config name like "10M-gas-limit" or "30M-gas-limit"
+ * @returns {number|null} Gas limit in millions, or null if not parseable
+ */
+export function parseGasLimitFromConfig(config) {
+    const match = config.match(/^(\d+)M-gas-limit$/);
+    return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * Determines the baseline config for marginal cost calculation.
+ * @param {string} currentConfig - Current config like "30M-gas-limit"
+ * @param {string[]} allConfigs - All available configs for this hardware
+ * @returns {string|null} Baseline config, or null if current is the first/smallest
+ */
+export function getBaselineConfig(currentConfig, allConfigs) {
+    // Parse gas limits and sort configs by gas limit ascending
+    const parsed = allConfigs
+        .map(c => ({ config: c, gasLimit: parseGasLimitFromConfig(c) }))
+        .filter(p => p.gasLimit !== null)
+        .sort((a, b) => a.gasLimit - b.gasLimit);
+
+    // Find current config's index
+    const currentIndex = parsed.findIndex(p => p.config === currentConfig);
+
+    // If current is first (smallest) or not found, no baseline available
+    if (currentIndex <= 0) return null;
+
+    // Return the previous config as baseline
+    return parsed[currentIndex - 1].config;
+}
+
+/**
+ * Calculates the marginal gas between two configs.
+ * @param {string} currentConfig - Current config like "30M-gas-limit"
+ * @param {string} baselineConfig - Baseline config like "10M-gas-limit"
+ * @returns {number|null} Marginal gas in raw units (not millions)
+ */
+export function getMarginalGasLimit(currentConfig, baselineConfig) {
+    const current = parseGasLimitFromConfig(currentConfig);
+    const baseline = parseGasLimitFromConfig(baselineConfig);
+    if (current === null || baseline === null) return null;
+    return (current - baseline) * 1_000_000;
+}

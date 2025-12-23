@@ -70,6 +70,32 @@ export function formatTime(ms) {
 }
 
 /**
+ * Formats a marginal (delta) time with +/- prefix.
+ *
+ * @param {number|null|undefined} ms - Delta time in milliseconds
+ * @returns {string} Formatted time with sign (e.g., "+2.5s", "-500ms")
+ */
+export function formatMarginalTime(ms) {
+    if (ms === null || ms === undefined) return '-';
+
+    const sign = ms >= 0 ? '+' : '';
+    const absMs = Math.abs(ms);
+
+    const { MS_PER_SECOND, MS_PER_MINUTE } = THRESHOLDS.TIME;
+
+    if (absMs < MS_PER_SECOND) {
+        return `${sign}${ms}ms`;
+    }
+    if (absMs < MS_PER_MINUTE) {
+        return `${sign}${(ms / MS_PER_SECOND).toFixed(1)}s`;
+    }
+
+    const mins = Math.floor(absMs / MS_PER_MINUTE);
+    const secs = ((absMs % MS_PER_MINUTE) / MS_PER_SECOND).toFixed(0);
+    return `${sign}${mins}m ${secs}s`;
+}
+
+/**
  * Formats gas throughput as a human-readable string.
  *
  * @param {number} gasUsed - Gas used in the operation
