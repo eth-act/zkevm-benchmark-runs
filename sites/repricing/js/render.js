@@ -3,7 +3,7 @@
  * All UI rendering logic is centralized here.
  */
 
-import { CONFIG, STATUS, VIEW, THRESHOLDS, CATEGORY_ORDER } from './constants.js';
+import { CONFIG, STATUS, VIEW, CATEGORY_ORDER } from './constants.js';
 import {
     escapeHtml,
     formatTime,
@@ -309,31 +309,6 @@ export class Renderer {
             }
         }
 
-        // Find top expensive/cheap operations (grouped by operation)
-        const activeZkvm = zkvmView === VIEW.ALL ? VIEW.WORST : zkvmView;
-        const groupsWithRelativeCost = groupedData
-            .map(group => ({
-                operation: group.operation,
-                testCount: group.testCount,
-                relativeCost: this.dataAccessor.getGroupRelativeCost(group, activeZkvm),
-            }))
-            .filter(g => g.relativeCost !== null);
-
-        groupsWithRelativeCost.sort((a, b) => b.relativeCost - a.relativeCost);
-
-        const topExpensive = groupsWithRelativeCost.slice(0, THRESHOLDS.TOP_LIST_COUNT);
-        const topCheap = groupsWithRelativeCost.slice(-THRESHOLDS.TOP_LIST_COUNT).reverse();
-
-        const formatTopItem = (g) => `
-            <li>
-                <div class="top-text">
-                    <div class="top-title" title="${escapeHtml(g.operation)}">${escapeHtml(g.operation)}</div>
-                    <div class="top-sub">${g.testCount} fixture${g.testCount !== 1 ? 's' : ''}</div>
-                </div>
-                <span class="${getRelativeCostClass(g.relativeCost)}">${formatRelativeCost(g.relativeCost)}</span>
-            </li>
-        `;
-
         const parts = [
             `<div class="stat-card">
                 <h3>Total Tests (Filtered)</h3>
@@ -353,17 +328,6 @@ export class Renderer {
                 </div>
             `);
         }
-
-        parts.push(`
-            <div class="stat-card warning">
-                <h3>Most Expensive (Top ${THRESHOLDS.TOP_LIST_COUNT})</h3>
-                <ul class="top-list">${topExpensive.map(formatTopItem).join('')}</ul>
-            </div>
-            <div class="stat-card success">
-                <h3>Least Expensive (Top ${THRESHOLDS.TOP_LIST_COUNT})</h3>
-                <ul class="top-list">${topCheap.map(formatTopItem).join('')}</ul>
-            </div>
-        `);
 
         return parts.join('');
     }

@@ -3,7 +3,7 @@
  * Orchestrates data loading, state management, and UI rendering.
  */
 
-import { CONFIG, VIEW, STATUS } from './constants.js';
+import { CONFIG, VIEW, STATUS, HARDWARE_TARGET_DEFAULTS } from './constants.js';
 import { debounce, createComparator, parseColumn } from './utils.js';
 import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
@@ -38,7 +38,7 @@ export class BenchmarkApp {
         // Filter State
         // ====================================================================
         this.targetMGasPerS = CONFIG.DEFAULT_TARGET_MGAS_PER_S;
-        this.minRelativeCost = 10;
+        this.minRelativeCost = null;
 
         // ====================================================================
         // Sort State
@@ -68,6 +68,19 @@ export class BenchmarkApp {
         // DOM Elements (cached during init)
         // ====================================================================
         this.elements = {};
+    }
+
+    // ========================================================================
+    // Helpers
+    // ========================================================================
+
+    /**
+     * Gets the default target MGas/s for a given hardware configuration.
+     * @param {string} hardwareId - The hardware ID
+     * @returns {number} The default target value
+     */
+    getDefaultTargetForHardware(hardwareId) {
+        return HARDWARE_TARGET_DEFAULTS[hardwareId] ?? CONFIG.DEFAULT_TARGET_MGAS_PER_S;
     }
 
     // ========================================================================
@@ -125,6 +138,11 @@ export class BenchmarkApp {
             // Determine which hardware to use
             if (!this.selectedHardware || !this.globalManifest.hardware_configs.find(h => h.id === this.selectedHardware)) {
                 this.selectedHardware = this.globalManifest.default_hardware;
+            }
+
+            // Apply hardware-specific default target if not specified in URL
+            if (!urlState.target) {
+                this.targetMGasPerS = this.getDefaultTargetForHardware(this.selectedHardware);
             }
 
             // Initialize hardware selector
@@ -232,6 +250,9 @@ export class BenchmarkApp {
         if (hardwareId === this.selectedHardware) return;
 
         this.selectedHardware = hardwareId;
+
+        // Update target to hardware-specific default
+        this.targetMGasPerS = this.getDefaultTargetForHardware(hardwareId);
 
         // Show loading state
         this.elements.app.classList.add('hidden');

@@ -23,6 +23,13 @@ export const CONFIG = Object.freeze({
     DEFAULT_TARGET_MGAS_PER_S: 7,
 });
 
+// Default target throughput by hardware configuration (MGas/s)
+// Maps hardware IDs to their recommended target prover speeds
+export const HARDWARE_TARGET_DEFAULTS = Object.freeze({
+    '1xL40s': 0.11,
+    '8x5090': 1.75,
+});
+
 // ============================================================================
 // Status Constants
 // ============================================================================

@@ -4,7 +4,7 @@
  * This enables shareable links that preserve the current view.
  */
 
-import { CONFIG, URL_PARAMS, VIEW } from './constants.js';
+import { CONFIG, URL_PARAMS, VIEW, HARDWARE_TARGET_DEFAULTS } from './constants.js';
 
 // ============================================================================
 // URL State Manager
@@ -58,8 +58,9 @@ export const URLState = {
             params.set(URL_PARAMS.DATASET, state.dataset);
         }
 
-        // Target throughput
-        if (state.target !== CONFIG.DEFAULT_TARGET_MGAS_PER_S) {
+        // Target throughput (compare against hardware-specific default)
+        const defaultTarget = HARDWARE_TARGET_DEFAULTS[state.hardware] ?? CONFIG.DEFAULT_TARGET_MGAS_PER_S;
+        if (state.target !== defaultTarget) {
             params.set(URL_PARAMS.TARGET, state.target.toString());
         }
 
