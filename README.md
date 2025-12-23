@@ -9,7 +9,7 @@ You can see a website rendering of the results [here](https://eth-act.github.io/
 | Hardware Setup | Proving Results | Execution Results |
 |----------------|-----------------|-------------------|
 | **1xL40s** | [3 gas limits, 1 mainnet range](data/proving/1xL40s/README.md) | [3 gas limits, 1 mainnet range](data/executions/1xL40s/README.md) |
-| **8x5090** | [3 gas limits](data/proving/8x5090/README.md) | — |
+| **8x5090** | [3 gas limits, 1 mainnet range](data/proving/8x5090/README.md) | — |
 
 ## Folder Structure
 
