@@ -261,14 +261,22 @@ export class DataAccessor {
     // ========================================================================
 
     /**
-     * Normalizes a test ID by removing the gas limit value.
-     * e.g., "test_arithmetic[fork_Prague-benchmark-gas-value_30M-..."
-     *    -> "test_arithmetic[fork_Prague-benchmark-gas-value_XXM-..."
+     * Normalizes a test ID for matching across different gas limit datasets.
+     * Extracts only the part after 'blockchain_test-' to allow matching.
+     *
+     * TODO: Temporal workaround due to 5M fixtures having non-standardized names.
+     * Remove when Fusaka benchmarks are run and use test.id directly again.
+     *
      * @private
      */
     normalizeTestId(testId) {
-        // Replace gas-value_XXM pattern with a normalized placeholder
-        return testId.replace(/gas-value_\d+M/g, 'gas-value_XXM');
+        const marker = 'blockchain_test-';
+        const idx = testId.indexOf(marker);
+        if (idx !== -1) {
+            return testId.substring(idx + marker.length);
+        }
+        // Fallback: return full ID if marker not found
+        return testId;
     }
 
     /**
