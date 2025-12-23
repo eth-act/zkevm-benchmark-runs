@@ -86,7 +86,8 @@ export const URLState = {
         }
 
         // Sort column (only if not default)
-        if (state.sortColumn !== 'worst-time') {
+        const defaultSortColumn = defaults.sortColumn || 'worst-time';
+        if (state.sortColumn !== defaultSortColumn) {
             params.set(URL_PARAMS.SORT_COLUMN, state.sortColumn);
         }
 

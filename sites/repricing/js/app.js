@@ -44,7 +44,7 @@ export class BenchmarkApp {
         // ====================================================================
         // Sort State
         // ====================================================================
-        this.sortColumn = 'worst-time';
+        this.sortColumn = null;  // Will be set to first zkVM after data loads
         this.sortDirection = 'desc';
 
         // ====================================================================
@@ -219,6 +219,11 @@ export class BenchmarkApp {
         if (this.elements.rawDataLink) {
             this.elements.rawDataLink.href = `data/${this.selectedHardware}/${datasetInfo.file}`;
         }
+
+        // Set default sort column to first zkVM if not specified
+        if (!this.sortColumn && this.data.zkvms.length > 0) {
+            this.sortColumn = `${this.data.zkvms[0]}-time`;
+        }
     }
 
     /**
@@ -292,16 +297,32 @@ export class BenchmarkApp {
 
     /**
      * Reinitializes UI after dataset change.
+     * Resets all filters to provide a clean slate for the new dataset.
      */
     reinitializeUI() {
-        // Reset state
+        // Reset filter state
         this.selectedOperations.clear();
         this.expandedOperations.clear();
         this.currentPage = 1;
+        this.minRelativeCost = null;
+
+        // Reset sort to default (first zkVM column)
+        this.sortColumn = this.data.zkvms.length > 0 ? `${this.data.zkvms[0]}-time` : 'worst-time';
+        this.sortDirection = 'desc';
 
         // Reset to absolute mode (baseline may have changed)
         this.valueMode = VALUE_MODE.ABSOLUTE;
         this.dataAccessor.clearBaselineData();
+
+        // Reset search input
+        if (this.elements.search) {
+            this.elements.search.value = '';
+        }
+
+        // Reset hide crashed checkbox
+        if (this.elements.hideCrashed) {
+            this.elements.hideCrashed.checked = false;
+        }
 
         // Reinitialize components
         this.initializeTargetInput();
@@ -917,6 +938,7 @@ export class BenchmarkApp {
             ? Object.values(this.data.operations_by_category).flat()
             : this.data.operations;
 
+        const defaultSortColumn = this.data.zkvms.length > 0 ? `${this.data.zkvms[0]}-time` : 'worst-time';
         URLState.serialize({
             hardware: this.selectedHardware,
             dataset: this.selectedDataset,
@@ -934,6 +956,7 @@ export class BenchmarkApp {
         }, {
             hardware: this.globalManifest?.default_hardware,
             dataset: this.manifest?.default_dataset,
+            sortColumn: defaultSortColumn,
         }, allOps);
     }
 
