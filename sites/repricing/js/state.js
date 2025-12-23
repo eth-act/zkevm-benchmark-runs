@@ -22,6 +22,7 @@ export const URLState = {
         const params = new URLSearchParams(window.location.search);
 
         return {
+            hardware: params.get(URL_PARAMS.HARDWARE),
             dataset: params.get(URL_PARAMS.DATASET),
             target: parseFloat(params.get(URL_PARAMS.TARGET)) || null,
             zkvmView: params.get(URL_PARAMS.ZKVM_VIEW),
@@ -46,6 +47,11 @@ export const URLState = {
      */
     serialize(state, defaults, allOperations) {
         const params = new URLSearchParams();
+
+        // Hardware (only if not default)
+        if (state.hardware && state.hardware !== defaults.hardware) {
+            params.set(URL_PARAMS.HARDWARE, state.hardware);
+        }
 
         // Dataset (only if not default)
         if (state.dataset && state.dataset !== defaults.dataset) {
@@ -128,6 +134,7 @@ export const URLState = {
  */
 export function applyURLStateToApp(urlState, appState) {
     // Apply state that doesn't require data
+    if (urlState.hardware) appState.selectedHardware = urlState.hardware;
     if (urlState.dataset) appState.selectedDataset = urlState.dataset;
     if (urlState.target && urlState.target > 0) appState.targetMGasPerS = urlState.target;
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;

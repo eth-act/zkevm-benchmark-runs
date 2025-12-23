@@ -5,7 +5,7 @@
 
 import { CONFIG, VIEW, STATUS } from './constants.js';
 import { debounce, createComparator, parseColumn } from './utils.js';
-import { CacheManager, DataAccessor, loadManifest, loadDataset } from './data.js';
+import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
 import { Renderer } from './render.js';
 
@@ -18,7 +18,8 @@ export class BenchmarkApp {
         // ====================================================================
         // Data State
         // ====================================================================
-        this.manifest = null;
+        this.globalManifest = null;  // Global manifest with hardware configs
+        this.manifest = null;        // Current hardware's manifest
         this.data = null;
         this.filteredTests = [];
         this.groupedData = [];
@@ -27,6 +28,7 @@ export class BenchmarkApp {
         // ====================================================================
         // Selection State
         // ====================================================================
+        this.selectedHardware = null;
         this.selectedDataset = null;
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.ALL;
@@ -80,6 +82,7 @@ export class BenchmarkApp {
             loading: document.getElementById('loading'),
             error: document.getElementById('error'),
             app: document.getElementById('app'),
+            hardware: document.getElementById('hardware'),
             dataset: document.getElementById('dataset'),
             target: document.getElementById('target'),
             zkvmView: document.getElementById('zkvm-view'),
@@ -116,8 +119,19 @@ export class BenchmarkApp {
         this.pendingURLState = applyURLStateToApp(urlState, this);
 
         try {
-            // Load manifest
-            this.manifest = await loadManifest();
+            // Load global manifest (contains hardware configs)
+            this.globalManifest = await loadGlobalManifest();
+
+            // Determine which hardware to use
+            if (!this.selectedHardware || !this.globalManifest.hardware_configs.find(h => h.id === this.selectedHardware)) {
+                this.selectedHardware = this.globalManifest.default_hardware;
+            }
+
+            // Initialize hardware selector
+            this.initializeHardwareSelector();
+
+            // Load hardware manifest
+            this.manifest = await loadHardwareManifest(this.selectedHardware);
 
             // Determine which dataset to load
             if (!this.selectedDataset || !this.manifest.datasets.find(d => d.id === this.selectedDataset)) {
@@ -168,7 +182,7 @@ export class BenchmarkApp {
             throw new Error(`Dataset not found: ${datasetId}`);
         }
 
-        this.data = await loadDataset(datasetInfo.file);
+        this.data = await loadDataset(this.selectedHardware, datasetInfo.file);
         this.cache.clearAll();
 
         // Initialize data accessor with new data
@@ -181,7 +195,7 @@ export class BenchmarkApp {
 
         // Update raw data link
         if (this.elements.rawDataLink) {
-            this.elements.rawDataLink.href = `data/${datasetInfo.file}`;
+            this.elements.rawDataLink.href = `data/${this.selectedHardware}/${datasetInfo.file}`;
         }
     }
 
@@ -207,6 +221,47 @@ export class BenchmarkApp {
         } catch (error) {
             console.error('Error loading dataset:', error);
             this.showError(`Error loading dataset: ${error.message}`);
+        }
+    }
+
+    /**
+     * Handles hardware change.
+     * @param {string} hardwareId - The new hardware ID
+     */
+    async handleHardwareChange(hardwareId) {
+        if (hardwareId === this.selectedHardware) return;
+
+        this.selectedHardware = hardwareId;
+
+        // Show loading state
+        this.elements.app.classList.add('hidden');
+        this.elements.loading.classList.remove('hidden');
+        this.elements.loading.textContent = 'Loading hardware configuration...';
+
+        try {
+            // Load new hardware manifest
+            this.manifest = await loadHardwareManifest(hardwareId);
+
+            // Update dataset selector with new datasets
+            this.initializeDatasetSelector();
+
+            // Select default dataset for this hardware (or keep if same name exists)
+            const existingDataset = this.manifest.datasets.find(d => d.id === this.selectedDataset);
+            if (existingDataset) {
+                // Keep same dataset name if it exists in new hardware
+                await this.loadDatasetById(this.selectedDataset);
+            } else {
+                // Use default dataset for this hardware
+                this.selectedDataset = this.manifest.default_dataset;
+                await this.loadDatasetById(this.selectedDataset);
+            }
+
+            this.reinitializeUI();
+            this.showApp();
+            this.updateURL();
+        } catch (error) {
+            console.error('Error loading hardware:', error);
+            this.showError(`Error loading hardware: ${error.message}`);
         }
     }
 
@@ -461,8 +516,10 @@ export class BenchmarkApp {
         this.elements.generatedAt.textContent = new Date(this.data.generated_at).toLocaleString();
 
         const hw = this.data.hardware_info;
+        const hwConfig = this.globalManifest?.hardware_configs?.find(h => h.id === this.selectedHardware);
+        const hwName = hwConfig?.name || this.data.hardware;
         this.elements.hardwareInfo.textContent =
-            `${this.data.hardware} - ${hw.cpu_model}, ${hw.total_ram_gib}GB RAM, ${hw.gpus?.[0]?.model || 'No GPU'}`;
+            `${hwName} - ${hw.cpu_model}, ${hw.total_ram_gib}GB RAM, ${hw.gpus?.[0]?.model || 'No GPU'}`;
     }
 
     // ========================================================================
@@ -581,6 +638,18 @@ export class BenchmarkApp {
     // ========================================================================
     // UI Initialization
     // ========================================================================
+
+    initializeHardwareSelector() {
+        const select = this.elements.hardware;
+        if (!select) return;
+
+        // Render directly without renderer (called before data loads)
+        select.innerHTML = this.globalManifest.hardware_configs.map(hw => {
+            const selected = hw.id === this.selectedHardware ? 'selected' : '';
+            return `<option value="${hw.id}" ${selected}>${hw.name} (${hw.dataset_count} datasets)</option>`;
+        }).join('');
+        select.addEventListener('change', (e) => this.handleHardwareChange(e.target.value));
+    }
 
     initializeDatasetSelector() {
         const select = this.elements.dataset;
@@ -736,6 +805,7 @@ export class BenchmarkApp {
             : this.data.operations;
 
         URLState.serialize({
+            hardware: this.selectedHardware,
             dataset: this.selectedDataset,
             target: this.targetMGasPerS,
             zkvmView: this.selectedZkvmView,
@@ -747,7 +817,10 @@ export class BenchmarkApp {
             pageSize: this.pageSize,
             minRelativeCost: this.minRelativeCost,
             selectedOperations: this.selectedOperations,
-        }, { dataset: this.manifest?.default_dataset }, allOps);
+        }, {
+            hardware: this.globalManifest?.default_hardware,
+            dataset: this.manifest?.default_dataset,
+        }, allOps);
     }
 
     // ========================================================================

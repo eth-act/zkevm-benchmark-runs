@@ -299,26 +299,41 @@ export class DataAccessor {
 // ============================================================================
 
 /**
- * Loads the manifest file containing available datasets.
- * @returns {Promise<Object>} The manifest object
+ * Loads the global manifest file containing available hardware configurations.
+ * @returns {Promise<Object>} The global manifest object
  * @throws {Error} If manifest fails to load
  */
-export async function loadManifest() {
+export async function loadGlobalManifest() {
     const response = await fetch('data/manifest.json');
     if (!response.ok) {
-        throw new Error(`Failed to load manifest: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to load global manifest: ${response.status} ${response.statusText}`);
     }
     return response.json();
 }
 
 /**
- * Loads a specific dataset by filename.
+ * Loads the manifest for a specific hardware configuration.
+ * @param {string} hardware - The hardware identifier (e.g., "1xL40s")
+ * @returns {Promise<Object>} The hardware manifest object
+ * @throws {Error} If manifest fails to load
+ */
+export async function loadHardwareManifest(hardware) {
+    const response = await fetch(`data/${hardware}/manifest.json`);
+    if (!response.ok) {
+        throw new Error(`Failed to load manifest for ${hardware}: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+}
+
+/**
+ * Loads a specific dataset by hardware and filename.
+ * @param {string} hardware - The hardware identifier (e.g., "1xL40s")
  * @param {string} filename - The dataset filename (e.g., "results-10M-gas-limit.json")
  * @returns {Promise<Object>} The dataset object
  * @throws {Error} If dataset fails to load
  */
-export async function loadDataset(filename) {
-    const response = await fetch(`data/${filename}`);
+export async function loadDataset(hardware, filename) {
+    const response = await fetch(`data/${hardware}/${filename}`);
     if (!response.ok) {
         throw new Error(`Failed to load dataset: ${response.status} ${response.statusText}`);
     }

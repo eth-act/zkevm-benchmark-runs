@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 # Base paths (relative to repo root)
-DEFAULT_PROVING_BASE = Path("data/proving/1xL40s")
+DEFAULT_PROVING_BASE = Path("data/proving")
 DEFAULT_OUTPUT_DIR = Path("dist/repricing/data")
 
 # Pattern to match EEST configurations (e.g., "10M-gas-limit", "1M-gas-limit")
@@ -452,6 +452,37 @@ def load_hardware_info(hardware_file: Path) -> dict[str, Any]:
         return {}
 
 
+def discover_hardware_configs(proving_base: Path) -> list[str]:
+    """Discover all hardware configurations in the proving directory."""
+    hardware_configs = []
+    if proving_base.exists():
+        for entry in sorted(proving_base.iterdir()):
+            if entry.is_dir() and not entry.name.startswith('.'):
+                # Check if it has at least one EEST config
+                if discover_eest_configs(entry):
+                    hardware_configs.append(entry.name)
+    return hardware_configs
+
+
+def get_hardware_friendly_name(hardware_id: str, hardware_info: dict[str, Any]) -> str:
+    """Generate a friendly display name for a hardware configuration."""
+    # Try to extract GPU info from hardware_info
+    gpus = hardware_info.get("gpus", [])
+    if gpus:
+        gpu_model = gpus[0].get("model", "")
+        gpu_count = len(gpus)
+        if gpu_model:
+            return f"{gpu_count}x {gpu_model}"
+
+    # Fallback to parsing the hardware_id (e.g., "1xL40s" -> "1x L40s")
+    match = re.match(r"^(\d+)x(.+)$", hardware_id)
+    if match:
+        count, model = match.groups()
+        return f"{count}x {model}"
+
+    return hardware_id
+
+
 def discover_eest_configs(proving_base: Path) -> list[str]:
     """Discover all EEST configurations in the proving directory."""
     configs = []
@@ -619,6 +650,12 @@ def main():
         default=None,
         help='Output directory path (default: dist/repricing/data)'
     )
+    parser.add_argument(
+        '--hardware',
+        type=str,
+        default=None,
+        help='Process specific hardware config only (default: all)'
+    )
 
     args = parser.parse_args()
 
@@ -636,73 +673,129 @@ def main():
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Discover all EEST configurations
-    eest_configs = discover_eest_configs(proving_base)
-    if not eest_configs:
-        logger.error("No EEST configurations found in %s", proving_base)
+    # Discover all hardware configurations
+    all_hardware = discover_hardware_configs(proving_base)
+    if not all_hardware:
+        logger.error("No hardware configurations found in %s", proving_base)
         return
 
-    logger.info("Discovered EEST configurations: %s", eest_configs)
+    # Filter to specific hardware if requested
+    if args.hardware:
+        if args.hardware not in all_hardware:
+            logger.error("Hardware '%s' not found. Available: %s", args.hardware, all_hardware)
+            return
+        all_hardware = [args.hardware]
 
-    # Extract hardware ID from path (e.g., "1xL40s" from ".../proving/1xL40s")
-    hardware_id = proving_base.name
-    logger.info("Hardware: %s", hardware_id)
+    logger.info("Processing hardware configurations: %s", all_hardware)
 
-    # Process each configuration
-    manifest_datasets = []
-    for config_name in eest_configs:
-        logger.info("Processing configuration: %s", config_name)
+    # Track all hardware configs for global manifest
+    global_hardware_configs = []
 
-        config_path = proving_base / config_name
-        hardware_file = config_path / "hardware.json"
+    # Process each hardware configuration
+    for hardware_id in all_hardware:
+        hardware_base = proving_base / hardware_id
+        logger.info("=" * 60)
+        logger.info("Processing hardware: %s", hardware_id)
 
-        output = process_all_results(config_path, hardware_file, config_name, hardware_id)
+        # Discover EEST configurations for this hardware
+        eest_configs = discover_eest_configs(hardware_base)
+        if not eest_configs:
+            logger.warning("No EEST configurations found for %s, skipping", hardware_id)
+            continue
 
-        # Write output file for this configuration
-        output_file = output_dir / f"results-{config_name}.json"
-        with open(output_file, "w") as f:
-            json.dump(output, f, indent=2)
+        logger.info("Discovered EEST configurations: %s", eest_configs)
 
-        logger.info("Generated %s", output_file)
-        logger.info("  - %d zkVMs", len(output["zkvms"]))
-        logger.info("  - %d operations", len(output["operations"]))
-        logger.info("  - %d tests", len(output["tests"]))
+        # Create hardware-specific output directory
+        hardware_output_dir = output_dir / hardware_id
+        hardware_output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Print summary stats
-        for zkvm in output["zkvms"]:
-            success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
-            crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
-            logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
+        # Process each configuration for this hardware
+        manifest_datasets = []
+        hardware_info_sample = {}
 
-        # Add to manifest
-        manifest_datasets.append({
-            "id": config_name,
-            "name": f"EEST {output['gas_limit']} Gas Limit",
-            "file": f"results-{config_name}.json",
-            "gas_limit": output["gas_limit"],
-            "test_count": len(output["tests"]),
-            "zkvm_count": len(output["zkvms"]),
+        for config_name in eest_configs:
+            logger.info("Processing configuration: %s/%s", hardware_id, config_name)
+
+            config_path = hardware_base / config_name
+            hardware_file = config_path / "hardware.json"
+
+            output = process_all_results(config_path, hardware_file, config_name, hardware_id)
+
+            # Keep a sample of hardware_info for the global manifest
+            if not hardware_info_sample and output.get("hardware_info"):
+                hardware_info_sample = output["hardware_info"]
+
+            # Write output file for this configuration
+            output_file = hardware_output_dir / f"results-{config_name}.json"
+            with open(output_file, "w") as f:
+                json.dump(output, f, indent=2)
+
+            logger.info("Generated %s", output_file)
+            logger.info("  - %d zkVMs", len(output["zkvms"]))
+            logger.info("  - %d operations", len(output["operations"]))
+            logger.info("  - %d tests", len(output["tests"]))
+
+            # Print summary stats
+            for zkvm in output["zkvms"]:
+                success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
+                crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
+                logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
+
+            # Add to per-hardware manifest
+            manifest_datasets.append({
+                "id": config_name,
+                "name": f"EEST {output['gas_limit']} Gas Limit",
+                "file": f"results-{config_name}.json",
+                "gas_limit": output["gas_limit"],
+                "test_count": len(output["tests"]),
+                "zkvm_count": len(output["zkvms"]),
+            })
+
+        # Sort datasets by gas limit (numeric sort, descending)
+        def sort_key(d):
+            match = re.match(r"(\d+)", d["gas_limit"])
+            return int(match.group(1)) if match else 0
+
+        manifest_datasets.sort(key=sort_key, reverse=True)
+
+        # Write per-hardware manifest
+        hardware_manifest = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "hardware_id": hardware_id,
+            "hardware_info": hardware_info_sample,
+            "datasets": manifest_datasets,
+            "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
+        }
+
+        hardware_manifest_file = hardware_output_dir / "manifest.json"
+        with open(hardware_manifest_file, "w") as f:
+            json.dump(hardware_manifest, f, indent=2)
+
+        logger.info("Generated hardware manifest: %s with %d datasets", hardware_manifest_file, len(manifest_datasets))
+
+        # Add to global hardware configs
+        global_hardware_configs.append({
+            "id": hardware_id,
+            "name": get_hardware_friendly_name(hardware_id, hardware_info_sample),
+            "path": hardware_id,
+            "dataset_count": len(manifest_datasets),
+            "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
         })
 
-    # Sort datasets by gas limit (numeric sort)
-    def sort_key(d):
-        match = re.match(r"(\d+)", d["gas_limit"])
-        return int(match.group(1)) if match else 0
-
-    manifest_datasets.sort(key=sort_key, reverse=True)
-
-    # Write manifest file
-    manifest = {
+    # Write global manifest
+    global_manifest = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "datasets": manifest_datasets,
-        "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
+        "hardware_configs": global_hardware_configs,
+        "default_hardware": global_hardware_configs[0]["id"] if global_hardware_configs else None,
     }
 
-    manifest_file = output_dir / "manifest.json"
-    with open(manifest_file, "w") as f:
-        json.dump(manifest, f, indent=2)
+    global_manifest_file = output_dir / "manifest.json"
+    with open(global_manifest_file, "w") as f:
+        json.dump(global_manifest, f, indent=2)
 
-    logger.info("Generated manifest: %s with %d datasets", manifest_file, len(manifest_datasets))
+    logger.info("=" * 60)
+    logger.info("Generated global manifest: %s", global_manifest_file)
+    logger.info("Hardware configurations: %s", [h["id"] for h in global_hardware_configs])
 
 
 if __name__ == "__main__":
