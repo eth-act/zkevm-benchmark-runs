@@ -265,7 +265,7 @@ export class Renderer {
         return sortedFixtures.map(test => {
             const rowParts = [
                 '<td class="fixture-indent"></td>',
-                `<td class="fixture-name" title="${escapeHtml(test.id)}">${escapeHtml(test.name)}</td>`,
+                `<td class="fixture-name">${escapeHtml(test.id)}</td>`,
             ];
 
             if (zkvmView === VIEW.ALL) {
