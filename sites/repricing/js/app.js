@@ -102,8 +102,7 @@ export class BenchmarkApp {
             zkvmView: document.getElementById('zkvm-view'),
             search: document.getElementById('search'),
             hideCrashed: document.getElementById('hide-crashed'),
-            statsPanel: document.getElementById('stats-panel'),
-            targetInfo: document.getElementById('target-info'),
+            summaryBar: document.getElementById('summary-bar'),
             operationFilters: document.getElementById('operation-filters'),
             tableHeader: document.getElementById('table-header'),
             tableBody: document.getElementById('table-body'),
@@ -454,8 +453,7 @@ export class BenchmarkApp {
         this.groupTestsByOperation();
         this.sortGroupedData();
         this.renderTable();
-        this.updateStats();
-        this.renderTargetInfo();
+        this.updateSummaryBar();
         this.updateQuickFilterButtons();
         if (updateUrl) this.updateURL();
     }
@@ -541,26 +539,15 @@ export class BenchmarkApp {
     }
 
     /**
-     * Updates the statistics panel.
+     * Updates the inline summary bar.
      */
-    updateStats() {
-        this.elements.statsPanel.innerHTML = this.renderer.renderStats({
+    updateSummaryBar() {
+        this.elements.summaryBar.innerHTML = this.renderer.renderSummaryBar({
             filteredTests: this.filteredTests,
             allTests: this.data.tests,
-            groupedData: this.groupedData,
             zkvms: this.data.zkvms,
             zkvmView: this.selectedZkvmView,
-        });
-    }
-
-    /**
-     * Renders the target info panel.
-     */
-    renderTargetInfo() {
-        this.elements.targetInfo.innerHTML = this.renderer.renderTargetInfo({
             targetMGasPerS: this.targetMGasPerS,
-            filteredTests: this.filteredTests,
-            zkvmView: this.selectedZkvmView,
         });
     }
 

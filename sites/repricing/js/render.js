@@ -389,23 +389,23 @@ export class Renderer {
     }
 
     // ========================================================================
-    // Stats Panel
+    // Summary Bar (replaces Stats Panel + Target Info)
     // ========================================================================
 
     /**
-     * Renders the statistics panel.
+     * Renders a compact inline summary bar with key stats.
      *
-     * @param {Object} options - Stats options
-     * @returns {string} HTML string for stats panel
+     * @param {Object} options - Summary options
+     * @returns {string} HTML string for summary bar
      */
-    renderStats({ filteredTests, allTests, groupedData, zkvms, zkvmView }) {
+    renderSummaryBar({ filteredTests, allTests, zkvms, zkvmView, targetMGasPerS }) {
         const totalTests = filteredTests.length;
+
+        // Per-zkVM stats
         const zkvmStats = {};
-
         for (const zkvm of zkvms) {
-            zkvmStats[zkvm] = { success: 0, crashed: 0, missing: 0 };
+            zkvmStats[zkvm] = { success: 0, crashed: 0 };
         }
-
         for (const test of filteredTests) {
             for (const zkvm of zkvms) {
                 const result = test.results[zkvm];
@@ -413,90 +413,52 @@ export class Renderer {
                     zkvmStats[zkvm].success++;
                 } else if (result) {
                     zkvmStats[zkvm].crashed++;
-                } else {
-                    zkvmStats[zkvm].missing++;
                 }
             }
         }
 
-        const parts = [
-            `<div class="stat-card">
-                <h3>Total Tests (Filtered)</h3>
-                <div class="value">${totalTests}</div>
-                <div class="detail">out of ${allTests.length} total</div>
-            </div>`,
-        ];
-
-        for (const zkvm of zkvms) {
-            const stats = zkvmStats[zkvm];
-            const successRate = totalTests > 0 ? ((stats.success / totalTests) * 100).toFixed(1) : 0;
-            const detail = stats.missing > 0
-                ? `${stats.success} success, ${stats.crashed} crashed, ${stats.missing} missing`
-                : `${stats.success} success, ${stats.crashed} crashed`;
-            parts.push(`
-                <div class="stat-card ${stats.success > stats.crashed ? 'success' : 'error'}">
-                    <h3>${escapeHtml(zkvm)}</h3>
-                    <div class="value">${successRate}%</div>
-                    <div class="detail">${detail}</div>
-                </div>
-            `);
-        }
-
-        return parts.join('');
-    }
-
-    // ========================================================================
-    // Target Info Panel
-    // ========================================================================
-
-    /**
-     * Renders the target throughput information panel.
-     *
-     * @param {Object} options - Target info options
-     * @returns {string} HTML string for target info
-     */
-    renderTargetInfo({ targetMGasPerS, filteredTests, zkvmView }) {
+        // Target throughput stats
         const activeZkvm = zkvmView === VIEW.ALL ? VIEW.WORST : zkvmView;
         let testsAboveTarget = 0;
-        let testsBelowTarget = 0;
         let totalWithThroughput = 0;
-
         for (const test of filteredTests) {
             const throughput = this.dataAccessor.getActualMGasPerS(test, activeZkvm);
             if (throughput !== null) {
                 totalWithThroughput++;
                 if (throughput >= targetMGasPerS) {
                     testsAboveTarget++;
-                } else {
-                    testsBelowTarget++;
                 }
             }
         }
-
+        const testsBelowTarget = totalWithThroughput - testsAboveTarget;
         const percentAbove = totalWithThroughput > 0
             ? ((testsAboveTarget / totalWithThroughput) * 100).toFixed(1)
             : 0;
 
-        return `
-            <h2>Target Throughput Analysis</h2>
-            <div class="target-details">
-                <div class="target-item highlight">
-                    <div class="label">Target</div>
-                    <div class="value">${targetMGasPerS} MGas/s</div>
-                    <div class="subtext">Operations meeting target show relative cost ~1x</div>
-                </div>
-                <div class="target-item">
-                    <div class="label">Meeting Target</div>
-                    <div class="value success">${testsAboveTarget}</div>
-                    <div class="subtext">${percentAbove}% of filtered tests</div>
-                </div>
-                <div class="target-item">
-                    <div class="label">Below Target</div>
-                    <div class="value">${testsBelowTarget}</div>
-                    <div class="subtext">May need gas repricing</div>
-                </div>
-            </div>
-        `;
+        const sep = '<span class="summary-sep">|</span>';
+
+        const parts = [
+            `<span class="summary-value">${totalTests}</span> <span class="summary-detail">of ${allTests.length} tests</span>`,
+        ];
+
+        for (const zkvm of zkvms) {
+            const stats = zkvmStats[zkvm];
+            const rate = totalTests > 0 ? ((stats.success / totalTests) * 100).toFixed(1) : 0;
+            const cls = stats.success > stats.crashed ? 'success' : 'error';
+            parts.push(
+                `${escapeHtml(zkvm)}: <span class="summary-value ${cls}">${rate}%</span> ok` +
+                (stats.crashed > 0 ? ` <span class="summary-detail">(${stats.crashed} crashed)</span>` : '')
+            );
+        }
+
+        parts.push(
+            `<span class="summary-label">Target ${targetMGasPerS} MGas/s:</span> ` +
+            `<span class="summary-value success">${testsAboveTarget}</span> meeting` +
+            ` ${sep} <span class="summary-value">${testsBelowTarget}</span> below ` +
+            `<span class="summary-detail">(${percentAbove}%)</span>`
+        );
+
+        return parts.join(` ${sep} `);
     }
 
     // ========================================================================
