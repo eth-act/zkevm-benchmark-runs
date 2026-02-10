@@ -68,6 +68,7 @@ PRECOMPILE_RULES = [
             r"^BN128_.*PAIRING(S)?(_.*)?$",
             r"^ALT_BN128_PAIRING$",
             r"^ALT_BN128_.*PAIRING.*$",
+            r"^ALT_BN128_BENCHMARK$",
             r"^ECPAIRING.*$",
             r"^EC_PAIRING.*$",
         ]),
@@ -79,17 +80,19 @@ PRECOMPILE_RULES = [
     # 0x0b EIP-2537
     {"name": "BLS12_381_G1ADD", "patterns": _compile_patterns([r"^BLS12_381_G1ADD$", r"^BLS12_G1ADD$"])},
     # 0x0c EIP-2537
-    {"name": "BLS12_381_G1MSM", "patterns": _compile_patterns([r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$"])},
+    {"name": "BLS12_381_G1MSM", "patterns": _compile_patterns([r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$", r"^BLS12_G1_MSM$"])},
     # 0x0d EIP-2537
     {"name": "BLS12_381_G2ADD", "patterns": _compile_patterns([r"^BLS12_381_G2ADD$", r"^BLS12_G2ADD$"])},
     # 0x0e EIP-2537
-    {"name": "BLS12_381_G2MSM", "patterns": _compile_patterns([r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$"])},
+    {"name": "BLS12_381_G2MSM", "patterns": _compile_patterns([r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$", r"^BLS12_G2_MSM$"])},
     # 0x0f EIP-2537
     {"name": "BLS12_381_PAIRING", "patterns": _compile_patterns([r"^BLS12_381_PAIRING$", r"^BLS12_PAIRING$", r"^BLS12_PAIRING_CHECK$"])},
     # 0x10 EIP-2537
     {"name": "BLS12_381_MAP_FP_TO_G1", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP_TO_G1$", r"^BLS12_MAP_FP_TO_G1$", r"^BLS12_FP_TO_G1$"])},
     # 0x11 EIP-2537
     {"name": "BLS12_381_MAP_FP2_TO_G2", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP2_TO_G2$", r"^BLS12_MAP_FP2_TO_G2$", r"^BLS12_FP_TO_G2$"])},
+    # 0x100 EIP-7212
+    {"name": "P256VERIFY", "patterns": _compile_patterns([r"^P256VERIFY$", r"^P256_VERIFY$"])},
 ]
 
 # Canonical opcode mapping rules (EVM yellow paper opcodes)
@@ -121,6 +124,7 @@ OPCODE_RULES = [
     {"name": "SHL", "patterns": _compile_patterns([r"^SHL$"])},
     {"name": "SHR", "patterns": _compile_patterns([r"^SHR$"])},
     {"name": "SAR", "patterns": _compile_patterns([r"^SAR$"])},
+    {"name": "CLZ", "patterns": _compile_patterns([r"^CLZ$"])},
     {"name": "KECCAK256", "patterns": _compile_patterns([r"^KECCAK256$", r"^KECCAK$", r"^SHA3$"])},
     {"name": "ADDRESS", "patterns": _compile_patterns([r"^ADDRESS$"])},
     {"name": "BALANCE", "patterns": _compile_patterns([r"^BALANCE$"])},
@@ -153,14 +157,14 @@ OPCODE_RULES = [
     {"name": "MLOAD", "patterns": _compile_patterns([r"^MLOAD$"])},
     {"name": "MSTORE", "patterns": _compile_patterns([r"^MSTORE$"])},
     {"name": "MSTORE8", "patterns": _compile_patterns([r"^MSTORE8$"])},
-    {"name": "SLOAD", "patterns": _compile_patterns([r"^SLOAD$"])},
-    {"name": "SSTORE", "patterns": _compile_patterns([r"^SSTORE$"])},
-    {"name": "JUMP", "patterns": _compile_patterns([r"^JUMP$"])},
-    {"name": "JUMPI", "patterns": _compile_patterns([r"^JUMPI$"])},
+    {"name": "SLOAD", "patterns": _compile_patterns([r"^SLOAD$", r"^SSLOAD$"])},
+    {"name": "SSTORE", "patterns": _compile_patterns([r"^SSTORE$", r"^SSSTORE$"])},
+    {"name": "JUMP", "patterns": _compile_patterns([r"^JUMP$", r"^JUMPS$"])},
+    {"name": "JUMPI", "patterns": _compile_patterns([r"^JUMPI$", r"^JUMPIS$"])},
     {"name": "PC", "patterns": _compile_patterns([r"^PC$"])},
     {"name": "MSIZE", "patterns": _compile_patterns([r"^MSIZE$"])},
     {"name": "GAS", "patterns": _compile_patterns([r"^GAS$"])},
-    {"name": "JUMPDEST", "patterns": _compile_patterns([r"^JUMPDEST$"])},
+    {"name": "JUMPDEST", "patterns": _compile_patterns([r"^JUMPDEST$", r"^JUMPDESTS$"])},
     {"name": "TLOAD", "patterns": _compile_patterns([r"^TLOAD$"])},
     {"name": "TSTORE", "patterns": _compile_patterns([r"^TSTORE$"])},
     {"name": "MCOPY", "patterns": _compile_patterns([r"^MCOPY$"])},
@@ -298,6 +302,9 @@ def extract_operation(test_name: str) -> str:
         params = params_match.group(1)
         if "blockchain_test" in params:
             op_region = params.split("blockchain_test", 1)[1].lstrip("-")
+            # Strip benchmark boilerplate suffix (e.g., "benchmark-gas-value_10M")
+            # to avoid false matches on the token "gas" -> GAS opcode
+            op_region = re.sub(r"-?benchmark-gas-value_\d+M$", "", op_region)
 
     # Step 3: Check parameter region for precompiles, then opcodes
     if op_region:
