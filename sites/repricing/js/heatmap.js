@@ -1,17 +1,14 @@
 /**
  * Heatmap visualization module for the Repricing Analysis Application.
- * Provides a compact overview of operation performance across zkVMs.
+ * Unified view combining compact operation overview with detailed fixture data.
  *
  * Level 1: Each row = one operation, each column = one zkVM.
- *   Cells show proportional bars (green/yellow/red segments).
- * Level 2: Clicking a row expands to show individual fixture squares.
+ *   Cells show proportional bars (green/yellow/red segments) with worst-case cost label.
+ * Level 2: Clicking a row expands to show individual fixture rows with full numeric detail.
  */
 
-import { STATUS, VIEW, CATEGORY_ORDER } from './constants.js';
-import { escapeHtml, formatRelativeCost } from './utils.js';
-
-// Fixture cost thresholds for color classification
-const FIXTURE_THRESHOLDS = { MODERATE: 3.0, HIGH: 10.0 };
+import { VIEW, CATEGORY_ORDER } from './constants.js';
+import { escapeHtml, formatRelativeCost, getRelativeCostClass } from './utils.js';
 
 /**
  * Renders the performance heatmap visualization.
@@ -19,9 +16,11 @@ const FIXTURE_THRESHOLDS = { MODERATE: 3.0, HIGH: 10.0 };
 export class HeatmapRenderer {
     /**
      * @param {import('./data.js').DataAccessor} dataAccessor
+     * @param {import('./render.js').Renderer} renderer - For rendering fixture detail cells
      */
-    constructor(dataAccessor) {
+    constructor(dataAccessor, renderer) {
         this.dataAccessor = dataAccessor;
+        this.renderer = renderer;
     }
 
     // ========================================================================
@@ -81,22 +80,7 @@ export class HeatmapRenderer {
                 this.dataAccessor.getWorstCaseTime(test) === null;
         }
         const result = test.results[zkvm];
-        return !result || result.status !== STATUS.SUCCESS;
-    }
-
-    /**
-     * Returns a CSS color class for a fixture square based on its cost.
-     * @private
-     */
-    _getFixtureClass(test, zkvm) {
-        if (this._isFixtureCrashed(test, zkvm)) return 'hm-fx-crashed';
-
-        const cost = this.dataAccessor.getRelativeCost(test, zkvm);
-        if (cost === null) return 'hm-fx-crashed';
-        if (cost <= 1.0) return 'hm-fx-ok';
-        if (cost < FIXTURE_THRESHOLDS.MODERATE) return 'hm-fx-warn';
-        if (cost < FIXTURE_THRESHOLDS.HIGH) return 'hm-fx-bad';
-        return 'hm-fx-crashed';
+        return !result || result.status !== 'success';
     }
 
     // ========================================================================
@@ -166,7 +150,7 @@ export class HeatmapRenderer {
     // ========================================================================
 
     /**
-     * Renders a proportional bar for one cell (operation x zkVM).
+     * Renders a proportional bar with worst-case cost label for one cell.
      * @private
      */
     _renderBar(summary) {
@@ -189,33 +173,68 @@ export class HeatmapRenderer {
         if (pBelow > 0) segments.push(`<div class="hm-seg hm-seg-below" style="width:${pBelow.toFixed(1)}%"></div>`);
         if (pCrashed > 0) segments.push(`<div class="hm-seg hm-seg-crashed" style="width:${pCrashed.toFixed(1)}%"></div>`);
 
-        return `<div class="hm-cell" title="${title}"><div class="hm-bar">${segments.join('')}</div></div>`;
+        // Worst-cost label below the bar
+        let worstLabel = '';
+        if (crashed === total) {
+            worstLabel = '<div class="hm-cell-worst hm-worst-crashed">CRASHED</div>';
+        } else if (worstCost !== null) {
+            const cls = getRelativeCostClass(worstCost);
+            worstLabel = `<div class="hm-cell-worst ${cls}">${formatRelativeCost(worstCost)}</div>`;
+        }
+
+        return `<div class="hm-cell" title="${title}"><div class="hm-bar">${segments.join('')}</div>${worstLabel}</div>`;
     }
 
+    // ========================================================================
+    // Expanded Fixture Table
+    // ========================================================================
+
     /**
-     * Renders expanded fixture squares for an operation.
-     * Sorted by cost descending (worst first).
+     * Renders expanded fixture rows for an operation.
+     * Uses the Renderer's cell rendering for consistent formatting with marginal mode support.
      * @private
      */
-    _renderFixtures(tests, zkvm) {
-        const sorted = [...tests].sort((a, b) => {
-            const costA = this.dataAccessor.getRelativeCost(a, zkvm) ?? Infinity;
-            const costB = this.dataAccessor.getRelativeCost(b, zkvm) ?? Infinity;
+    _renderExpandedRows(group, columns, colSpan) {
+        // Sort fixtures by worst cost descending (worst first)
+        const sorted = [...group.tests].sort((a, b) => {
+            const costA = this.dataAccessor.getRelativeCost(a, columns[0].id) ?? Infinity;
+            const costB = this.dataAccessor.getRelativeCost(b, columns[0].id) ?? Infinity;
             return costB - costA;
         });
 
-        const squares = sorted.map(test => {
-            const cls = this._getFixtureClass(test, zkvm);
-            const name = test.name || test.id;
-            const cost = this.dataAccessor.getRelativeCost(test, zkvm);
-            const label = this._isFixtureCrashed(test, zkvm)
-                ? 'Crashed'
-                : (cost ? formatRelativeCost(cost) : 'N/A');
-            const tooltip = escapeHtml(`${name}: ${label}`);
-            return `<div class="hm-fx ${cls}" title="${tooltip}"></div>`;
+        // Build fixture rows as a nested scrollable table
+        const fixtureRows = sorted.map(test => {
+            const cells = columns.map(col => {
+                if (col.id === VIEW.WORST) {
+                    return this.renderer.renderTestWorstCell(test);
+                }
+                return this.renderer.renderTestZkvmCell(test, col.id);
+            });
+
+            return `<tr class="hm-fixture-row">` +
+                `<td class="hm-fixture-indent"></td>` +
+                `<td class="hm-fixture-name" title="${escapeHtml(test.id)}">${escapeHtml(test.id)}</td>` +
+                cells.join('') +
+                `</tr>`;
         });
 
-        return `<div class="hm-fixtures">${squares.join('')}</div>`;
+        // Wrap in scrollable container using a nested table
+        const colHeaders = columns.map(c =>
+            `<th class="hm-th">${escapeHtml(c.label)}</th>`
+        ).join('');
+
+        return `<tr class="hm-detail-row"><td colspan="${colSpan}">` +
+            `<div class="hm-fixture-scroll">` +
+            `<table class="hm-fixture-table">` +
+            `<thead><tr>` +
+            `<th class="hm-th hm-fixture-th-indent"></th>` +
+            `<th class="hm-th hm-fixture-th-name">Fixture</th>` +
+            colHeaders +
+            `</tr></thead>` +
+            `<tbody>${fixtureRows.join('')}</tbody>` +
+            `</table>` +
+            `</div>` +
+            `</td></tr>`;
     }
 
     // ========================================================================
@@ -287,12 +306,7 @@ export class HeatmapRenderer {
                 );
 
                 if (isExpanded) {
-                    const fxCells = columns.map(col =>
-                        `<td class="hm-fx-td">${this._renderFixtures(group.tests, col.id)}</td>`
-                    );
-                    rows.push(
-                        `<tr class="hm-detail-row"><td colspan="2"></td>${fxCells.join('')}</tr>`
-                    );
+                    rows.push(this._renderExpandedRows(group, columns, colSpan));
                 }
             }
         }

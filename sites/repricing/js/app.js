@@ -4,7 +4,7 @@
  */
 
 import { CONFIG, VIEW, VALUE_MODE, HARDWARE_TARGET_DEFAULTS, getBaselineConfig, getMarginalGasLimit } from './constants.js';
-import { debounce, createComparator, parseColumn } from './utils.js';
+import { debounce } from './utils.js';
 import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
 import { Renderer } from './render.js';
@@ -34,25 +34,11 @@ export class BenchmarkApp {
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.ALL;
         this.valueMode = VALUE_MODE.ABSOLUTE;  // 'absolute' or 'marginal'
-        this.expandedOperations = new Set();
-
         // ====================================================================
         // Filter State
         // ====================================================================
         this.targetMGasPerS = CONFIG.DEFAULT_TARGET_MGAS_PER_S;
         this.minRelativeCost = null;
-
-        // ====================================================================
-        // Sort State
-        // ====================================================================
-        this.sortColumn = null;  // Will be set to first zkVM after data loads
-        this.sortDirection = 'desc';
-
-        // ====================================================================
-        // Pagination State
-        // ====================================================================
-        this.currentPage = 1;
-        this.pageSize = CONFIG.DEFAULT_PAGE_SIZE;
 
         // ====================================================================
         // Pending URL State (applied after data loads)
@@ -112,12 +98,6 @@ export class BenchmarkApp {
             hideCrashed: document.getElementById('hide-crashed'),
             summaryBar: document.getElementById('summary-bar'),
             operationFilters: document.getElementById('operation-filters'),
-            tableHeader: document.getElementById('table-header'),
-            tableBody: document.getElementById('table-body'),
-            tableCount: document.getElementById('table-count'),
-            resultsTable: document.getElementById('results-table'),
-            paginationTop: document.getElementById('pagination-top'),
-            paginationBottom: document.getElementById('pagination-bottom'),
             themeToggle: document.getElementById('theme-toggle'),
             generatedAt: document.getElementById('generated-at'),
             hardwareInfo: document.getElementById('hardware-info'),
@@ -191,7 +171,7 @@ export class BenchmarkApp {
             this.pendingURLState = null;
 
             // Initial render
-            this.refresh({ resetPage: false, updateUrl: false });
+            this.refresh({ updateUrl: false });
             this.updateFooter();
 
             this.showApp();
@@ -225,16 +205,11 @@ export class BenchmarkApp {
 
         // Initialize renderers
         this.renderer = new Renderer(this.elements, this.dataAccessor);
-        this.heatmapRenderer = new HeatmapRenderer(this.dataAccessor);
+        this.heatmapRenderer = new HeatmapRenderer(this.dataAccessor, this.renderer);
 
         // Update raw data link
         if (this.elements.rawDataLink) {
             this.elements.rawDataLink.href = `data/${this.selectedHardware}/${datasetInfo.file}`;
-        }
-
-        // Set default sort column to first zkVM if not specified
-        if (!this.sortColumn && this.data.zkvms.length > 0) {
-            this.sortColumn = `${this.data.zkvms[0]}-time`;
         }
     }
 
@@ -314,15 +289,9 @@ export class BenchmarkApp {
     reinitializeUI() {
         // Reset filter state
         this.selectedOperations.clear();
-        this.expandedOperations.clear();
         this.heatmapExpandedOps.clear();
         this.heatmapSortMode = 'cost';
-        this.currentPage = 1;
         this.minRelativeCost = null;
-
-        // Reset sort to default (first zkVM column)
-        this.sortColumn = this.data.zkvms.length > 0 ? `${this.data.zkvms[0]}-time` : 'worst-time';
-        this.sortDirection = 'desc';
 
         // Reset to absolute mode (baseline may have changed)
         this.valueMode = VALUE_MODE.ABSOLUTE;
@@ -347,7 +316,7 @@ export class BenchmarkApp {
         this.initializeQuickFilters();
 
         // Render
-        this.refresh({ resetPage: true, updateUrl: false });
+        this.refresh({ updateUrl: false });
         this.updateFooter();
     }
 
@@ -407,39 +376,9 @@ export class BenchmarkApp {
     }
 
     /**
-     * Sorts grouped data based on current sort settings.
+     * Refreshes the UI after filter changes.
      */
-    sortGroupedData() {
-        const activeZkvm = this.selectedZkvmView === VIEW.ALL ? VIEW.WORST : this.selectedZkvmView;
-        const { type, zkvm } = parseColumn(this.sortColumn);
-
-        const getValue = (group) => {
-            switch (type) {
-                case 'operation':
-                    return group.operation;
-                case 'name':
-                    return group.testCount;
-                case 'worst-time':
-                    return this.dataAccessor.getGroupWorstCase(group, VIEW.WORST).time ?? Infinity;
-                case 'worst-relative':
-                    return this.dataAccessor.getGroupRelativeCost(group, VIEW.WORST) ?? Infinity;
-                case 'zkvm-time':
-                    return this.dataAccessor.getGroupWorstCase(group, zkvm).time ?? Infinity;
-                case 'zkvm-relative':
-                    return this.dataAccessor.getGroupRelativeCost(group, zkvm) ?? Infinity;
-                default:
-                    return this.dataAccessor.getGroupRelativeCost(group, activeZkvm) ?? Infinity;
-            }
-        };
-
-        this.groupedData.sort(createComparator(this.sortDirection, getValue));
-    }
-
-    /**
-     * Refreshes the UI after filter/sort changes.
-     */
-    refresh({ resetPage = true, updateUrl = true } = {}) {
-        if (resetPage) this.currentPage = 1;
+    refresh({ updateUrl = true } = {}) {
         this.cache.clearGroupCache();
         // Sync value mode to renderer
         if (this.renderer) {
@@ -447,92 +386,10 @@ export class BenchmarkApp {
         }
         this.filterTests();
         this.groupTestsByOperation();
-        this.sortGroupedData();
         this.renderHeatmap();
-        this.renderTable();
         this.updateSummaryBar();
         this.updateQuickFilterButtons();
         if (updateUrl) this.updateURL();
-    }
-
-    // ========================================================================
-    // Rendering
-    // ========================================================================
-
-    /**
-     * Renders the data table.
-     */
-    renderTable() {
-        const { tableHeader, tableBody, tableCount, paginationTop, paginationBottom } = this.elements;
-
-        // Update count
-        tableCount.textContent = `(${this.groupedData.length} operations, ${this.filteredTests.length} tests)`;
-
-        // Render header
-        tableHeader.innerHTML = this.renderer.renderTableHeader({
-            zkvmView: this.selectedZkvmView,
-            zkvms: this.data.zkvms,
-            sortColumn: this.sortColumn,
-            sortDirection: this.sortDirection,
-        });
-
-        // Add sort handlers
-        tableHeader.querySelectorAll('th[data-sort]').forEach(th => {
-            th.addEventListener('click', () => this.handleSort(th.dataset.sort));
-        });
-
-        // Calculate pagination
-        const totalPages = Math.ceil(this.groupedData.length / this.pageSize);
-        if (this.currentPage > totalPages) {
-            this.currentPage = Math.max(1, totalPages);
-        }
-
-        const startIdx = (this.currentPage - 1) * this.pageSize;
-        const endIdx = Math.min(startIdx + this.pageSize, this.groupedData.length);
-        const pageGroups = this.groupedData.slice(startIdx, endIdx);
-
-        // Render body
-        const rows = [];
-        const renderOptions = { zkvmView: this.selectedZkvmView, zkvms: this.data.zkvms };
-
-        for (const group of pageGroups) {
-            const isExpanded = this.expandedOperations.has(group.operation);
-            rows.push(this.renderer.renderGroupRow(group, isExpanded, renderOptions));
-
-            if (isExpanded) {
-                rows.push(this.renderer.renderGroupFixtures(group, renderOptions));
-            }
-        }
-
-        tableBody.innerHTML = rows.join('');
-
-        // Add expansion handlers
-        tableBody.querySelectorAll('.group-row').forEach(row => {
-            row.addEventListener('click', () => {
-                this.toggleOperationExpansion(row.dataset.operation);
-            });
-        });
-
-        // Render pagination
-        const paginationHtml = this.renderer.renderPagination({
-            currentPage: this.currentPage,
-            totalPages,
-            pageSize: this.pageSize,
-        });
-
-        paginationTop.innerHTML = paginationHtml;
-        paginationBottom.innerHTML = paginationHtml;
-
-        // Add pagination handlers
-        [paginationTop, paginationBottom].forEach(container => {
-            container.querySelectorAll('button[data-page]').forEach(btn => {
-                btn.addEventListener('click', () => this.goToPage(parseInt(btn.dataset.page, 10)));
-            });
-            const select = container.querySelector('select[data-action="page-size"]');
-            if (select) {
-                select.addEventListener('change', (e) => this.changePageSize(parseInt(e.target.value, 10)));
-            }
-        });
     }
 
     /**
@@ -565,51 +422,16 @@ export class BenchmarkApp {
     // Event Handlers
     // ========================================================================
 
-    handleSort(column) {
-        if (this.sortColumn === column) {
-            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            this.sortColumn = column;
-            this.sortDirection = 'asc';
-        }
-        this.sortGroupedData();
-        this.renderTable();
-        this.updateURL();
-    }
-
-    toggleOperationExpansion(operation) {
-        if (this.expandedOperations.has(operation)) {
-            this.expandedOperations.delete(operation);
-        } else {
-            this.expandedOperations.add(operation);
-        }
-        this.renderTable();
-    }
-
-    goToPage(page) {
-        this.currentPage = page;
-        this.renderTable();
-        this.elements.resultsTable.scrollIntoView({ behavior: 'smooth' });
-        this.updateURL();
-    }
-
-    changePageSize(size) {
-        this.pageSize = size;
-        this.currentPage = 1;
-        this.renderTable();
-        this.updateURL();
-    }
-
     handleTargetChange(target) {
         if (target <= 0 || isNaN(target)) return;
         this.targetMGasPerS = target;
         this.dataAccessor.setTarget(target);
-        this.refresh({ resetPage: false });
+        this.refresh();
     }
 
     handleZkvmViewChange(view) {
         this.selectedZkvmView = view;
-        this.refresh({ resetPage: false });
+        this.refresh();
     }
 
     /**
@@ -647,7 +469,7 @@ export class BenchmarkApp {
         }
 
         this.updateMarginalInfo();
-        this.refresh({ resetPage: false });
+        this.refresh();
     }
 
     handleSearch() {
@@ -939,7 +761,7 @@ export class BenchmarkApp {
         });
 
         if (this.elements.heatmapCount) {
-            this.elements.heatmapCount.textContent = `(${this.groupedData.length} operations)`;
+            this.elements.heatmapCount.textContent = `(${this.groupedData.length} operations, ${this.filteredTests.length} tests)`;
         }
     }
 
@@ -982,7 +804,6 @@ export class BenchmarkApp {
             ? Object.values(this.data.operations_by_category).flat()
             : this.data.operations;
 
-        const defaultSortColumn = this.data.zkvms.length > 0 ? `${this.data.zkvms[0]}-time` : 'worst-time';
         URLState.serialize({
             hardware: this.selectedHardware,
             dataset: this.selectedDataset,
@@ -991,16 +812,11 @@ export class BenchmarkApp {
             valueMode: this.valueMode,
             search: this.elements.search?.value || '',
             hideCrashed: this.elements.hideCrashed?.checked || false,
-            sortColumn: this.sortColumn,
-            sortDirection: this.sortDirection,
-            page: this.currentPage,
-            pageSize: this.pageSize,
             minRelativeCost: this.minRelativeCost,
             selectedOperations: this.selectedOperations,
         }, {
             hardware: this.globalManifest?.default_hardware,
             dataset: this.manifest?.default_dataset,
-            sortColumn: defaultSortColumn,
         }, allOps);
     }
 

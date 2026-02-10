@@ -30,10 +30,6 @@ export const URLState = {
             search: params.get(URL_PARAMS.SEARCH),
             hideCrashed: params.get(URL_PARAMS.HIDE_CRASHED) === '1',
             operations: params.get(URL_PARAMS.OPERATIONS)?.split(',').filter(Boolean) || null,
-            sortColumn: params.get(URL_PARAMS.SORT_COLUMN),
-            sortDirection: params.get(URL_PARAMS.SORT_DIR),
-            page: parseInt(params.get(URL_PARAMS.PAGE), 10) || null,
-            pageSize: parseInt(params.get(URL_PARAMS.PAGE_SIZE), 10) || null,
             minRelativeCost: parseFloat(params.get(URL_PARAMS.MIN_RELATIVE)) || null,
         };
     },
@@ -85,27 +81,6 @@ export const URLState = {
             params.set(URL_PARAMS.HIDE_CRASHED, '1');
         }
 
-        // Sort column (only if not default)
-        const defaultSortColumn = defaults.sortColumn || 'worst-time';
-        if (state.sortColumn !== defaultSortColumn) {
-            params.set(URL_PARAMS.SORT_COLUMN, state.sortColumn);
-        }
-
-        // Sort direction (only if not default)
-        if (state.sortDirection !== 'desc') {
-            params.set(URL_PARAMS.SORT_DIR, state.sortDirection);
-        }
-
-        // Current page (only if not first page)
-        if (state.page !== 1) {
-            params.set(URL_PARAMS.PAGE, state.page.toString());
-        }
-
-        // Page size (only if not default)
-        if (state.pageSize !== CONFIG.DEFAULT_PAGE_SIZE) {
-            params.set(URL_PARAMS.PAGE_SIZE, state.pageSize.toString());
-        }
-
         // Minimum relative cost filter
         if (state.minRelativeCost !== null) {
             params.set(URL_PARAMS.MIN_RELATIVE, state.minRelativeCost.toString());
@@ -148,12 +123,6 @@ export function applyURLStateToApp(urlState, appState) {
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;
     if (urlState.valueMode && Object.values(VALUE_MODE).includes(urlState.valueMode)) {
         appState.valueMode = urlState.valueMode;
-    }
-    if (urlState.sortColumn) appState.sortColumn = urlState.sortColumn;
-    if (urlState.sortDirection) appState.sortDirection = urlState.sortDirection;
-    if (urlState.page) appState.currentPage = urlState.page;
-    if (urlState.pageSize && CONFIG.PAGE_SIZE_OPTIONS.includes(urlState.pageSize)) {
-        appState.pageSize = urlState.pageSize;
     }
     if (urlState.minRelativeCost) appState.minRelativeCost = urlState.minRelativeCost;
 

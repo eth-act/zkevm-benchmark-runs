@@ -1099,7 +1099,7 @@ footer a:hover {
 
 /* Scrollable grid container */
 .hm-grid-container {
-    max-height: 560px;
+    max-height: 80vh;
     overflow-y: auto;
     overflow-x: auto;
     border: 1px solid var(--border);
@@ -1205,7 +1205,7 @@ footer a:hover {
 }
 
 .hm-cell {
-    height: 16px;
+    min-height: 16px;
     min-width: 80px;
     border-radius: 3px;
     overflow: hidden;
@@ -1223,7 +1223,7 @@ footer a:hover {
 
 .hm-bar {
     display: flex;
-    height: 100%;
+    height: 16px;
     width: 100%;
 }
 
@@ -1238,45 +1238,109 @@ footer a:hover {
     text-align: center;
 }
 
+/* Worst cost label below proportional bar */
+.hm-cell-worst {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 2px;
+    line-height: 1;
+}
+
+.hm-worst-crashed {
+    color: var(--error);
+    font-size: 0.625rem;
+}
+
 /* Expanded fixture detail row */
 .hm-detail-row td {
-    padding: 6px 8px 10px;
+    padding: 0;
     border-bottom: 2px solid var(--accent);
     background: var(--bg-secondary);
-    vertical-align: top;
 }
 
-.hm-fx-td {
-    padding: 6px 6px 10px;
-    border-bottom: 2px solid var(--accent);
+/* Scrollable fixture container */
+.hm-fixture-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Nested fixture table */
+.hm-fixture-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hm-fixture-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
+.hm-fixture-th-indent {
+    width: 24px;
+    min-width: 24px;
+}
+
+.hm-fixture-th-name {
+    width: 200px;
+    min-width: 120px;
+}
+
+/* Fixture rows */
+.hm-fixture-row {
     background: var(--bg-secondary);
-    vertical-align: top;
 }
 
-/* Fixture squares */
-.hm-fixtures {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
+.hm-fixture-row:hover td {
+    background: var(--bg-card);
 }
 
-.hm-fx {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    cursor: default;
-    transition: transform 0.1s ease;
+.hm-fixture-row td {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid var(--border);
 }
 
-.hm-fx:hover {
-    transform: scale(1.5);
-    z-index: 1;
+.hm-fixture-indent {
+    width: 24px;
+    min-width: 24px;
+    text-align: right;
+    padding-right: 4px;
+    color: var(--text-muted);
 }
 
-.hm-fx-ok { background: var(--success); }
-.hm-fx-warn { background: var(--warning); }
-.hm-fx-bad { background: #f97316; }
-.hm-fx-crashed { background: var(--error); }
+.hm-fixture-indent::after {
+    content: "\2514";
+    font-size: 0.625rem;
+}
+
+.hm-fixture-name {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    word-break: break-word;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Fixture cells reuse .combined-cell styles from the table */
+.hm-fixture-row .combined-cell {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+}
+
+.hm-fixture-row .combined-cell .cell-relative {
+    font-size: 0.8125rem;
+}
+
+.hm-fixture-row .combined-cell .cell-time {
+    font-size: 0.6875rem;
+}
 
 /* ============================================================================
    Responsive Adjustments
