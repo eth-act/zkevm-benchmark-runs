@@ -3,7 +3,7 @@
  * Orchestrates data loading, state management, and UI rendering.
  */
 
-import { CONFIG, VIEW, VALUE_MODE, STATUS, HARDWARE_TARGET_DEFAULTS, getBaselineConfig, getMarginalGasLimit } from './constants.js';
+import { CONFIG, VIEW, VALUE_MODE, HARDWARE_TARGET_DEFAULTS, getBaselineConfig, getMarginalGasLimit } from './constants.js';
 import { debounce, createComparator, parseColumn } from './utils.js';
 import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
@@ -392,20 +392,6 @@ export class BenchmarkApp {
     }
 
     /**
-     * Checks if any test in a group crashed for a specific zkVM.
-     * Matches the display logic in renderer.hasAnyCrashed.
-     */
-    hasAnyCrashed(group, zkvm) {
-        return group.tests.some(test => {
-            if (zkvm === VIEW.WORST) {
-                return this.dataAccessor.isAllCrashed(test);
-            }
-            const result = test.results[zkvm];
-            return !result || result.status !== STATUS.SUCCESS;
-        });
-    }
-
-    /**
      * Sorts grouped data based on current sort settings.
      */
     sortGroupedData() {
@@ -419,19 +405,14 @@ export class BenchmarkApp {
                 case 'name':
                     return group.testCount;
                 case 'worst-time':
-                    if (this.hasAnyCrashed(group, VIEW.WORST)) return Infinity;
                     return this.dataAccessor.getGroupWorstCase(group, VIEW.WORST).time ?? Infinity;
                 case 'worst-relative':
-                    if (this.hasAnyCrashed(group, VIEW.WORST)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, VIEW.WORST) ?? Infinity;
                 case 'zkvm-time':
-                    if (this.hasAnyCrashed(group, zkvm)) return Infinity;
                     return this.dataAccessor.getGroupWorstCase(group, zkvm).time ?? Infinity;
                 case 'zkvm-relative':
-                    if (this.hasAnyCrashed(group, zkvm)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, zkvm) ?? Infinity;
                 default:
-                    if (this.hasAnyCrashed(group, activeZkvm)) return Infinity;
                     return this.dataAccessor.getGroupRelativeCost(group, activeZkvm) ?? Infinity;
             }
         };
