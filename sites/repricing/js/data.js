@@ -140,14 +140,28 @@ export class DataAccessor {
 
     /**
      * Checks if all zkVMs crashed for a test.
+     * Returns true only if at least one zkVM actually crashed and none succeeded.
+     * Missing results (no data) are not counted as crashes.
      * @param {Object} test - The test object
-     * @returns {boolean} True if all zkVMs crashed
+     * @returns {boolean} True if at least one zkVM crashed and none succeeded
      */
     isAllCrashed(test) {
-        return this.data.zkvms.every(zkvm => {
+        let hasCrash = false;
+        for (const zkvm of this.data.zkvms) {
             const result = test.results[zkvm];
-            return !result || result.status !== STATUS.SUCCESS;
-        });
+            if (result && result.status === STATUS.SUCCESS) return false;
+            if (result && result.status === STATUS.CRASHED) hasCrash = true;
+        }
+        return hasCrash;
+    }
+
+    /**
+     * Checks if all zkVMs are missing data for a test (no results at all).
+     * @param {Object} test - The test object
+     * @returns {boolean} True if no zkVM has any result for this test
+     */
+    isAllMissing(test) {
+        return this.data.zkvms.every(zkvm => !test.results[zkvm]);
     }
 
     /**

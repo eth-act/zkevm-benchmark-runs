@@ -30,12 +30,15 @@ import {
  * @param {boolean} options.noBaseline - Whether baseline data is missing for this test
  * @returns {string} HTML string for the cell
  */
-export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, isMarginal = false, noBaseline = false }) {
+export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, isMarginal = false, noBaseline = false }) {
     if (allCrashed) {
         return '<td class="combined-cell status-crashed">CRASHED</td>';
     }
     if (crashed) {
         return '<td class="combined-cell status-crashed">CRASHED</td>';
+    }
+    if (missing) {
+        return '<td class="combined-cell status-na" title="No data available for this combination">-</td>';
     }
     if (noBaseline) {
         return '<td class="combined-cell status-na" title="Test not found in baseline dataset">N/A</td>';
@@ -172,11 +175,12 @@ export class Renderer {
     hasAnyCrashed(group, zkvm) {
         return group.tests.some(test => {
             if (zkvm === VIEW.WORST) {
-                // For worst-case view, check if any zkVM crashed for this test
+                // For worst-case view, check if any zkVM actually crashed for this test
                 return this.dataAccessor.isAllCrashed(test);
             }
             const result = test.results[zkvm];
-            return !result || result.status !== STATUS.SUCCESS;
+            // Only flag actual crashes, not missing data
+            return result && result.status === STATUS.CRASHED;
         });
     }
 
@@ -185,13 +189,18 @@ export class Renderer {
      * Shows CRASHED if any fixture in the group crashed for this zkVM.
      */
     renderGroupZkvmCell(group, zkvm) {
-        // If any fixture crashed, show CRASHED
+        // If any fixture actually crashed, show CRASHED
         if (this.hasAnyCrashed(group, zkvm)) {
             return renderProofCell({ allCrashed: true });
         }
 
         const isMarginal = this.isInMarginalMode();
         const worst = this.dataAccessor.getGroupWorstCase(group, zkvm);
+
+        // If no test had data for this zkVM, show missing
+        if (!worst.test) {
+            return renderProofCell({ missing: true });
+        }
 
         if (isMarginal) {
             // Check if baseline exists for this test
@@ -212,13 +221,18 @@ export class Renderer {
      * Shows CRASHED if any fixture in the group crashed on all zkVMs.
      */
     renderGroupWorstCell(group) {
-        // If any fixture crashed on all zkVMs, show CRASHED
+        // If any fixture actually crashed on all zkVMs, show CRASHED
         if (this.hasAnyCrashed(group, VIEW.WORST)) {
             return renderProofCell({ allCrashed: true });
         }
 
         const isMarginal = this.isInMarginalMode();
         const worst = this.dataAccessor.getGroupWorstCase(group, VIEW.WORST);
+
+        // If no test had any successful data, show missing
+        if (!worst.test) {
+            return renderProofCell({ missing: true });
+        }
 
         if (isMarginal) {
             // Check if baseline exists for this test
@@ -287,7 +301,10 @@ export class Renderer {
      */
     renderTestZkvmCell(test, zkvm) {
         const result = test.results[zkvm];
-        if (result?.status !== STATUS.SUCCESS) {
+        if (!result) {
+            return renderProofCell({ missing: true });
+        }
+        if (result.status !== STATUS.SUCCESS) {
             return renderProofCell({ crashed: true });
         }
 
@@ -325,6 +342,9 @@ export class Renderer {
             if (time !== null) {
                 return renderProofCell({ time, relativeCost, zkvm: worstZkvm, isMarginal: true });
             }
+            if (this.dataAccessor.isAllMissing(test)) {
+                return renderProofCell({ missing: true });
+            }
             return renderProofCell({ allCrashed: true });
         }
 
@@ -334,6 +354,9 @@ export class Renderer {
 
         if (time !== null) {
             return renderProofCell({ time, relativeCost, zkvm: worstZkvm });
+        }
+        if (this.dataAccessor.isAllMissing(test)) {
+            return renderProofCell({ missing: true });
         }
         return renderProofCell({ allCrashed: true });
     }
@@ -380,7 +403,7 @@ export class Renderer {
         const zkvmStats = {};
 
         for (const zkvm of zkvms) {
-            zkvmStats[zkvm] = { success: 0, crashed: 0 };
+            zkvmStats[zkvm] = { success: 0, crashed: 0, missing: 0 };
         }
 
         for (const test of filteredTests) {
@@ -388,8 +411,10 @@ export class Renderer {
                 const result = test.results[zkvm];
                 if (result?.status === STATUS.SUCCESS) {
                     zkvmStats[zkvm].success++;
-                } else {
+                } else if (result) {
                     zkvmStats[zkvm].crashed++;
+                } else {
+                    zkvmStats[zkvm].missing++;
                 }
             }
         }
@@ -405,11 +430,14 @@ export class Renderer {
         for (const zkvm of zkvms) {
             const stats = zkvmStats[zkvm];
             const successRate = totalTests > 0 ? ((stats.success / totalTests) * 100).toFixed(1) : 0;
+            const detail = stats.missing > 0
+                ? `${stats.success} success, ${stats.crashed} crashed, ${stats.missing} missing`
+                : `${stats.success} success, ${stats.crashed} crashed`;
             parts.push(`
                 <div class="stat-card ${stats.success > stats.crashed ? 'success' : 'error'}">
                     <h3>${escapeHtml(zkvm)}</h3>
                     <div class="value">${successRate}%</div>
-                    <div class="detail">${stats.success} success, ${stats.crashed} crashed</div>
+                    <div class="detail">${detail}</div>
                 </div>
             `);
         }
