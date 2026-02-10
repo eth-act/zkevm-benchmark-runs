@@ -27,17 +27,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Generate benchmarks website
-        run: python3 scripts/generate_benchmarks_website.py --output dist/benchmarks
-
-      - name: Generate repricing website
-        run: |
-          mkdir -p dist/repricing/data
-          cp -r sites/repricing/* dist/repricing/
-          python3 scripts/generate_repricing_website.py --output dist/repricing/data
-
-      - name: Copy landing page
-        run: cp sites/landing/index.html dist/
+      - name: Build website
+        run: python3 scripts/build_site.py --output dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

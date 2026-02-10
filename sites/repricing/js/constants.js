@@ -16,7 +16,7 @@ export const CONFIG = Object.freeze({
     DEBOUNCE_MS: 150,
 
     // Local storage key for theme preference
-    THEME_KEY: 'epra-theme',
+    THEME_KEY: 'theme',
 
     // Default target throughput for gas repricing analysis (MGas/s)
     // This represents the target proving speed for zkVM provers

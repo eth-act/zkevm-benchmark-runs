@@ -1,273 +1,13 @@
 /* ============================================================================
-   TABLE OF CONTENTS
-   ============================================================================
-   1. CSS Variables & Themes .................... line ~15
-   2. Base Styles & Typography .................. line ~85
-   3. Layout (Header, Container) ................ line ~110
-   4. Controls & Form Elements .................. line ~150
-   5. Radio & Checkbox Groups ................... line ~205
-   6. Quick Filters ............................. line ~260
-   7. Stats Panel ............................... line ~315
-   8. Target Info Panel ......................... line ~405
-   9. Section & Details/Summary ................. line ~465
-   10. Filter Grid & Groups ..................... line ~515
-   11. Buttons .................................. line ~570
-   12. Table Styles ............................. line ~615
-   13. Status & Relative Cost Classes ........... line ~680
-   14. Badges ................................... line ~710
-   15. Combined Cell ............................ line ~735
-   16. Grouped Table Rows ....................... line ~760
-   17. Expandable Rows .......................... line ~820
-   18. Pagination ............................... line ~885
-   19. Loading & Error States ................... line ~935
-   20. Footer ................................... line ~955
-   21. Utility Classes .......................... line ~990
-   22. Responsive Breakpoints ................... line ~1000
+   Repricing-Specific Styles
    ============================================================================ */
-
-/* ============================================================================
-   1. CSS Variables & Themes
-   ============================================================================ */
-
-:root {
-    --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-[data-theme="light"] {
-    color-scheme: light;
-
-    /* Background colors */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-card: #f1f5f9;
-    --input-bg: #ffffff;
-
-    /* Text colors */
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-
-    /* Accent colors */
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
-    --accent-secondary: #0ea5e9;
-
-    /* Status colors */
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-
-    /* Borders and shadows */
-    --border: #e2e8f0;
-    --border-strong: #cbd5e1;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-    /* Special backgrounds */
-    --info-panel-bg: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    --header-bg: #ffffff;
-}
-
-[data-theme="dark"] {
-    color-scheme: dark;
-
-    /* Background colors */
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-card: #334155;
-    --input-bg: #1e293b;
-
-    /* Text colors */
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-
-    /* Accent colors */
-    --accent: #818cf8;
-    --accent-hover: #a5b4fc;
-    --accent-secondary: #38bdf8;
-
-    /* Status colors */
-    --success: #34d399;
-    --warning: #fbbf24;
-    --error: #f87171;
-
-    /* Borders and shadows */
-    --border: #334155;
-    --border-strong: #475569;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-
-    /* Special backgrounds */
-    --info-panel-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    --header-bg: #1e293b;
-}
-
-/* ============================================================================
-   Base Styles
-   ============================================================================ */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 body {
-    font-family: var(--font-body);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    line-height: 1.6;
     font-size: 18px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    font-weight: 600;
 }
 
 .container {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
-}
-
-/* ============================================================================
-   Header
-   ============================================================================ */
-
-header {
-    background: var(--header-bg);
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.header-text h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-    letter-spacing: -0.025em;
-}
-
-.header-text p {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* ============================================================================
-   Main Content
-   ============================================================================ */
-
-main.container {
-    padding-top: 24px;
-    padding-bottom: 24px;
-}
-
-/* ============================================================================
-   Controls Bar (compact horizontal layout)
-   ============================================================================ */
-
-.controls-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-    background: var(--bg-primary);
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-}
-
-.controls-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.control-inline {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.control-inline label {
-    font-weight: 500;
-    color: var(--text-secondary);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-}
-
-.control-inline select,
-.control-inline input[type="number"] {
-    padding: 5px 8px;
-    font-size: 0.8125rem;
-    min-width: 0;
-}
-
-.control-inline input[type="number"] {
-    width: 70px;
-}
-
-.control-search {
-    flex: 1;
-    min-width: 140px;
-    max-width: 220px;
-}
-
-.control-search input[type="text"] {
-    width: 100%;
-    padding: 5px 8px;
-    font-size: 0.8125rem;
-}
-
-.control-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    cursor: pointer;
-}
-
-.control-checkbox input[type="checkbox"] {
-    accent-color: var(--accent);
-    width: 14px;
-    height: 14px;
-}
-
-select,
-input[type="text"],
-input[type="number"] {
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--input-bg);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    font-family: var(--font-body);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-select:focus,
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* ============================================================================
@@ -337,24 +77,8 @@ input:focus {
 }
 
 /* ============================================================================
-   Quick Filters (inline in controls bar)
+   Quick Filters
    ============================================================================ */
-
-.filter-section {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-.filter-label {
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-}
 
 .btn-filter {
     padding: 4px 8px;
@@ -380,23 +104,8 @@ input:focus {
 }
 
 /* ============================================================================
-   Summary Bar (replaces stats panel + target info)
+   Summary Bar Extensions
    ============================================================================ */
-
-.summary-bar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 12px;
-    padding: 8px 14px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    flex-wrap: wrap;
-    line-height: 1.6;
-}
 
 .summary-bar .summary-sep {
     color: var(--border-strong);
@@ -431,7 +140,7 @@ input:focus {
 }
 
 /* ============================================================================
-   Section & Details/Summary
+   Section & Details Extensions
    ============================================================================ */
 
 .section {
@@ -447,52 +156,6 @@ input:focus {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 16px;
-}
-
-details {
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-details summary {
-    padding: 12px 16px;
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    list-style: none;
-}
-
-details summary::-webkit-details-marker {
-    display: none;
-}
-
-details summary::before {
-    content: '▶';
-    font-size: 0.65rem;
-    transition: transform 0.2s ease;
-    color: var(--text-secondary);
-}
-
-details[open] summary::before {
-    transform: rotate(90deg);
-}
-
-details summary h2 {
-    font-size: 0.875rem;
-    margin: 0;
-}
-
-details[open] summary {
-    border-bottom: 1px solid var(--border);
-}
-
-details > *:not(summary) {
-    padding: 16px;
 }
 
 /* ============================================================================
@@ -549,27 +212,8 @@ details > *:not(summary) {
 }
 
 /* ============================================================================
-   Buttons
+   Button Extensions
    ============================================================================ */
-
-.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
 
 .btn-secondary {
     background: var(--bg-secondary);
@@ -582,83 +226,18 @@ details > *:not(summary) {
     color: var(--accent);
 }
 
-.btn-tertiary {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    font-size: 0.8125rem;
-}
-
-.btn-tertiary:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
 /* ============================================================================
-   Table Styles
+   Table Overrides (repricing-specific)
    ============================================================================ */
 
 .table-container {
-    overflow-x: auto;
     max-height: 70vh;
     overflow-y: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg-primary);
-}
-
-thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
 }
 
 th,
 td {
     padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.875rem;
-}
-
-th {
-    background: var(--bg-secondary);
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    position: relative;
-    user-select: none;
-    white-space: nowrap;
-}
-
-th:hover {
-    color: var(--accent);
-}
-
-th.sorted-asc::after {
-    content: " \25B2";
-    color: var(--accent);
-    font-size: 0.625rem;
-}
-
-th.sorted-desc::after {
-    content: " \25BC";
-    color: var(--accent);
-    font-size: 0.625rem;
-}
-
-tbody tr {
-    transition: background 0.15s ease;
-}
-
-tbody tr:hover td {
-    background: var(--bg-secondary);
 }
 
 /* ============================================================================
@@ -925,72 +504,6 @@ tbody tr:hover td {
 }
 
 /* ============================================================================
-   Loading & Error States
-   ============================================================================ */
-
-.loading {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-.error-message {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--error);
-    color: var(--error);
-    padding: 16px;
-    border-radius: 8px;
-}
-
-/* ============================================================================
-   Footer
-   ============================================================================ */
-
-footer {
-    background: var(--bg-primary);
-    padding: 24px 0;
-    margin-top: 40px;
-    border-top: 1px solid var(--border);
-}
-
-footer .container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
-    justify-content: space-between;
-}
-
-footer p {
-    color: var(--text-muted);
-    font-size: 0.8125rem;
-    margin: 0;
-}
-
-footer a {
-    color: var(--accent);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-footer a:hover {
-    color: var(--accent-hover);
-}
-
-/* ============================================================================
-   Utility Classes
-   ============================================================================ */
-
-.hidden {
-    display: none !important;
-}
-
-.text-secondary {
-    color: var(--text-secondary);
-}
-
-/* ============================================================================
    Performance Heatmap
    ============================================================================ */
 
@@ -1198,7 +711,7 @@ footer a:hover {
     flex-wrap: wrap;
 }
 
-/* Worst cost label — matches .hm-op-name */
+/* Worst cost label */
 .hm-cell-worst {
     font-size: 0.875rem;
     font-weight: 600;
@@ -1215,7 +728,7 @@ footer a:hover {
     color: var(--text-secondary);
 }
 
-/* Crash badge (e.g. "2/5 crashed") — matches .hm-count */
+/* Crash badge */
 .hm-cell-crash-badge {
     font-size: 0.8125rem;
     color: var(--error);
@@ -1298,7 +811,7 @@ footer a:hover {
     white-space: nowrap;
 }
 
-/* Fixture cells reuse .combined-cell styles from the table */
+/* Fixture cells reuse .combined-cell styles */
 .hm-fixture-row .combined-cell {
     padding: 6px 10px;
     font-size: 0.875rem;
@@ -1313,35 +826,12 @@ footer a:hover {
 }
 
 /* ============================================================================
-   Responsive Adjustments
+   Responsive (repricing-specific)
    ============================================================================ */
 
 @media (max-width: 768px) {
-    .header-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .header-text h1 {
-        font-size: 1.25rem;
-    }
-
-    .controls-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .control-inline {
-        flex-wrap: wrap;
-    }
-
     .control-search {
         max-width: none;
-    }
-
-    .filter-section {
-        flex-wrap: wrap;
     }
 
     .btn-filter {
@@ -1358,10 +848,5 @@ footer a:hover {
 
     .summary-bar .summary-sep {
         display: none;
-    }
-
-    footer .container {
-        flex-direction: column;
-        align-items: flex-start;
     }
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zkEVM Benchmark Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/base.css">
+    <link rel="stylesheet" href="../shared/components.css">
+    <link rel="stylesheet" href="../shared/responsive.css">
+    <link rel="stylesheet" href="benchmarks.css">
+</head>
+<body>
+    <header>
+        <div class="container header-row">
+            <div class="header-text">
+                <h1>zkEVM Benchmark Results</h1>
+                <p>Performance comparison of zkEVM provers and executors</p>
+            </div>
+            <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="controls-bar">
+            <div class="controls-row">
+                <div class="filter-section">
+                    <span class="filter-label">Mode:</span>
+                    <button class="tab-button active" data-tab="execution">Execution</button>
+                    <button class="tab-button" data-tab="proving">Proving</button>
+                </div>
+                <div class="control-inline">
+                    <label for="hardware-filter">Machine</label>
+                    <select id="hardware-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="control-inline">
+                    <label for="config-filter">Config</label>
+                    <select id="config-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="control-inline">
+                    <label for="el-client-filter">EL Client</label>
+                    <select id="el-client-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <label class="control-checkbox">
+                    <input type="checkbox" id="crashes-filter">
+                    Show crashes only
+                </label>
+            </div>
+        </div>
+
+        <div id="tab-info" class="summary-bar"></div>
+
+        <details id="reproduce-section">
+            <summary><h2>How to reproduce?</h2></summary>
+            <div class="reproduce-content">
+                <p>To reproduce do:</p>
+                <pre><code>$ git clone git@github.com:eth-act/zkevm-benchmark-workload.git
+$ cd zkevm-benchmark-workload
+# Change 60M to 10M or 45M as desired.
+$ RUST_LOG=info cargo run --release -p witness-generator-cli -- tests --include 60M-
+# Change 'zisk' to any other zkvm name.
+$ RUST_LOG=info cargo run --release -p ere-hosts -- --zkvms zisk stateless-validator --execution-client reth</code></pre>
+            </div>
+        </details>
+
+        <div id="content">
+            <div class="loading">Loading benchmark data...</div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>zkEVM Benchmark Results</p>
+            <p><a href="https://github.com/eth-act/zkevm-benchmark-runs">Raw Data (GitHub)</a></p>
+        </div>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
