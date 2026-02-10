@@ -109,12 +109,12 @@ export function formatThroughput(gasUsed, timeMs) {
     const { MILLION, THOUSAND } = THRESHOLDS.GAS;
 
     if (gasPerSecond >= MILLION) {
-        return `${(gasPerSecond / MILLION).toFixed(2)}M gas/s`;
+        return `${Math.round(gasPerSecond / MILLION)}M gas/s`;
     }
     if (gasPerSecond >= THOUSAND) {
-        return `${(gasPerSecond / THOUSAND).toFixed(2)}K gas/s`;
+        return `${Math.round(gasPerSecond / THOUSAND)}K gas/s`;
     }
-    return `${gasPerSecond.toFixed(2)} gas/s`;
+    return `${Math.round(gasPerSecond)} gas/s`;
 }
 
 /**

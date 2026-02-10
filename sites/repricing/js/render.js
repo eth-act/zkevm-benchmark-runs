@@ -9,6 +9,7 @@ import {
     formatTime,
     formatMarginalTime,
     formatRelativeCost,
+    formatThroughput,
     getRelativeCostClass,
 } from './utils.js';
 
@@ -28,9 +29,11 @@ import {
  * @param {boolean} options.allCrashed - Whether all zkVMs crashed
  * @param {boolean} options.isMarginal - Whether displaying marginal (delta) values
  * @param {boolean} options.noBaseline - Whether baseline data is missing for this test
+ * @param {string|null} options.crashInfo - Crash annotation text (e.g. "3/5 crashed") for partial group crashes
+ * @param {string|null} options.secondaryLabel - Override for the time line (e.g. formatted throughput)
  * @returns {string} HTML string for the cell
  */
-export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, isMarginal = false, noBaseline = false }) {
+export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, isMarginal = false, noBaseline = false, crashInfo = null, secondaryLabel = null }) {
     if (allCrashed) {
         return '<td class="combined-cell status-crashed">CRASHED</td>';
     }
@@ -47,12 +50,15 @@ export function renderProofCell({ time, relativeCost, zkvm = null, crashed = fal
     const relativeClass = getRelativeCostClass(relativeCost);
     const zkvmBadge = zkvm ? `<span class="worst-zkvm-badge">${escapeHtml(zkvm)}</span>` : '';
     const marginalClass = isMarginal ? 'marginal-value' : '';
-    const formattedTime = isMarginal ? formatMarginalTime(time) : formatTime(time);
+    const secondary = secondaryLabel ?? (isMarginal ? formatMarginalTime(time) : formatTime(time));
+
+    const crashBadge = crashInfo ? `<span class="cell-crash-info">${escapeHtml(crashInfo)}</span>` : '';
 
     return `<td class="combined-cell status-success ${marginalClass}">
         <span class="cell-relative ${relativeClass}">${formatRelativeCost(relativeCost)}</span>
-        <span class="cell-time">${formattedTime}</span>
+        <span class="cell-time">${secondary}</span>
         ${zkvmBadge}
+        ${crashBadge}
     </td>`;
 }
 
@@ -185,12 +191,34 @@ export class Renderer {
     }
 
     /**
+     * Counts crashed vs total tests in a group for a specific zkVM.
+     * @returns {{ crashed: number, total: number }}
+     */
+    getGroupCrashCount(group, zkvm) {
+        let crashed = 0;
+        const total = group.tests.length;
+        for (const test of group.tests) {
+            if (zkvm === VIEW.WORST) {
+                if (this.dataAccessor.isAllCrashed(test)) crashed++;
+            } else {
+                const result = test.results[zkvm];
+                if (result && result.status === STATUS.CRASHED) crashed++;
+            }
+        }
+        return { crashed, total };
+    }
+
+    /**
      * Renders a zkVM cell for a group.
-     * Shows CRASHED if any fixture in the group crashed for this zkVM.
+     * Shows CRASHED only if all fixtures crashed; shows worst successful result
+     * with crash count annotation if some fixtures crashed.
      */
     renderGroupZkvmCell(group, zkvm) {
-        // If any fixture actually crashed, show CRASHED
-        if (this.hasAnyCrashed(group, zkvm)) {
+        const { crashed: crashCount, total } = this.getGroupCrashCount(group, zkvm);
+        const crashInfo = crashCount > 0 ? `${crashCount}/${total} crashed` : null;
+
+        // If ALL fixtures crashed, show CRASHED
+        if (crashCount === total) {
             return renderProofCell({ allCrashed: true });
         }
 
@@ -202,6 +230,8 @@ export class Renderer {
             return renderProofCell({ missing: true });
         }
 
+        const throughput = formatThroughput(worst.test.block_used_gas, worst.time);
+
         if (isMarginal) {
             // Check if baseline exists for this test
             if (!this.dataAccessor.hasMarginalData(worst.test)) {
@@ -209,20 +239,24 @@ export class Renderer {
             }
             const time = this.dataAccessor.getMarginalProvingTime(worst.test, zkvm);
             const relativeCost = this.dataAccessor.getMarginalRelativeCost(worst.test, zkvm);
-            return renderProofCell({ time, relativeCost, isMarginal: true });
+            return renderProofCell({ time, relativeCost, isMarginal: true, crashInfo, secondaryLabel: throughput });
         }
 
         const relativeCost = this.dataAccessor.getRelativeCost(worst.test, zkvm);
-        return renderProofCell({ time: worst.time, relativeCost });
+        return renderProofCell({ time: worst.time, relativeCost, crashInfo, secondaryLabel: throughput });
     }
 
     /**
      * Renders the worst-case cell for a group.
-     * Shows CRASHED if any fixture in the group crashed on all zkVMs.
+     * Shows CRASHED only if all fixtures crashed on all zkVMs; shows worst successful
+     * result with crash count annotation if some fixtures crashed.
      */
     renderGroupWorstCell(group) {
-        // If any fixture actually crashed on all zkVMs, show CRASHED
-        if (this.hasAnyCrashed(group, VIEW.WORST)) {
+        const { crashed: crashCount, total } = this.getGroupCrashCount(group, VIEW.WORST);
+        const crashInfo = crashCount > 0 ? `${crashCount}/${total} crashed` : null;
+
+        // If ALL fixtures crashed on all zkVMs, show CRASHED
+        if (crashCount === total) {
             return renderProofCell({ allCrashed: true });
         }
 
@@ -233,6 +267,8 @@ export class Renderer {
         if (!worst.test) {
             return renderProofCell({ missing: true });
         }
+
+        const throughput = formatThroughput(worst.test.block_used_gas, worst.time);
 
         if (isMarginal) {
             // Check if baseline exists for this test
@@ -246,6 +282,8 @@ export class Renderer {
                 relativeCost,
                 zkvm: worst.zkvm,
                 isMarginal: true,
+                crashInfo,
+                secondaryLabel: throughput,
             });
         }
 
@@ -254,6 +292,8 @@ export class Renderer {
             time: worst.time,
             relativeCost,
             zkvm: worst.zkvm,
+            crashInfo,
+            secondaryLabel: throughput,
         });
     }
 
