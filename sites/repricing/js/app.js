@@ -3,7 +3,7 @@
  * Orchestrates data loading, state management, and UI rendering.
  */
 
-import { CONFIG, VIEW, VALUE_MODE, HARDWARE_TARGET_DEFAULTS, getBaselineConfig, getMarginalGasLimit } from './constants.js';
+import { CONFIG, VIEW, HARDWARE_TARGET_DEFAULTS } from './constants.js';
 import { debounce } from './utils.js';
 import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
@@ -33,7 +33,6 @@ export class BenchmarkApp {
         this.selectedDataset = null;
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.ALL;
-        this.valueMode = VALUE_MODE.ABSOLUTE;  // 'absolute' or 'marginal'
         // ====================================================================
         // Filter State
         // ====================================================================
@@ -48,7 +47,7 @@ export class BenchmarkApp {
         // ====================================================================
         // Heatmap State
         // ====================================================================
-        this.heatmapSortMode = 'cost';
+        this.heatmapSortMode = 'name';
         this.heatmapExpandedOps = new Set();
 
         // ====================================================================
@@ -103,8 +102,6 @@ export class BenchmarkApp {
             hardwareInfo: document.getElementById('hardware-info'),
             rawDataLink: document.getElementById('raw-data-link'),
             quickFilters: document.getElementById('quick-filters'),
-            valueModeSelector: document.getElementById('value-mode'),
-            marginalInfo: document.getElementById('marginal-info'),
             heatmapSection: document.getElementById('heatmap-section'),
             heatmapGrid: document.getElementById('heatmap-grid'),
             heatmapCount: document.getElementById('heatmap-count'),
@@ -160,7 +157,6 @@ export class BenchmarkApp {
             // Initialize UI components
             this.initializeTargetInput();
             this.initializeZkvmViewSelector();
-            this.initializeValueModeToggle();
             this.initializeSearchAndFilters();
             this.initializeOperationFilters();
             this.initializeQuickFilters();
@@ -290,12 +286,8 @@ export class BenchmarkApp {
         // Reset filter state
         this.selectedOperations.clear();
         this.heatmapExpandedOps.clear();
-        this.heatmapSortMode = 'cost';
+        this.heatmapSortMode = 'name';
         this.minRelativeCost = null;
-
-        // Reset to absolute mode (baseline may have changed)
-        this.valueMode = VALUE_MODE.ABSOLUTE;
-        this.dataAccessor.clearBaselineData();
 
         // Reset search input
         if (this.elements.search) {
@@ -311,7 +303,6 @@ export class BenchmarkApp {
         this.initializeTargetInput();
         this.elements.zkvmView.innerHTML = '';
         this.initializeZkvmViewSelector();
-        this.initializeValueModeToggle();
         this.initializeOperationFilters();
         this.initializeQuickFilters();
 
@@ -380,10 +371,6 @@ export class BenchmarkApp {
      */
     refresh({ updateUrl = true } = {}) {
         this.cache.clearGroupCache();
-        // Sync value mode to renderer
-        if (this.renderer) {
-            this.renderer.setValueMode(this.valueMode);
-        }
         this.filterTests();
         this.groupTestsByOperation();
         this.renderHeatmap();
@@ -431,44 +418,6 @@ export class BenchmarkApp {
 
     handleZkvmViewChange(view) {
         this.selectedZkvmView = view;
-        this.refresh();
-    }
-
-    /**
-     * Handles value mode change (absolute vs marginal).
-     * @param {string} mode - The new value mode
-     */
-    async handleValueModeChange(mode) {
-        if (mode === this.valueMode) return;
-
-        this.valueMode = mode;
-
-        if (mode === VALUE_MODE.MARGINAL) {
-            // Load baseline data
-            const allConfigs = this.manifest.datasets.map(d => d.id);
-            const baselineConfig = getBaselineConfig(this.selectedDataset, allConfigs);
-
-            if (baselineConfig) {
-                try {
-                    const baselineDatasetInfo = this.manifest.datasets.find(d => d.id === baselineConfig);
-                    if (baselineDatasetInfo) {
-                        const baselineData = await loadDataset(this.selectedHardware, baselineDatasetInfo.file);
-                        const marginalGas = getMarginalGasLimit(this.selectedDataset, baselineConfig);
-                        this.dataAccessor.setBaselineData(baselineData, baselineConfig, marginalGas);
-                    }
-                } catch (error) {
-                    console.error('Error loading baseline data:', error);
-                    // Fall back to absolute mode
-                    this.valueMode = VALUE_MODE.ABSOLUTE;
-                    this.dataAccessor.clearBaselineData();
-                }
-            }
-        } else {
-            // Clear baseline data
-            this.dataAccessor.clearBaselineData();
-        }
-
-        this.updateMarginalInfo();
         this.refresh();
     }
 
@@ -581,47 +530,6 @@ export class BenchmarkApp {
             selectedView: this.selectedZkvmView,
         });
         container.addEventListener('change', (e) => this.handleZkvmViewChange(e.target.value));
-    }
-
-    initializeValueModeToggle() {
-        const container = this.elements.valueModeSelector;
-        if (!container) return;
-
-        // Check if baseline is available for current dataset
-        const allConfigs = this.manifest.datasets.map(d => d.id);
-        const baselineConfig = getBaselineConfig(this.selectedDataset, allConfigs);
-
-        container.innerHTML = this.renderer.renderValueModeToggle({
-            selectedMode: this.valueMode,
-            hasBaseline: baselineConfig !== null,
-            currentDataset: this.selectedDataset,
-            baselineDataset: baselineConfig,
-        });
-
-        container.addEventListener('change', (e) => {
-            if (e.target.name === 'value-mode') {
-                this.handleValueModeChange(e.target.value);
-            }
-        });
-
-        // Update marginal info display
-        this.updateMarginalInfo();
-    }
-
-    /**
-     * Updates the marginal info display showing baseline details.
-     */
-    updateMarginalInfo() {
-        const infoEl = this.elements.marginalInfo;
-        if (!infoEl) return;
-
-        if (this.valueMode === VALUE_MODE.MARGINAL && this.dataAccessor.hasBaselineData()) {
-            const marginalGasM = (this.dataAccessor.marginalGas / 1_000_000).toFixed(0);
-            infoEl.innerHTML = `<span class="marginal-badge">Showing: ${this.selectedDataset} − ${this.dataAccessor.baselineConfig} (${marginalGasM}M gas delta)</span>`;
-            infoEl.classList.remove('hidden');
-        } else {
-            infoEl.classList.add('hidden');
-        }
     }
 
     initializeSearchAndFilters() {
@@ -809,7 +717,6 @@ export class BenchmarkApp {
             dataset: this.selectedDataset,
             target: this.targetMGasPerS,
             zkvmView: this.selectedZkvmView,
-            valueMode: this.valueMode,
             search: this.elements.search?.value || '',
             hideCrashed: this.elements.hideCrashed?.checked || false,
             minRelativeCost: this.minRelativeCost,

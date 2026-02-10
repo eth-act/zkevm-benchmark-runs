@@ -3,11 +3,10 @@
  * All UI rendering logic is centralized here.
  */
 
-import { STATUS, VIEW, VALUE_MODE, CATEGORY_ORDER } from './constants.js';
+import { STATUS, VIEW, CATEGORY_ORDER } from './constants.js';
 import {
     escapeHtml,
     formatTime,
-    formatMarginalTime,
     formatRelativeCost,
     getRelativeCostClass,
 } from './utils.js';
@@ -18,7 +17,6 @@ import {
 
 /**
  * Renders a proof result cell (combined relative cost + time).
- * This unified function replaces the 4 separate cell rendering methods.
  *
  * @param {Object} options - Cell options
  * @param {number|null} options.time - Proving time in ms
@@ -26,13 +24,12 @@ import {
  * @param {string|null} options.zkvm - zkVM badge to display (for worst-case)
  * @param {boolean} options.crashed - Whether this specific zkVM crashed
  * @param {boolean} options.allCrashed - Whether all zkVMs crashed
- * @param {boolean} options.isMarginal - Whether displaying marginal (delta) values
- * @param {boolean} options.noBaseline - Whether baseline data is missing for this test
+ * @param {boolean} options.missing - Whether data is missing
  * @param {string|null} options.crashInfo - Crash annotation text (e.g. "3/5 crashed") for partial group crashes
  * @param {string|null} options.secondaryLabel - Override for the time line (e.g. formatted throughput)
  * @returns {string} HTML string for the cell
  */
-export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, isMarginal = false, noBaseline = false, crashInfo = null, secondaryLabel = null }) {
+export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, crashInfo = null, secondaryLabel = null }) {
     if (allCrashed) {
         return '<td class="combined-cell status-crashed">CRASHED</td>';
     }
@@ -42,18 +39,14 @@ export function renderProofCell({ time, relativeCost, zkvm = null, crashed = fal
     if (missing) {
         return '<td class="combined-cell status-na" title="No data available for this combination">-</td>';
     }
-    if (noBaseline) {
-        return '<td class="combined-cell status-na" title="Test not found in baseline dataset">N/A</td>';
-    }
 
     const relativeClass = getRelativeCostClass(relativeCost);
     const zkvmBadge = zkvm ? `<span class="worst-zkvm-badge">${escapeHtml(zkvm)}</span>` : '';
-    const marginalClass = isMarginal ? 'marginal-value' : '';
-    const secondary = secondaryLabel ?? (isMarginal ? formatMarginalTime(time) : formatTime(time));
+    const secondary = secondaryLabel ?? formatTime(time);
 
     const crashBadge = crashInfo ? `<span class="cell-crash-info">${escapeHtml(crashInfo)}</span>` : '';
 
-    return `<td class="combined-cell status-success ${marginalClass}">
+    return `<td class="combined-cell status-success">
         <span class="cell-relative ${relativeClass}">${formatRelativeCost(relativeCost)}</span>
         <span class="cell-time">${secondary}</span>
         ${zkvmBadge}
@@ -76,23 +69,6 @@ export class Renderer {
     constructor(elements, dataAccessor) {
         this.elements = elements;
         this.dataAccessor = dataAccessor;
-        this.valueMode = VALUE_MODE.ABSOLUTE;
-    }
-
-    /**
-     * Sets the value mode for rendering.
-     * @param {string} mode - VALUE_MODE.ABSOLUTE or VALUE_MODE.MARGINAL
-     */
-    setValueMode(mode) {
-        this.valueMode = mode;
-    }
-
-    /**
-     * Checks if currently in marginal mode with baseline data available.
-     * @returns {boolean}
-     */
-    isInMarginalMode() {
-        return this.valueMode === VALUE_MODE.MARGINAL && this.dataAccessor.hasBaselineData();
     }
 
     /**
@@ -107,18 +83,6 @@ export class Renderer {
             return renderProofCell({ crashed: true });
         }
 
-        const isMarginal = this.isInMarginalMode();
-
-        if (isMarginal) {
-            // Check if baseline exists for this test
-            if (!this.dataAccessor.hasMarginalData(test)) {
-                return renderProofCell({ noBaseline: true });
-            }
-            const time = this.dataAccessor.getMarginalProvingTime(test, zkvm);
-            const relativeCost = this.dataAccessor.getMarginalRelativeCost(test, zkvm);
-            return renderProofCell({ time, relativeCost, isMarginal: true });
-        }
-
         const time = result.proving_time_ms;
         const relativeCost = this.dataAccessor.getRelativeCost(test, zkvm);
         return renderProofCell({ time, relativeCost });
@@ -128,25 +92,6 @@ export class Renderer {
      * Renders the worst-case cell for an individual test.
      */
     renderTestWorstCell(test) {
-        const isMarginal = this.isInMarginalMode();
-
-        if (isMarginal) {
-            // Check if baseline exists for this test
-            if (!this.dataAccessor.hasMarginalData(test)) {
-                return renderProofCell({ noBaseline: true });
-            }
-            const time = this.dataAccessor.getMarginalProvingTime(test, VIEW.WORST);
-            const relativeCost = this.dataAccessor.getMarginalRelativeCost(test, VIEW.WORST);
-            const worstZkvm = this.dataAccessor.getWorstCaseZkvm(test);
-            if (time !== null) {
-                return renderProofCell({ time, relativeCost, zkvm: worstZkvm, isMarginal: true });
-            }
-            if (this.dataAccessor.isAllMissing(test)) {
-                return renderProofCell({ missing: true });
-            }
-            return renderProofCell({ allCrashed: true });
-        }
-
         const time = this.dataAccessor.getWorstCaseTime(test);
         const relativeCost = this.dataAccessor.getRelativeCost(test, VIEW.WORST);
         const worstZkvm = this.dataAccessor.getWorstCaseZkvm(test);
@@ -309,46 +254,6 @@ export class Renderer {
                 </label>
             `;
         }).join('');
-    }
-
-    // ========================================================================
-    // Value Mode Toggle (Absolute vs Marginal)
-    // ========================================================================
-
-    /**
-     * Renders value mode radio buttons.
-     *
-     * @param {Object} options - Toggle options
-     * @param {string} options.selectedMode - Currently selected mode
-     * @param {boolean} options.hasBaseline - Whether a baseline dataset exists
-     * @param {string} options.currentDataset - Current dataset name
-     * @param {string|null} options.baselineDataset - Baseline dataset name
-     * @returns {string} HTML string for value mode toggle
-     */
-    renderValueModeToggle({ selectedMode, hasBaseline, currentDataset, baselineDataset }) {
-        const absoluteChecked = selectedMode === VALUE_MODE.ABSOLUTE ? 'checked' : '';
-        const marginalChecked = selectedMode === VALUE_MODE.MARGINAL ? 'checked' : '';
-        const marginalDisabled = !hasBaseline ? 'disabled' : '';
-
-        let marginalLabel = 'Marginal';
-        let marginalTitle = '';
-
-        if (!hasBaseline) {
-            marginalTitle = 'title="No baseline available - this is the smallest gas limit dataset"';
-        } else {
-            marginalLabel = `Marginal (${currentDataset} − ${baselineDataset})`;
-        }
-
-        return `
-            <label class="radio-item">
-                <input type="radio" name="value-mode" value="${VALUE_MODE.ABSOLUTE}" ${absoluteChecked}>
-                Absolute
-            </label>
-            <label class="radio-item ${marginalDisabled ? 'disabled' : ''}" ${marginalTitle}>
-                <input type="radio" name="value-mode" value="${VALUE_MODE.MARGINAL}" ${marginalChecked} ${marginalDisabled}>
-                ${escapeHtml(marginalLabel)}
-            </label>
-        `;
     }
 
 }

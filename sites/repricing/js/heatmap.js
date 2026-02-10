@@ -7,8 +7,9 @@
  * Level 2: Clicking a row expands to show individual fixture rows with full numeric detail.
  */
 
-import { VIEW, CATEGORY_ORDER } from './constants.js';
+import { STATUS, VIEW, CATEGORY_ORDER } from './constants.js';
 import { escapeHtml, formatRelativeCost, getRelativeCostClass } from './utils.js';
+import { renderProofCell } from './render.js';
 
 /**
  * Renders the performance heatmap visualization.
@@ -32,13 +33,14 @@ export class HeatmapRenderer {
      *
      * @param {Object[]} tests - Tests for this operation
      * @param {string} zkvm - zkVM identifier or VIEW.WORST
-     * @returns {{ meetsTarget: number, below: number, crashed: number, total: number, worstCost: number|null }}
+     * @returns {{ meetsTarget: number, below: number, crashed: number, total: number, worstCost: number|null, minThroughput: number|null }}
      */
     computeCellSummary(tests, zkvm) {
         let meetsTarget = 0;
         let below = 0;
         let crashed = 0;
         let worstCost = null;
+        let minThroughput = null;
 
         for (const test of tests) {
             if (this._isFixtureCrashed(test, zkvm)) {
@@ -61,9 +63,14 @@ export class HeatmapRenderer {
             if (worstCost === null || cost > worstCost) {
                 worstCost = cost;
             }
+
+            const throughput = this.dataAccessor.getActualMGasPerS(test, zkvm);
+            if (throughput !== null && (minThroughput === null || throughput < minThroughput)) {
+                minThroughput = throughput;
+            }
         }
 
-        return { meetsTarget, below, crashed, total: tests.length, worstCost };
+        return { meetsTarget, below, crashed, total: tests.length, worstCost, minThroughput };
     }
 
     // ========================================================================
@@ -150,39 +157,64 @@ export class HeatmapRenderer {
     // ========================================================================
 
     /**
+     * Formats throughput in MGas/s for compact display.
+     * @private
+     */
+    _formatThroughput(mGasPerS) {
+        if (mGasPerS === null) return null;
+        if (mGasPerS >= 1) return `${mGasPerS.toFixed(1)} MGas/s`;
+        if (mGasPerS >= 0.01) return `${(mGasPerS * 1000).toFixed(0)} KGas/s`;
+        return `${(mGasPerS * 1_000_000).toFixed(0)} Gas/s`;
+    }
+
+    /**
      * Renders a proportional bar with worst-case cost label for one cell.
      * @private
      */
     _renderBar(summary) {
-        const { meetsTarget, below, crashed, total, worstCost } = summary;
+        const { meetsTarget, below, crashed, total, worstCost, minThroughput } = summary;
         if (total === 0) return '<div class="hm-cell hm-cell-empty"></div>';
 
         const pOk = meetsTarget / total * 100;
         const pBelow = below / total * 100;
         const pCrashed = crashed / total * 100;
 
-        const parts = [];
-        if (meetsTarget > 0) parts.push(`${meetsTarget} meeting target`);
-        if (below > 0) parts.push(`${below} below target`);
-        if (crashed > 0) parts.push(`${crashed} crashed`);
-        if (worstCost !== null) parts.push(`worst: ${formatRelativeCost(worstCost)}`);
-        const title = escapeHtml(parts.join(', '));
+        const tooltipParts = [];
+        if (meetsTarget > 0) tooltipParts.push(`${meetsTarget} meeting target`);
+        if (below > 0) tooltipParts.push(`${below} below target`);
+        if (crashed > 0) tooltipParts.push(`${crashed} crashed`);
+        if (worstCost !== null) tooltipParts.push(`worst cost: ${formatRelativeCost(worstCost)}`);
+        if (minThroughput !== null) tooltipParts.push(`min throughput: ${this._formatThroughput(minThroughput)}`);
+        const title = escapeHtml(tooltipParts.join(', '));
 
         const segments = [];
         if (pOk > 0) segments.push(`<div class="hm-seg hm-seg-ok" style="width:${pOk.toFixed(1)}%"></div>`);
         if (pBelow > 0) segments.push(`<div class="hm-seg hm-seg-below" style="width:${pBelow.toFixed(1)}%"></div>`);
         if (pCrashed > 0) segments.push(`<div class="hm-seg hm-seg-crashed" style="width:${pCrashed.toFixed(1)}%"></div>`);
 
-        // Worst-cost label below the bar
-        let worstLabel = '';
+        // Annotations below the bar
+        const annotations = [];
+
         if (crashed === total) {
-            worstLabel = '<div class="hm-cell-worst hm-worst-crashed">CRASHED</div>';
-        } else if (worstCost !== null) {
-            const cls = getRelativeCostClass(worstCost);
-            worstLabel = `<div class="hm-cell-worst ${cls}">${formatRelativeCost(worstCost)}</div>`;
+            annotations.push('<span class="hm-cell-worst hm-worst-crashed">CRASHED</span>');
+        } else {
+            if (worstCost !== null) {
+                const cls = getRelativeCostClass(worstCost);
+                annotations.push(`<span class="hm-cell-worst ${cls}">${formatRelativeCost(worstCost)}</span>`);
+            }
+            if (minThroughput !== null) {
+                annotations.push(`<span class="hm-cell-throughput">${this._formatThroughput(minThroughput)}</span>`);
+            }
+            if (crashed > 0) {
+                annotations.push(`<span class="hm-cell-crash-badge">${crashed}/${total} crashed</span>`);
+            }
         }
 
-        return `<div class="hm-cell" title="${title}"><div class="hm-bar">${segments.join('')}</div>${worstLabel}</div>`;
+        const annotationHtml = annotations.length > 0
+            ? `<div class="hm-cell-annotations">${annotations.join('')}</div>`
+            : '';
+
+        return `<div class="hm-cell" title="${title}"><div class="hm-bar">${segments.join('')}</div>${annotationHtml}</div>`;
     }
 
     // ========================================================================
@@ -190,8 +222,36 @@ export class HeatmapRenderer {
     // ========================================================================
 
     /**
+     * Renders a fixture cell showing relative cost + throughput.
+     * @private
+     */
+    _renderFixtureCell(test, zkvm) {
+        if (zkvm === VIEW.WORST) {
+            const time = this.dataAccessor.getWorstCaseTime(test);
+            if (time === null) {
+                if (this.dataAccessor.isAllMissing(test)) {
+                    return renderProofCell({ missing: true });
+                }
+                return renderProofCell({ allCrashed: true });
+            }
+            const relativeCost = this.dataAccessor.getRelativeCost(test, VIEW.WORST);
+            const worstZkvm = this.dataAccessor.getWorstCaseZkvm(test);
+            const throughput = this._formatThroughput(this.dataAccessor.getActualMGasPerS(test, VIEW.WORST));
+            return renderProofCell({ time, relativeCost, zkvm: worstZkvm, secondaryLabel: throughput });
+        }
+
+        const result = test.results[zkvm];
+        if (!result) return renderProofCell({ missing: true });
+        if (result.status !== STATUS.SUCCESS) return renderProofCell({ crashed: true });
+
+        const time = result.proving_time_ms;
+        const relativeCost = this.dataAccessor.getRelativeCost(test, zkvm);
+        const throughput = this._formatThroughput(this.dataAccessor.getActualMGasPerS(test, zkvm));
+        return renderProofCell({ time, relativeCost, secondaryLabel: throughput });
+    }
+
+    /**
      * Renders expanded fixture rows for an operation.
-     * Uses the Renderer's cell rendering for consistent formatting with marginal mode support.
      * @private
      */
     _renderExpandedRows(group, columns, colSpan) {
@@ -204,12 +264,7 @@ export class HeatmapRenderer {
 
         // Build fixture rows as a nested scrollable table
         const fixtureRows = sorted.map(test => {
-            const cells = columns.map(col => {
-                if (col.id === VIEW.WORST) {
-                    return this.renderer.renderTestWorstCell(test);
-                }
-                return this.renderer.renderTestZkvmCell(test, col.id);
-            });
+            const cells = columns.map(col => this._renderFixtureCell(test, col.id));
 
             return `<tr class="hm-fixture-row">` +
                 `<td class="hm-fixture-indent"></td>` +
