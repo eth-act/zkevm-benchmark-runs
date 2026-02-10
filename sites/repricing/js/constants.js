@@ -61,19 +61,6 @@ export const THRESHOLDS = Object.freeze({
         MS_PER_MINUTE: 60000,
     },
 
-    // Relative cost severity thresholds
-    // These determine the color coding in the UI:
-    // - LOW (green): Operation is efficient, meets target well
-    // - MODERATE (yellow): Operation is slightly over target
-    // - HIGH (orange): Operation is significantly over target
-    // - EXTREME (red): Operation needs serious attention for repricing
-    RELATIVE_COST: {
-        LOW: 1.5,       // < 1.5x is considered good
-        MODERATE: 3.0,  // 1.5x - 3.0x is moderate concern
-        HIGH: 10.0,     // 3.0x - 10.0x is high concern
-        // > 10.0x is extreme
-    },
-
     // Gas formatting thresholds
     GAS: {
         MILLION: 1_000_000,

@@ -8,7 +8,7 @@
  */
 
 import { STATUS, VIEW, CATEGORY_ORDER } from './constants.js';
-import { escapeHtml, formatRelativeCost, getRelativeCostClass } from './utils.js';
+import { escapeHtml, formatRelativeCost, getRelativeCostStyle } from './utils.js';
 import { renderProofCell } from './render.js';
 
 /**
@@ -199,8 +199,8 @@ export class HeatmapRenderer {
             annotations.push('<span class="hm-cell-worst hm-worst-crashed">CRASHED</span>');
         } else {
             if (worstCost !== null) {
-                const cls = getRelativeCostClass(worstCost);
-                annotations.push(`<span class="hm-cell-worst ${cls}">${formatRelativeCost(worstCost)}</span>`);
+                const style = getRelativeCostStyle(worstCost);
+                annotations.push(`<span class="hm-cell-worst" style="${style}">${formatRelativeCost(worstCost)}</span>`);
             }
             if (minThroughput !== null) {
                 annotations.push(`<span class="hm-cell-throughput">${this._formatThroughput(minThroughput)}</span>`);

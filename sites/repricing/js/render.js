@@ -8,7 +8,7 @@ import {
     escapeHtml,
     formatTime,
     formatRelativeCost,
-    getRelativeCostClass,
+    getRelativeCostStyle,
 } from './utils.js';
 
 // ============================================================================
@@ -40,14 +40,14 @@ export function renderProofCell({ time, relativeCost, zkvm = null, crashed = fal
         return '<td class="combined-cell status-na" title="No data available for this combination">-</td>';
     }
 
-    const relativeClass = getRelativeCostClass(relativeCost);
+    const costStyle = getRelativeCostStyle(relativeCost);
     const zkvmBadge = zkvm ? `<span class="worst-zkvm-badge">${escapeHtml(zkvm)}</span>` : '';
     const secondary = secondaryLabel ?? formatTime(time);
 
     const crashBadge = crashInfo ? `<span class="cell-crash-info">${escapeHtml(crashInfo)}</span>` : '';
 
-    return `<td class="combined-cell status-success">
-        <span class="cell-relative ${relativeClass}">${formatRelativeCost(relativeCost)}</span>
+    return `<td class="combined-cell" style="${costStyle}">
+        <span class="cell-relative">${formatRelativeCost(relativeCost)}</span>
         <span class="cell-time">${secondary}</span>
         ${zkvmBadge}
         ${crashBadge}

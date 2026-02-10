@@ -129,21 +129,17 @@ export function formatRelativeCost(cost) {
 }
 
 /**
- * Gets the CSS class for a relative cost value.
- * Used to color-code operations by their cost severity.
+ * Gets an inline color style for a relative cost value.
+ * Green if meets target (cost <= 1.0), yellow if below target (cost > 1.0).
  *
  * @param {number|null|undefined} cost - The relative cost value
- * @returns {string} CSS class name for styling
+ * @returns {string} CSS inline style string
  */
-export function getRelativeCostClass(cost) {
+export function getRelativeCostStyle(cost) {
     if (cost === null || cost === undefined) return '';
 
-    const { LOW, MODERATE, HIGH } = THRESHOLDS.RELATIVE_COST;
-
-    if (cost < LOW) return 'relative-low';
-    if (cost < MODERATE) return 'relative-moderate';
-    if (cost < HIGH) return 'relative-high';
-    return 'relative-extreme';
+    if (cost <= 1.0) return 'color: var(--success)';
+    return 'color: var(--warning)';
 }
 
 // ============================================================================
