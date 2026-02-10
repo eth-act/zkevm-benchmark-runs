@@ -112,40 +112,6 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
     return mode_data
 
 
-def compute_cycles_gas_data(execution_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Compute cycles/gas ratios from execution data.
-
-    Args:
-        execution_data: Execution mode data structure
-
-    Returns:
-        Dictionary with same structure but containing cycles/gas ratios instead of execution times
-    """
-    import copy
-    cycles_gas_data = copy.deepcopy(execution_data)
-
-    # Traverse the nested structure: hardware -> config -> el_clients -> zkVM -> results
-    for hardware_name, hardware_data in cycles_gas_data.items():
-        for config_name, config_data in hardware_data.items():
-            for el_client_name, el_client_data in config_data.get('el_clients', {}).items():
-                for zkvm_name, zkvm_data in el_client_data.get('zkvm_data', {}).items():
-                    # Process successful runs
-                    for run in zkvm_data.get('successful_runs', []):
-                        cycles = run.get('total_num_cycles', 0)
-                        gas = run.get('gas_used', 0)
-
-                        if gas > 0 and cycles > 0:
-                            # Compute cycles/gas ratio
-                            run['cycles_per_gas'] = cycles / gas
-                        else:
-                            run['cycles_per_gas'] = 0
-
-                    # SDK and prover crashed runs don't have cycles/gas data
-                    # but we keep them to show crashes in the table
-
-    return cycles_gas_data
-
-
 def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str, Any]:
     """Collect all benchmark data for the website.
 
@@ -155,7 +121,6 @@ def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str,
     data = {
         'proving': {},
         'execution': {},
-        'cycles-gas': {}
     }
 
     # Process proving data
@@ -165,8 +130,6 @@ def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str,
     # Process execution data
     if executions_path.exists():
         data['execution'] = collect_mode_data(executions_path, 'execution')
-        # Compute cycles/gas data from execution data
-        data['cycles-gas'] = compute_cycles_gas_data(data['execution'])
 
     return data
 
@@ -174,64 +137,65 @@ def collect_website_data(proving_path: Path, executions_path: Path) -> Dict[str,
 def generate_index_html(output_dir: Path):
     """Generate the main index.html file."""
     html_content = """<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>zkEVM Benchmark Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>zkEVM Benchmark Results</h1>
-            <p class="subtitle">Performance comparison of zkEVM provers and executors</p>
-        </header>
-
-        <div class="tabs">
-            <button class="tab-button active" data-tab="execution">Execution</button>
-            <button class="tab-button" data-tab="cycles-gas">Cycles/gas</button>
-            <button class="tab-button" data-tab="proving">Proving</button>
+    <header>
+        <div class="container header-row">
+            <div class="header-text">
+                <h1>zkEVM Benchmark Results</h1>
+                <p>Performance comparison of zkEVM provers and executors</p>
+            </div>
+            <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>
         </div>
+    </header>
 
-        <div id="tab-info" class="info-box"></div>
-
-        <div class="filters">
-            <div class="filter-group">
-                <label for="hardware-filter">Machine:</label>
-                <select id="hardware-filter">
-                    <option value="all">All</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="config-filter">Configuration:</label>
-                <select id="config-filter">
-                    <option value="all">All</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="el-client-filter">EL Client:</label>
-                <select id="el-client-filter">
-                    <option value="all">All</option>
-                </select>
-            </div>
-
-            <div class="filter-group checkbox-group">
-                <label>
+    <main class="container">
+        <div class="controls-bar">
+            <div class="controls-row">
+                <div class="filter-section">
+                    <span class="filter-label">Mode:</span>
+                    <button class="tab-button active" data-tab="execution">Execution</button>
+                    <button class="tab-button" data-tab="proving">Proving</button>
+                </div>
+                <div class="control-inline">
+                    <label for="hardware-filter">Machine</label>
+                    <select id="hardware-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="control-inline">
+                    <label for="config-filter">Config</label>
+                    <select id="config-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="control-inline">
+                    <label for="el-client-filter">EL Client</label>
+                    <select id="el-client-filter">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <label class="control-checkbox">
                     <input type="checkbox" id="crashes-filter">
                     Show crashes only
                 </label>
             </div>
         </div>
 
-        <div id="reproduce-section" class="reproduce-section">
-            <div class="reproduce-header" id="reproduce-header">
-                <span>How to reproduce?</span>
-                <span class="reproduce-toggle">▶</span>
-            </div>
-            <div class="reproduce-content" id="reproduce-content">
+        <div id="tab-info" class="summary-bar"></div>
+
+        <details id="reproduce-section">
+            <summary><h2>How to reproduce?</h2></summary>
+            <div class="reproduce-content">
                 <p>To reproduce do:</p>
                 <pre><code>$ git clone git@github.com:eth-act/zkevm-benchmark-workload.git
 $ cd zkevm-benchmark-workload
@@ -240,12 +204,19 @@ $ RUST_LOG=info cargo run --release -p witness-generator-cli -- tests --include 
 # Change 'zisk' to any other zkvm name.
 $ RUST_LOG=info cargo run --release -p ere-hosts -- --zkvms zisk stateless-validator --execution-client reth</code></pre>
             </div>
-        </div>
+        </details>
 
         <div id="content">
             <div class="loading">Loading benchmark data...</div>
         </div>
-    </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>zkEVM Benchmark Results</p>
+            <p><a href="https://github.com/eth-act/zkevm-benchmark-runs">Raw Data (GitHub)</a></p>
+        </div>
+    </footer>
 
     <script src="data.js"></script>
     <script src="app.js"></script>
@@ -259,221 +230,417 @@ $ RUST_LOG=info cargo run --release -p ere-hosts -- --zkvms zisk stateless-valid
 
 def generate_css(output_dir: Path):
     """Generate the CSS file for the website."""
-    css_content = """* {
+    css_content = """/* ============================================================================
+   CSS Variables & Themes
+   ============================================================================ */
+
+:root {
+    --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+[data-theme="light"] {
+    color-scheme: light;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-card: #f1f5f9;
+    --input-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --header-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #334155;
+    --input-bg: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --error: #f87171;
+    --border: #334155;
+    --border-strong: #475569;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --header-bg: #1e293b;
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: var(--font-body);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
+    font-size: 16px;
 }
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* ============================================================================
+   Layout
+   ============================================================================ */
 
 .container {
     max-width: 1800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 16px;
 }
 
 header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--header-bg);
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
 }
 
-header h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    color: #2c3e50;
-}
-
-.subtitle {
-    color: #666;
-    font-size: 1.1em;
-}
-
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.tab-button {
-    flex: 1;
-    padding: 15px 30px;
-    border: none;
-    background: white;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.tab-button:hover {
-    background: #e8f4f8;
-}
-
-.tab-button.active {
-    background: #3498db;
-    color: white;
-}
-
-.filters {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex-wrap: wrap;
-}
-
-.filter-group {
-    flex: 1;
-    min-width: 200px;
-}
-
-.filter-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #555;
-}
-
-.filter-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
-    background: white;
-}
-
-.filter-group.checkbox-group {
-    display: flex;
-    align-items: center;
-    min-width: auto;
-}
-
-.filter-group.checkbox-group label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.filter-group.checkbox-group input[type="checkbox"] {
-    margin-right: 8px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.reproduce-section {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    overflow: hidden;
-}
-
-.reproduce-section.hidden {
-    display: none;
-}
-
-.reproduce-header {
-    padding: 10px 15px;
-    background: #f8f9fa;
-    cursor: pointer;
-    user-select: none;
+.header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.header-text h1 {
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #555;
-    font-size: 0.95em;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.025em;
 }
 
-.reproduce-header:hover {
-    background: #e9ecef;
+.header-text p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 
-.reproduce-toggle {
-    transition: transform 0.3s ease;
-    font-size: 0.8em;
+main.container {
+    padding-top: 24px;
+    padding-bottom: 24px;
 }
 
-.reproduce-header.expanded .reproduce-toggle {
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.btn-tertiary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+}
+
+.btn-tertiary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ============================================================================
+   Controls Bar
+   ============================================================================ */
+
+.controls-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+    background: var(--bg-primary);
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.control-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-inline label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.control-inline select {
+    padding: 5px 8px;
+    font-size: 0.8125rem;
+    min-width: 0;
+}
+
+select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.control-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.control-checkbox input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+}
+
+/* ============================================================================
+   Filter Section & Tab Buttons
+   ============================================================================ */
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.tab-button {
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+    font-family: var(--font-body);
+    font-weight: 500;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.tab-button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+
+/* ============================================================================
+   Summary Bar (info box)
+   ============================================================================ */
+
+.summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 8px 14px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+    line-height: 1.6;
+}
+
+/* ============================================================================
+   Details / Reproduce Section
+   ============================================================================ */
+
+details {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+details.hidden {
+    display: none;
+}
+
+details summary {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details summary::before {
+    content: '\\25B6';
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+    color: var(--text-secondary);
+}
+
+details[open] summary::before {
     transform: rotate(90deg);
 }
 
-.reproduce-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+details summary h2 {
+    font-size: 0.875rem;
+    margin: 0;
 }
 
-.reproduce-content.expanded {
-    max-height: 500px;
-    padding: 15px;
-    border-top: 1px solid #dee2e6;
+details[open] summary {
+    border-bottom: 1px solid var(--border);
+}
+
+.reproduce-content {
+    padding: 16px;
 }
 
 .reproduce-content p {
     margin-bottom: 10px;
-    color: #555;
-    font-size: 0.95em;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 
 .reproduce-content pre {
-    background: #f8f9fa;
+    background: var(--bg-secondary);
     padding: 12px;
-    border-radius: 4px;
-    border-left: 3px solid #3498db;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
     overflow-x: auto;
 }
 
 .reproduce-content code {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
-    line-height: 1.4;
-    color: #2c3e50;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-primary);
 }
 
+/* ============================================================================
+   Content Area
+   ============================================================================ */
+
 #content {
-    background: white;
-    padding: 30px;
+    background: var(--bg-primary);
+    padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
 }
 
 .loading {
     text-align: center;
-    padding: 40px;
-    color: #666;
-    font-size: 1.2em;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+    font-size: 1rem;
 }
 
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* ============================================================================
+   Results Sections
+   ============================================================================ */
+
 .results-section {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
 }
 
 .results-section h2 {
-    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
     margin-bottom: 10px;
-    padding: 10px;
-    border-bottom: 2px solid #3498db;
-    background: #f8f9fa;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--accent);
+    background: var(--bg-secondary);
+    border-radius: 6px 6px 0 0;
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -482,13 +649,14 @@ header h1 {
 }
 
 .results-section h2:hover {
-    background: #e9ecef;
+    background: var(--bg-card);
 }
 
 .results-section h2::after {
-    content: '▼';
-    font-size: 0.8em;
-    transition: transform 0.3s ease;
+    content: '\\25BC';
+    font-size: 0.625rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
 }
 
 .results-section h2.collapsed::after {
@@ -504,194 +672,248 @@ header h1 {
 }
 
 .results-section h3 {
-    color: #555;
-    margin-top: 20px;
-    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 16px;
+    margin-bottom: 12px;
 }
 
-.info-box {
-    background: #e8f4f8;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    border-left: 4px solid #3498db;
-}
-
-.info-box p {
-    margin-bottom: 5px;
-}
+/* ============================================================================
+   Hardware Info
+   ============================================================================ */
 
 .hardware-info {
-    background: #f8f9fa;
-    padding: 12px 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    border-left: 3px solid #6c757d;
-    font-size: 0.95em;
+    background: var(--bg-secondary);
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--text-muted);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
 .hardware-info strong {
-    color: #495057;
+    color: var(--text-primary);
+    font-weight: 500;
 }
+
+/* ============================================================================
+   Tables
+   ============================================================================ */
 
 .table-container {
     overflow-x: auto;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    background: var(--bg-primary);
 }
 
-table thead {
-    background: #34495e;
-    color: white;
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 table th {
-    padding: 12px;
+    padding: 10px 14px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     user-select: none;
     position: relative;
-    border-left: 1px solid #555;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    white-space: nowrap;
 }
 
 table th:first-child {
-    border-left: none;
     text-align: left;
 }
 
 table thead tr:first-child th {
-    background: #2c3e50;
-    border-bottom: 2px solid #555;
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border-strong);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 table thead tr:nth-child(2) th {
-    background: #34495e;
-    font-size: 0.9em;
+    background: var(--bg-secondary);
+    font-size: 0.8125rem;
 }
 
 table th:hover {
-    background: #2c3e50;
+    color: var(--accent);
 }
 
 table th.sortable::after {
-    content: ' ⇅';
-    font-size: 0.8em;
-    opacity: 0.5;
+    content: ' \\21C5';
+    font-size: 0.75rem;
+    opacity: 0.4;
 }
 
 table th.sorted-asc::after {
-    content: ' ▲';
+    content: " \\25B2";
+    color: var(--accent);
+    font-size: 0.625rem;
     opacity: 1;
 }
 
 table th.sorted-desc::after {
-    content: ' ▼';
+    content: " \\25BC";
+    color: var(--accent);
+    font-size: 0.625rem;
     opacity: 1;
 }
 
 table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #ddd;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
 }
 
-table tbody tr:hover {
-    background: #f8f9fa;
+tbody tr {
+    transition: background 0.15s ease;
 }
 
-table tbody tr:nth-child(even) {
-    background: #fafafa;
+tbody tr:hover td {
+    background: var(--bg-secondary);
 }
 
 .crash-sdk {
-    color: #e74c3c;
+    color: var(--error);
 }
 
 .crash-prover {
-    color: #c0392b;
-    font-weight: bold;
+    color: var(--error);
+    font-weight: 600;
 }
 
 .empty-result {
-    color: #999;
+    color: var(--text-muted);
 }
 
-.no-results {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-    font-style: italic;
-}
+/* ============================================================================
+   Summary Table
+   ============================================================================ */
 
 .summary-table {
-    margin-top: 30px;
+    margin-top: 16px;
 }
 
 .summary-table th {
-    background: #2c3e50;
+    background: var(--bg-card);
+    color: var(--text-primary);
 }
 
 .summary-table .zkvm-cell {
     font-weight: 600;
-    background: #f8f9fa;
+    background: var(--bg-secondary);
     vertical-align: middle;
-    border-right: 2px solid #ddd;
+    border-right: 2px solid var(--border);
 }
 
 .summary-table .el-client-subrow {
     padding-left: 20px;
-    font-size: 0.95em;
+    font-size: 0.875rem;
 }
 
-a {
-    color: #3498db;
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+footer {
+    background: var(--bg-primary);
+    padding: 24px 0;
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+}
+
+footer .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+footer p {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    margin: 0;
+}
+
+footer a {
+    color: var(--accent);
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-a:hover {
-    text-decoration: underline;
+footer a:hover {
+    color: var(--accent-hover);
 }
 
-.notes {
-    background: #fff9e6;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    border-left: 4px solid #f39c12;
+/* ============================================================================
+   Utility
+   ============================================================================ */
+
+.hidden {
+    display: none !important;
 }
 
-.notes ul {
-    margin-left: 20px;
-}
-
-.notes li {
-    margin-bottom: 5px;
-}
+/* ============================================================================
+   Responsive
+   ============================================================================ */
 
 @media (max-width: 768px) {
-    .filters {
+    .header-row {
         flex-direction: column;
+        align-items: flex-start;
     }
 
-    .filter-group {
-        width: 100%;
+    .header-text h1 {
+        font-size: 1.25rem;
     }
 
-    .tabs {
+    .controls-row {
         flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .control-inline {
+        flex-wrap: wrap;
+    }
+
+    .filter-section {
+        flex-wrap: wrap;
+    }
+
+    .tab-button {
+        flex: 1;
+        min-width: 60px;
+        text-align: center;
     }
 
     table {
-        font-size: 0.9em;
+        font-size: 0.8125rem;
     }
 
     table th, table td {
         padding: 8px;
+    }
+
+    footer .container {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 """
@@ -722,9 +944,25 @@ let currentFilters = {
 // Tab information text
 const TAB_INFO = {
     'execution': 'Contains execution-only runs (i.e. no proving) to detect completeness faults usually related to zkVM limits (e.g. execution length, input length, or guest program OOM). These are shown in the "SDK Crashed" column. Non-crashed execution durations aren\\'t meaningful to compare proving performance.',
-    'cycles-gas': 'Contains the reported cycles over the used gas in each fixture. This is a low-signal proxy for efficiency, since cycles aren\\'t a good proxy for performance.',
     'proving': 'Contains the wall-clock proving times of fixtures.'
 };
+
+// Dark mode toggle
+function setupThemeToggle() {
+    const toggle = document.getElementById('theme-toggle');
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        toggle.textContent = saved === 'dark' ? 'Light mode' : 'Dark mode';
+    }
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        toggle.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
+    });
+}
 
 // Update tab info box
 function updateTabInfo() {
@@ -739,7 +977,10 @@ function loadFiltersFromURL() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.has('mode')) {
-        currentMode = params.get('mode');
+        const mode = params.get('mode');
+        if (mode === 'execution' || mode === 'proving') {
+            currentMode = mode;
+        }
     }
     if (params.has('hardware')) {
         currentFilters.hardware = params.get('hardware');
@@ -781,8 +1022,8 @@ function updateURL() {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     loadFiltersFromURL();
+    setupThemeToggle();
     setupTabs();
-    setupReproduceSection();
     populateFilters();
     renderResults();
     updateTabInfo();
@@ -1053,10 +1294,7 @@ function setupSortableTables() {
                         // Avg column (last column)
                         actualColumnIndex = columnCount - 1;
                     } else {
-                        // zkVM columns - we can't sort by these directly
-                        // Instead, sort by the first EL client column under this zkVM
-                        const elClientCount = parseInt(header.getAttribute('colspan')) || 1;
-                        // Calculate which column this zkVM's first EL client is
+                        // zkVM columns - sort by the first EL client column under this zkVM
                         let colOffset = 1; // Skip Test Case column
                         for (let i = 1; i < index; i++) {
                             const prevColspan = parseInt(headers[i].getAttribute('colspan')) || 1;
@@ -1126,35 +1364,29 @@ function sortTable(table, columnIndex, header, isInitialSort = false) {
         const bText = bCell.textContent.trim();
 
         // Handle special cases (crashes, empty results)
-        // Check crashes first, then empty results
-        const aIsCrash = aText.includes('❌') || aText.includes('💥');
-        const bIsCrash = bText.includes('❌') || bText.includes('💥');
+        const aIsCrash = aText.includes('\\u274C') || aText.includes('\\uD83D\\uDCA5');
+        const bIsCrash = bText.includes('\\u274C') || bText.includes('\\uD83D\\uDCA5');
 
         if (aIsCrash && bIsCrash) {
-            // Both crashes - sort alphabetically
             return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
         }
-        if (aText === '—' && bText === '—') return 0;
+        if (aText === '\\u2014' && bText === '\\u2014') return 0;
 
         // Crashes vs empty: crash always before empty
-        if (aIsCrash && bText === '—') return -1;
-        if (bIsCrash && aText === '—') return 1;
+        if (aIsCrash && bText === '\\u2014') return -1;
+        if (bIsCrash && aText === '\\u2014') return 1;
 
-        // Crash vs normal: when descending, crashes at top; when ascending, crashes at bottom
+        // Crash vs normal
         if (aIsCrash) return ascending ? 1 : -1;
         if (bIsCrash) return ascending ? -1 : 1;
 
-        // Empty vs normal: empty always after normal
-        if (aText === '—') return 1;
-        if (bText === '—') return -1;
+        // Empty vs normal
+        if (aText === '\\u2014') return 1;
+        if (bText === '\\u2014') return -1;
 
-        // Try to parse as time values or cycles/gas values
+        // Try to parse as time values
         let aValue = parseTimeToMs(aText);
         let bValue = parseTimeToMs(bText);
-
-        // If time parsing failed, try parsing as cycles/gas
-        if (aValue === null) aValue = parseCyclesPerGas(aText);
-        if (bValue === null) bValue = parseCyclesPerGas(bText);
 
         if (aValue !== null && bValue !== null) {
             return ascending ? aValue - bValue : bValue - aValue;
@@ -1183,23 +1415,6 @@ function parseTimeToMs(timeStr) {
     return totalMs > 0 ? totalMs : null;
 }
 
-function parseCyclesPerGas(cyclesStr) {
-    // Parse cycles/gas strings like "1.23K", "45.67M", "123.45"
-    const mMatch = cyclesStr.match(/([\\d.]+)M/);
-    const kMatch = cyclesStr.match(/([\\d.]+)K/);
-    const plainMatch = cyclesStr.match(/^([\\d.]+)$/);
-
-    if (mMatch) {
-        return parseFloat(mMatch[1]) * 1_000_000;
-    } else if (kMatch) {
-        return parseFloat(kMatch[1]) * 1_000;
-    } else if (plainMatch) {
-        return parseFloat(plainMatch[1]);
-    }
-
-    return null;
-}
-
 function generateResultsSection(hardware, config, allElClients) {
     const sectionId = `section-${hardware}-${config}`.replace(/[^a-zA-Z0-9-]/g, '-');
 
@@ -1215,7 +1430,7 @@ function generateResultsSection(hardware, config, allElClients) {
         html += generateHardwareInfo(firstElClient.hardware_info);
     }
 
-    // Summary first, then comparison table (for both modes)
+    // Summary first, then comparison table
     html += generateSummary(allElClients);
     html += generateComparisonTable(allElClients);
 
@@ -1281,9 +1496,7 @@ function generateComparisonTable(allElClients) {
     });
 
     const testCases = Array.from(allTestCases).sort();
-    const timeField = currentMode === 'proving' ? 'proving_time_ms' :
-                      currentMode === 'cycles-gas' ? 'cycles_per_gas' :
-                      'execution_time_ms';
+    const timeField = currentMode === 'proving' ? 'proving_time_ms' : 'execution_time_ms';
 
     // Build the table with double header
     let html = `<div class="table-container"><table><thead>`;
@@ -1318,14 +1531,14 @@ function generateComparisonTable(allElClients) {
                         const size = Math.max(...proofSizes);
                         html += `<td>${formatProofSize(size)}</td>`;
                     } else {
-                        html += '<td>—</td>';
+                        html += '<td>\\u2014</td>';
                     }
                 } else {
-                    html += '<td>—</td>';
+                    html += '<td>\\u2014</td>';
                 }
             });
         });
-        html += '<td>—</td></tr>';
+        html += '<td>\\u2014</td></tr>';
     }
 
     html += '</thead><tbody>';
@@ -1344,26 +1557,20 @@ function generateComparisonTable(allElClients) {
                 const result = results[zkvm][elClient][testCase];
 
                 if (!result) {
-                    cells.push('<td class="empty-result">—</td>');
-                } else if (result.status === 'success' && currentMode === 'cycles-gas' && result[timeField] === 0) {
-                    // In cycles-gas mode, if cycles is 0, show em-dash instead of error
-                    cells.push('<td class="empty-result">—</td>');
+                    cells.push('<td class="empty-result">\\u2014</td>');
                 } else if (result.status === 'success' && result[timeField]) {
                     const time = result[timeField];
                     times.push(time);
-                    const formattedValue = currentMode === 'cycles-gas' ?
-                                          formatCyclesPerGas(time) :
-                                          formatTime(time);
-                    cells.push(`<td>${formattedValue}</td>`);
+                    cells.push(`<td>${formatTime(time)}</td>`);
                 } else if (result.status === 'crashed') {
                     hasCrash = true;
-                    cells.push('<td class="crash-sdk">❌ SDK</td>');
+                    cells.push('<td class="crash-sdk">\\u274C SDK</td>');
                 } else if (result.status === 'prover_crashed') {
                     hasCrash = true;
-                    cells.push('<td class="crash-prover">💥 Prover</td>');
+                    cells.push('<td class="crash-prover">\\uD83D\\uDCA5 Prover</td>');
                 } else {
                     hasCrash = true;
-                    cells.push('<td class="crash-sdk">❌ Error</td>');
+                    cells.push('<td class="crash-sdk">\\u274C Error</td>');
                 }
             });
         });
@@ -1377,12 +1584,9 @@ function generateComparisonTable(allElClients) {
         const avgCell = times.length > 0
             ? (() => {
                 const avg = times.reduce((a, b) => a + b, 0) / times.length;
-                const formattedAvg = currentMode === 'cycles-gas' ?
-                                    formatCyclesPerGas(avg) :
-                                    formatTime(avg);
-                return `<td>${formattedAvg}</td>`;
+                return `<td>${formatTime(avg)}</td>`;
               })()
-            : '<td class="empty-result">—</td>';
+            : '<td class="empty-result">\\u2014</td>';
 
         html += `<tr><td>${testCase}</td>${cells.join('')}${avgCell}</tr>`;
         rowsGenerated++;
@@ -1416,13 +1620,13 @@ function generateSummary(allElClients) {
                         <th>zkVM</th>
                         <th>EL Client</th>
                         <th>Total</th>
-                        <th>✅ Successful</th>
-                        <th>❌ SDK Crashed</th>
+                        <th>Successful</th>
+                        <th>SDK Crashed</th>
     `;
 
     // Only show Prover Crashed column in proving mode
     if (currentMode === 'proving') {
-        html += '<th>💥 Prover Crashed</th>';
+        html += '<th>Prover Crashed</th>';
     }
 
     html += `
@@ -1476,13 +1680,13 @@ function generateSummary(allElClients) {
 
                 html += `
                         <td class="el-client-subrow">${elClient}</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
+                        <td>\\u2014</td>
+                        <td>\\u2014</td>
+                        <td>\\u2014</td>
                 `;
 
                 if (currentMode === 'proving') {
-                    html += '<td>—</td>';
+                    html += '<td>\\u2014</td>';
                 }
 
                 html += '</tr>';
@@ -1525,27 +1729,6 @@ function formatProofSize(sizeBytes) {
     } else {
         return `${sizeBytes}B`;
     }
-}
-
-function formatCyclesPerGas(cyclesPerGas) {
-    if (cyclesPerGas >= 1_000_000) {
-        return `${(cyclesPerGas / 1_000_000).toFixed(2)}M`;
-    } else if (cyclesPerGas >= 1_000) {
-        return `${(cyclesPerGas / 1_000).toFixed(2)}K`;
-    } else {
-        return cyclesPerGas.toFixed(2);
-    }
-}
-
-// Setup reproduce section toggle
-function setupReproduceSection() {
-    const header = document.getElementById('reproduce-header');
-    const content = document.getElementById('reproduce-content');
-
-    header.addEventListener('click', () => {
-        header.classList.toggle('expanded');
-        content.classList.toggle('expanded');
-    });
 }
 
 // Update reproduce section visibility based on current tab
