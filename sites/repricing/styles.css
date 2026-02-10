@@ -1038,6 +1038,247 @@ footer a:hover {
 }
 
 /* ============================================================================
+   Performance Heatmap
+   ============================================================================ */
+
+.heatmap-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.hm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hm-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.hm-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Legend */
+.hm-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.hm-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hm-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.hm-swatch-ok { background: var(--success); }
+.hm-swatch-below { background: var(--warning); }
+.hm-swatch-crashed { background: var(--error); }
+
+/* Scrollable grid container */
+.hm-grid-container {
+    max-height: 560px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Table */
+.hm-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hm-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.hm-th {
+    background: var(--bg-secondary);
+    padding: 6px 8px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: left;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+}
+
+.hm-th-op {
+    width: 170px;
+    min-width: 120px;
+}
+
+.hm-th-count {
+    width: 32px;
+    text-align: center;
+}
+
+/* Category row */
+.hm-cat-row td {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 10px 8px 4px;
+    border-bottom: 2px solid var(--border-strong);
+    background: var(--bg-primary);
+}
+
+/* Operation row */
+.hm-row {
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.hm-row:hover {
+    background: var(--bg-secondary);
+}
+
+.hm-row-expanded {
+    background: var(--bg-secondary);
+}
+
+.hm-op-name {
+    padding: 4px 8px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+    border-bottom: 1px solid var(--border);
+}
+
+.hm-icon {
+    display: inline-block;
+    width: 12px;
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    margin-right: 3px;
+}
+
+.hm-count {
+    padding: 4px 6px;
+    text-align: center;
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+/* Cell with proportional bar */
+.hm-cell-td {
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.hm-cell {
+    height: 16px;
+    min-width: 80px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--bg-card);
+    cursor: default;
+}
+
+.hm-cell-empty {
+    height: 16px;
+    min-width: 80px;
+    border-radius: 3px;
+    background: var(--bg-card);
+    opacity: 0.3;
+}
+
+.hm-bar {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.hm-seg-ok { background: var(--success); }
+.hm-seg-below { background: var(--warning); }
+.hm-seg-crashed { background: var(--error); }
+
+.hm-empty {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Expanded fixture detail row */
+.hm-detail-row td {
+    padding: 6px 8px 10px;
+    border-bottom: 2px solid var(--accent);
+    background: var(--bg-secondary);
+    vertical-align: top;
+}
+
+.hm-fx-td {
+    padding: 6px 6px 10px;
+    border-bottom: 2px solid var(--accent);
+    background: var(--bg-secondary);
+    vertical-align: top;
+}
+
+/* Fixture squares */
+.hm-fixtures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.hm-fx {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    cursor: default;
+    transition: transform 0.1s ease;
+}
+
+.hm-fx:hover {
+    transform: scale(1.5);
+    z-index: 1;
+}
+
+.hm-fx-ok { background: var(--success); }
+.hm-fx-warn { background: var(--warning); }
+.hm-fx-bad { background: #f97316; }
+.hm-fx-crashed { background: var(--error); }
+
+/* ============================================================================
    Responsive Adjustments
    ============================================================================ */
 

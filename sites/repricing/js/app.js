@@ -8,6 +8,7 @@ import { debounce, createComparator, parseColumn } from './utils.js';
 import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, loadDataset } from './data.js';
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
 import { Renderer } from './render.js';
+import { HeatmapRenderer } from './heatmap.js';
 
 // ============================================================================
 // BenchmarkApp Class
@@ -59,11 +60,18 @@ export class BenchmarkApp {
         this.pendingURLState = null;
 
         // ====================================================================
+        // Heatmap State
+        // ====================================================================
+        this.heatmapSortMode = 'cost';
+        this.heatmapExpandedOps = new Set();
+
+        // ====================================================================
         // Services (initialized during init)
         // ====================================================================
         this.cache = new CacheManager();
         this.dataAccessor = null;
         this.renderer = null;
+        this.heatmapRenderer = null;
 
         // ====================================================================
         // DOM Elements (cached during init)
@@ -117,6 +125,9 @@ export class BenchmarkApp {
             quickFilters: document.getElementById('quick-filters'),
             valueModeSelector: document.getElementById('value-mode'),
             marginalInfo: document.getElementById('marginal-info'),
+            heatmapSection: document.getElementById('heatmap-section'),
+            heatmapGrid: document.getElementById('heatmap-grid'),
+            heatmapCount: document.getElementById('heatmap-count'),
         };
     }
 
@@ -173,6 +184,7 @@ export class BenchmarkApp {
             this.initializeSearchAndFilters();
             this.initializeOperationFilters();
             this.initializeQuickFilters();
+            this.initializeHeatmap();
 
             // Apply pending URL state
             applyPendingURLState(this.pendingURLState, this, this.data, this.elements);
@@ -211,8 +223,9 @@ export class BenchmarkApp {
         this.dataAccessor.setTarget(this.targetMGasPerS);
         this.dataAccessor.precomputeWorstCases();
 
-        // Initialize renderer
+        // Initialize renderers
         this.renderer = new Renderer(this.elements, this.dataAccessor);
+        this.heatmapRenderer = new HeatmapRenderer(this.dataAccessor);
 
         // Update raw data link
         if (this.elements.rawDataLink) {
@@ -302,6 +315,8 @@ export class BenchmarkApp {
         // Reset filter state
         this.selectedOperations.clear();
         this.expandedOperations.clear();
+        this.heatmapExpandedOps.clear();
+        this.heatmapSortMode = 'cost';
         this.currentPage = 1;
         this.minRelativeCost = null;
 
@@ -433,6 +448,7 @@ export class BenchmarkApp {
         this.filterTests();
         this.groupTestsByOperation();
         this.sortGroupedData();
+        this.renderHeatmap();
         this.renderTable();
         this.updateSummaryBar();
         this.updateQuickFilterButtons();
@@ -865,6 +881,66 @@ export class BenchmarkApp {
 
             btn.classList.toggle('active', isActive);
         });
+    }
+
+    // ========================================================================
+    // Heatmap
+    // ========================================================================
+
+    /**
+     * Initializes heatmap event listeners (called once).
+     * Uses event delegation so handlers survive re-renders.
+     */
+    initializeHeatmap() {
+        const grid = this.elements.heatmapGrid;
+        if (!grid) return;
+
+        // Row click → toggle expansion
+        grid.addEventListener('click', (e) => {
+            const row = e.target.closest('.hm-row');
+            if (!row) return;
+            const op = row.dataset.hmOperation;
+            if (this.heatmapExpandedOps.has(op)) {
+                this.heatmapExpandedOps.delete(op);
+            } else {
+                this.heatmapExpandedOps.add(op);
+            }
+            this.renderHeatmap();
+        });
+
+        // Sort buttons
+        const section = this.elements.heatmapSection;
+        if (section) {
+            section.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-hm-sort]');
+                if (!btn) return;
+                this.heatmapSortMode = btn.dataset.hmSort;
+                section.querySelectorAll('[data-hm-sort]').forEach(b =>
+                    b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
+                );
+                this.renderHeatmap();
+            });
+        }
+    }
+
+    /**
+     * Renders the performance heatmap.
+     */
+    renderHeatmap() {
+        if (!this.heatmapRenderer || !this.elements.heatmapGrid) return;
+
+        this.elements.heatmapGrid.innerHTML = this.heatmapRenderer.render({
+            groupedData: this.groupedData,
+            zkvmView: this.selectedZkvmView,
+            zkvms: this.data.zkvms,
+            operationsByCategory: this.data.operations_by_category,
+            expandedOps: this.heatmapExpandedOps,
+            sortMode: this.heatmapSortMode,
+        });
+
+        if (this.elements.heatmapCount) {
+            this.elements.heatmapCount.textContent = `(${this.groupedData.length} operations)`;
+        }
     }
 
     // ========================================================================
