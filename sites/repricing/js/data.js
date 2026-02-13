@@ -225,6 +225,18 @@ export class DataAccessor {
             return this.cache.relativeCost.get(cacheKey);
         }
 
+        // Zero-gas tests (e.g. empty blocks) trivially meet any throughput target
+        if (!test.block_used_gas) {
+            const hasProvingTime = zkvm === VIEW.WORST
+                ? this.getWorstCaseTime(test) !== null
+                : this.getProvingTime(test, zkvm) !== null;
+            if (hasProvingTime) {
+                this.cache.relativeCost.set(cacheKey, 0);
+                return 0;
+            }
+            return null;
+        }
+
         const actualMGasPerS = this.getActualMGasPerS(test, zkvm);
         if (!actualMGasPerS || actualMGasPerS <= 0) return null;
 
