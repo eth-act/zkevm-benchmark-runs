@@ -11,12 +11,22 @@
     <link rel="stylesheet" href="../shared/components.css">
     <link rel="stylesheet" href="../shared/responsive.css">
     <link rel="stylesheet" href="benchmarks.css">
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function() {
+            var saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                document.documentElement.style.colorScheme = saved;
+            }
+        })();
+    </script>
 </head>
 <body>
     <header>
         <div class="container header-row">
             <div class="header-text">
-                <h1>zkEVM Benchmark Results</h1>
+                <h1><a href="../" class="header-home-link">&larr; zkEVM Benchmark Results</a></h1>
                 <p>Performance comparison of zkEVM provers and executors</p>
             </div>
             <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>

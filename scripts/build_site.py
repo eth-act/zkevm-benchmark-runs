@@ -96,6 +96,25 @@ def main():
         cwd=str(scripts_dir),
     )
 
+    # =========================================================================
+    # 5. Verification site
+    # =========================================================================
+    print("Building verification site...")
+    verification_out = output / 'verification'
+    verification_out.mkdir()
+
+    # Copy static files
+    for filename in ('index.html', 'verification.css', 'app.js'):
+        shutil.copy2(sites_dir / 'verification' / filename, verification_out / filename)
+
+    # Generate data.js
+    subprocess.run(
+        [sys.executable, str(scripts_dir / 'generate_verification_website.py'),
+         '--output', str(verification_out)],
+        check=True,
+        cwd=str(scripts_dir),
+    )
+
     print(f"\nSite built successfully in {output}")
 
 
