@@ -16,7 +16,7 @@ on:
       workload_ref:
         description: 'Git ref (branch/tag/sha) of zkevm-benchmark-workload to use'
         required: false
-        default: 'main'
+        default: 'master'
 
 permissions:
   contents: write
@@ -37,10 +37,16 @@ jobs:
             --branch ${{ github.event.inputs.workload_ref || 'main' }} \
             /tmp/zkevm-benchmark-workload
 
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config libclang-dev
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run verification
+        env:
+          RUST_LOG: info,pico_vm=warn
+          ERE_IMAGE_REGISTRY: ghcr.io/eth-act/ere
         working-directory: /tmp/zkevm-benchmark-workload
         run: |
           ZKVMS_INPUT="${{ github.event.inputs.zkvms || 'zisk,openvm,sp1,risc0' }}"
@@ -61,7 +67,8 @@ jobs:
       - name: Replace verification data
         run: |
           rm -rf data/verification
-          cp -r /tmp/zkevm-benchmark-workload/zkevm-metrics/reth data/verification
+          RETH_DIR=$(ls -d /tmp/zkevm-benchmark-workload/zkevm-metrics/reth-* | head -1)
+          cp -r "$RETH_DIR" data/verification
 
           echo "Verification data:"
           for dir in data/verification/*/; do
