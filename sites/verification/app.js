@@ -104,6 +104,17 @@
     function init() {
         if (typeof verificationData === 'undefined') return;
 
+        const meta = verificationData.metadata || {};
+        if (meta.date || meta.workload_commit) {
+            const parts = [];
+            if (meta.date) parts.push('Measured: ' + meta.date);
+            if (meta.workload_commit) {
+                const short = meta.workload_commit.substring(0, 7);
+                parts.push('Workload: <a href="https://github.com/eth-act/zkevm-benchmark-workload/commit/' + meta.workload_commit + '">' + short + '</a>');
+            }
+            document.getElementById('metadata-info').innerHTML = parts.join(' · ');
+        }
+
         const zkvmNames = Object.keys(verificationData.zkvms);
         if (zkvmNames.length === 0) return;
 

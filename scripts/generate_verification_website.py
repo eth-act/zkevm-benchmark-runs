@@ -65,7 +65,13 @@ def main():
                 zkvms[zkvm_name] = {'results': results}
                 print(f"  {zkvm_name}: {len(results)} results")
 
-    data_js = 'const verificationData = ' + json.dumps({'zkvms': zkvms}, indent=2) + ';\n'
+    metadata = {}
+    metadata_file = verification_dir / 'metadata.json'
+    if metadata_file.exists():
+        with open(metadata_file, 'r') as f:
+            metadata = json.load(f)
+
+    data_js = 'const verificationData = ' + json.dumps({'zkvms': zkvms, 'metadata': metadata}, indent=2) + ';\n'
     output_file = output_dir / 'data.js'
     with open(output_file, 'w') as f:
         f.write(data_js)
