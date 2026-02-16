@@ -1,0 +1,87 @@
+name: Regenerate Verification Measurements
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      proofs_url:
+        description: 'URL to the proofs tar.gz archive'
+        required: false
+        default: 'https://github.com/jsign/artifacts/releases/download/v0.0.1/zkevm-proofs-50-mainnet.tar.gz'
+      zkvms:
+        description: 'Comma-separated list of zkVMs to verify (e.g., zisk,openvm,sp1,risc0)'
+        required: false
+        default: 'zisk,openvm,sp1,risc0'
+      workload_ref:
+        description: 'Git ref (branch/tag/sha) of zkevm-benchmark-workload to use'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  regenerate:
+    runs-on: [size-ccx43-x64, self-hosted-ghr]
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clone zkevm-benchmark-workload
+        run: |
+          git clone https://github.com/eth-act/zkevm-benchmark-workload.git \
+            --depth 1 \
+            --branch ${{ github.event.inputs.workload_ref || 'main' }} \
+            /tmp/zkevm-benchmark-workload
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run verification
+        working-directory: /tmp/zkevm-benchmark-workload
+        run: |
+          ZKVMS_INPUT="${{ github.event.inputs.zkvms || 'zisk,openvm,sp1,risc0' }}"
+          ZKVMS_FLAGS=""
+          IFS=',' read -ra ZKVM_ARRAY <<< "$ZKVMS_INPUT"
+          for zkvm in "${ZKVM_ARRAY[@]}"; do
+            ZKVMS_FLAGS="${ZKVMS_FLAGS} --zkvms $(echo "$zkvm" | xargs)"
+          done
+
+          PROOFS_URL="${{ github.event.inputs.proofs_url || 'https://github.com/jsign/artifacts/releases/download/v0.0.1/zkevm-proofs-50-mainnet.tar.gz' }}"
+
+          RUST_LOG=info cargo run --release -p ere-hosts -- \
+            ${ZKVMS_FLAGS} \
+            --action verify \
+            --proofs-url "${PROOFS_URL}" \
+            stateless-validator --execution-client reth
+
+      - name: Replace verification data
+        run: |
+          rm -rf data/verification
+          cp -r /tmp/zkevm-benchmark-workload/zkevm-metrics/reth data/verification
+
+          echo "Verification data:"
+          for dir in data/verification/*/; do
+            count=$(find "$dir" -name '*.json' | wc -l)
+            echo "  $(basename "$dir"): $count JSON files"
+          done
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/verification/
+          if git diff --cached --quiet; then
+            echo "No changes in verification data, skipping commit."
+          else
+            git commit -m "verification: regenerate measurements $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Trigger website deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-website.yml
