@@ -115,6 +115,25 @@
             document.getElementById('metadata-info').innerHTML = parts.join(' · ');
         }
 
+        // Hardware info + PassMark scores
+        const hwSection = document.getElementById('hardware-section');
+        if (hwSection && (meta.hardware || meta.passmark)) {
+            const parts = [];
+            if (meta.hardware) {
+                if (meta.hardware.cpu_model) parts.push('<strong>CPU:</strong> ' + meta.hardware.cpu_model);
+                if (meta.hardware.total_ram_gib) parts.push('<strong>RAM:</strong> ' + meta.hardware.total_ram_gib + ' GiB');
+            }
+            if (meta.passmark) {
+                const pm = [];
+                if (meta.passmark.single_thread) pm.push('ST ' + meta.passmark.single_thread.toLocaleString());
+                if (meta.passmark.multi_thread) pm.push('MT ' + meta.passmark.multi_thread.toLocaleString());
+                if (pm.length) parts.push('<strong>PassMark:</strong> ' + pm.join(' · '));
+            }
+            if (parts.length) {
+                hwSection.innerHTML = '<div class="hardware-info">' + parts.join(' | ') + '</div>';
+            }
+        }
+
         const zkvmNames = Object.keys(verificationData.zkvms);
         if (zkvmNames.length === 0) return;
 

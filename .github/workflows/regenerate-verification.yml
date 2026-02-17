@@ -12,11 +12,11 @@ on:
       zkvms:
         description: 'Comma-separated list of zkVMs to verify (e.g., zisk,openvm,sp1,risc0)'
         required: false
-        default: 'zisk,openvm,sp1,risc0'
+        default: 'openvm,sp1,risc0,zisk'
       workload_ref:
         description: 'Git ref (branch/tag/sha) of zkevm-benchmark-workload to use'
         required: false
-        default: 'master'
+        default: 'v0.1.0'
 
 permissions:
   contents: write
@@ -34,11 +34,24 @@ jobs:
         run: |
           git clone https://github.com/eth-act/zkevm-benchmark-workload.git \
             --depth 1 \
-            --branch ${{ github.event.inputs.workload_ref || 'main' }} \
+            --branch ${{ github.event.inputs.workload_ref || 'v0.1.0' }} \
             /tmp/zkevm-benchmark-workload
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config libclang-dev
+        run: |
+          sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config libclang-dev libncurses-dev unzip
+          sudo ln -sf /usr/lib/x86_64-linux-gnu/libncurses.so.6 /usr/lib/x86_64-linux-gnu/libncurses.so.5
+          sudo ln -sf /usr/lib/x86_64-linux-gnu/libtinfo.so.6 /usr/lib/x86_64-linux-gnu/libtinfo.so.5
+
+      - name: Run PassMark CPU benchmark
+        run: |
+          curl -L -o /tmp/pt_linux.zip https://github.com/jsign/artifacts/releases/download/passmark/PerformanceTest_Linux_x86-64.zip
+          unzip /tmp/pt_linux.zip -d /tmp/passmark
+          chmod +x /tmp/passmark/PerformanceTest/PerformanceTest_Linux_x86-64
+          cd /tmp/passmark/PerformanceTest
+          ./PerformanceTest_Linux_x86-64 -r 1 -d 2
+          echo "--- PassMark CPU Results ---"
+          cat results_cpu.yml
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -49,7 +62,7 @@ jobs:
           ERE_IMAGE_REGISTRY: ghcr.io/eth-act/ere
         working-directory: /tmp/zkevm-benchmark-workload
         run: |
-          ZKVMS_INPUT="${{ github.event.inputs.zkvms || 'zisk,openvm,sp1,risc0' }}"
+          ZKVMS_INPUT="${{ github.event.inputs.zkvms || 'openvm,sp1,risc0,zisk' }}"
           ZKVMS_FLAGS=""
           IFS=',' read -ra ZKVM_ARRAY <<< "$ZKVMS_INPUT"
           for zkvm in "${ZKVM_ARRAY[@]}"; do
@@ -70,8 +83,34 @@ jobs:
           RETH_DIR=$(ls -d /tmp/zkevm-benchmark-workload/zkevm-metrics/reth-* | head -1)
           cp -r "$RETH_DIR" data/verification
 
-          WORKLOAD_COMMIT=$(git -C /tmp/zkevm-benchmark-workload rev-parse HEAD)
-          echo "{\"date\": \"$(date -u +%Y-%m-%d)\", \"workload_commit\": \"${WORKLOAD_COMMIT}\"}" > data/verification/metadata.json
+          export WORKLOAD_COMMIT=$(git -C /tmp/zkevm-benchmark-workload rev-parse HEAD)
+
+          export CPU_MODEL=$(lscpu | grep 'Model name' | head -1 | sed 's/.*:\s*//')
+          export TOTAL_RAM_GIB=$(awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo)
+
+          PASSMARK_RESULTS="/tmp/passmark/PerformanceTest/results_cpu.yml"
+          export CPU_ST=$(grep -i 'CPU_SINGLETHREAD' "$PASSMARK_RESULTS" | head -1 | awk '{print $NF}')
+          export CPU_MT=$(grep -i 'SUMM_CPU' "$PASSMARK_RESULTS" | head -1 | awk '{print $NF}')
+          echo "Hardware: $CPU_MODEL, ${TOTAL_RAM_GIB} GiB RAM"
+          echo "PassMark scores - ST: $CPU_ST, MT: $CPU_MT"
+
+          python3 -c "
+          import json, sys, os
+          st = os.environ.get('CPU_ST', '')
+          mt = os.environ.get('CPU_MT', '')
+          print(json.dumps({
+              'date': '$(date -u +%Y-%m-%d)',
+              'workload_commit': os.environ.get('WORKLOAD_COMMIT', ''),
+              'hardware': {
+                  'cpu_model': os.environ.get('CPU_MODEL', ''),
+                  'total_ram_gib': int(os.environ.get('TOTAL_RAM_GIB', '0'))
+              },
+              'passmark': {
+                  'single_thread': float(st) if st else None,
+                  'multi_thread': float(mt) if mt else None
+              }
+          }, indent=2))
+          " > data/verification/metadata.json
 
           echo "Verification data:"
           for dir in data/verification/*/; do
