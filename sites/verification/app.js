@@ -304,6 +304,8 @@
                 ? formatProofSize(minSize)
                 : formatProofSize(minSize) + ' – ' + formatProofSize(maxSize);
 
+            const securityBits = verificationData.zkvms[name].security_bits || null;
+
             return {
                 name,
                 color: zkvmColors[name].border,
@@ -314,6 +316,7 @@
                 max: Math.max(...times),
                 proofSizeStr,
                 proofSizeSort: maxSize,
+                securityBits,
             };
         });
 
@@ -331,11 +334,12 @@
             <td>${d.min}</td>
             <td>${d.max}</td>
             <td>${d.proofSizeStr}</td>
+            <td>${d.securityBits != null ? d.securityBits : 'N/A'}</td>
         </tr>`).join('');
     }
 
     function setupSortHeaders() {
-        const SORT_KEYS = ['name', 'count', 'mean', 'median', 'min', 'max', 'proofSizeSort'];
+        const SORT_KEYS = ['name', 'count', 'mean', 'median', 'min', 'max', 'proofSizeSort', 'securityBits'];
         const ths = document.querySelectorAll('#stats-table thead th');
 
         ths.forEach((th, idx) => {
@@ -349,6 +353,10 @@
                 }
                 _statsData.sort((a, b) => {
                     const va = a[key], vb = b[key];
+                    // Null values always sort last
+                    if (va == null && vb == null) return 0;
+                    if (va == null) return 1;
+                    if (vb == null) return -1;
                     const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
                     return _sortAsc ? cmp : -cmp;
                 });

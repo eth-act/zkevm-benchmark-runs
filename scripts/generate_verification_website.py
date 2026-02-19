@@ -11,7 +11,67 @@ Usage:
 
 import argparse
 import json
+import re
+import urllib.request
 from pathlib import Path
+
+SOUNDCALC_URL = 'https://raw.githubusercontent.com/ethereum/soundcalc/main/reports/summary.md'
+
+
+def fetch_security_bits():
+    """Fetch JBR (bits) per proof system from the soundcalc summary table."""
+    try:
+        with urllib.request.urlopen(SOUNDCALC_URL, timeout=15) as resp:
+            text = resp.read().decode('utf-8')
+    except Exception as e:
+        print(f"Warning: could not fetch soundcalc data: {e}")
+        return {}
+
+    bits = {}
+    in_table = False
+    header_cols = []
+    jbr_idx = None
+
+    for line in text.splitlines():
+        line = line.strip()
+        if not line.startswith('|'):
+            if in_table:
+                break
+            continue
+
+        cols = [c.strip() for c in line.split('|')]
+        # split('|') gives empty strings at the edges for "|a|b|"
+        cols = [c for c in cols if c or not cols]
+
+        if not in_table:
+            # First table row is the header
+            header_cols = cols
+            try:
+                jbr_idx = next(
+                    i for i, h in enumerate(header_cols)
+                    if 'jbr' in h.lower() and 'bit' in h.lower()
+                )
+            except StopIteration:
+                print("Warning: JBR (bits) column not found in soundcalc table")
+                return {}
+            in_table = True
+            continue
+
+        # Skip separator row (e.g. |---|---|)
+        if all(c.replace('-', '').replace(':', '') == '' for c in cols):
+            continue
+
+        if len(cols) > jbr_idx:
+            name = cols[0].strip()
+            # Strip markdown link syntax: [text](url) → text
+            link_match = re.match(r'\[([^\]]+)\]', name)
+            if link_match:
+                name = link_match.group(1)
+            jbr_val = cols[jbr_idx].strip()
+            if name and jbr_val:
+                bits[name.lower()] = jbr_val
+
+    return bits
 
 
 def main():
@@ -64,6 +124,20 @@ def main():
             if results:
                 zkvms[zkvm_name] = {'results': results}
                 print(f"  {zkvm_name}: {len(results)} results")
+
+    # Fetch security bits from soundcalc
+    security_bits = fetch_security_bits()
+    if security_bits:
+        print(f"  Soundcalc security bits: {security_bits}")
+    for zkvm_name in zkvms:
+        # Match e.g. "openvm-v1.4.3" against soundcalc key "openvm"
+        zkvm_lower = zkvm_name.lower()
+        matched = None
+        for sc_name, bits_val in security_bits.items():
+            if zkvm_lower.startswith(sc_name):
+                matched = bits_val
+                break
+        zkvms[zkvm_name]['security_bits'] = matched
 
     metadata = {}
     metadata_file = verification_dir / 'metadata.json'
