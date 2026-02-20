@@ -19,7 +19,7 @@ SOUNDCALC_URL = 'https://raw.githubusercontent.com/ethereum/soundcalc/main/repor
 
 
 def fetch_security_bits():
-    """Fetch JBR (bits) per proof system from the soundcalc summary table."""
+    """Fetch security bits per proof system from the soundcalc summary table."""
     try:
         with urllib.request.urlopen(SOUNDCALC_URL, timeout=15) as resp:
             text = resp.read().decode('utf-8')
@@ -30,7 +30,7 @@ def fetch_security_bits():
     bits = {}
     in_table = False
     header_cols = []
-    jbr_idx = None
+    sec_idx = None
 
     for line in text.splitlines():
         line = line.strip()
@@ -47,12 +47,12 @@ def fetch_security_bits():
             # First table row is the header
             header_cols = cols
             try:
-                jbr_idx = next(
+                sec_idx = next(
                     i for i, h in enumerate(header_cols)
-                    if 'jbr' in h.lower() and 'bit' in h.lower()
+                    if h.strip().lower() == 'security'
                 )
             except StopIteration:
-                print("Warning: JBR (bits) column not found in soundcalc table")
+                print("Warning: 'Security' column not found in soundcalc table")
                 return {}
             in_table = True
             continue
@@ -61,15 +61,16 @@ def fetch_security_bits():
         if all(c.replace('-', '').replace(':', '') == '' for c in cols):
             continue
 
-        if len(cols) > jbr_idx:
+        if len(cols) > sec_idx:
             name = cols[0].strip()
             # Strip markdown link syntax: [text](url) → text
             link_match = re.match(r'\[([^\]]+)\]', name)
             if link_match:
                 name = link_match.group(1)
-            jbr_val = cols[jbr_idx].strip()
-            if name and jbr_val:
-                bits[name.lower()] = jbr_val
+            # Use value verbatim, just strip markdown bold markers
+            sec_val = cols[sec_idx].strip().replace('**', '')
+            if name and sec_val:
+                bits[name.lower()] = sec_val
 
     return bits
 
