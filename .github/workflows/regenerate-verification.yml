@@ -23,13 +23,18 @@ permissions:
   actions: write
 
 jobs:
-  regenerate:
-    runs-on: [size-attester7870-x64 , self-hosted-ghr]
+  collect:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - machine_id: size-attester7870-x64
+            runner: [size-attester7870-x64, self-hosted-ghr]
+          - machine_id: size-ccx43-x64
+            runner: [size-ccx43-x64, self-hosted-ghr]
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Clone zkevm-benchmark-workload
         run: |
           git clone https://github.com/eth-act/zkevm-benchmark-workload.git \
@@ -77,14 +82,16 @@ jobs:
             --proofs-url "${PROOFS_URL}" \
             stateless-validator --execution-client reth
 
-      - name: Replace verification data
+      - name: Collect verification results and metadata
         run: |
-          rm -rf data/verification
+          RESULTS_DIR="/tmp/verification-results"
+          rm -rf "$RESULTS_DIR"
+          mkdir -p "$RESULTS_DIR"
+
           RETH_DIR=$(ls -d /tmp/zkevm-benchmark-workload/zkevm-metrics/reth-* | head -1)
-          cp -r "$RETH_DIR" data/verification
+          cp -r "$RETH_DIR"/. "$RESULTS_DIR/"
 
           export WORKLOAD_COMMIT=$(git -C /tmp/zkevm-benchmark-workload rev-parse HEAD)
-
           export CPU_MODEL=$(lscpu | grep 'Model name' | head -1 | sed 's/.*:\s*//')
           export TOTAL_RAM_GIB=$(awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo)
 
@@ -110,20 +117,53 @@ jobs:
                   'multi_thread': float(mt) if mt else None
               }
           }, indent=2))
-          " > data/verification/metadata.json
+          " > "$RESULTS_DIR/metadata.json"
 
-          echo "Verification data:"
-          for dir in data/verification/*/; do
+          echo "Verification data for ${{ matrix.machine_id }}:"
+          for dir in "$RESULTS_DIR"/*/; do
             count=$(find "$dir" -name '*.json' | wc -l)
             echo "  $(basename "$dir"): $count JSON files"
           done
-          echo "Metadata: date=$(date -u +%Y-%m-%d), workload_commit=${WORKLOAD_COMMIT}"
+
+      - name: Upload verification results
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ matrix.machine_id }}
+          path: /tmp/verification-results/
+
+  regenerate:
+    needs: collect
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all verification artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/artifacts/
+
+      - name: Organize verification data
+        run: |
+          rm -rf data/verification
+          for artifact_dir in /tmp/artifacts/verification-*/; do
+            machine_id="${artifact_dir#/tmp/artifacts/verification-}"
+            machine_id="${machine_id%/}"
+            mkdir -p "data/verification/$machine_id"
+            cp -r "$artifact_dir". "data/verification/$machine_id/"
+            echo "Organized data for machine: $machine_id"
+            for dir in "data/verification/$machine_id"/*/; do
+              [ -d "$dir" ] || continue
+              count=$(find "$dir" -name '*.json' | wc -l)
+              echo "  $(basename "$dir"): $count JSON files"
+            done
+          done
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/verification/ data/verification/metadata.json
+          git add data/verification/
           if git diff --cached --quiet; then
             echo "No changes in verification data, skipping commit."
           else
