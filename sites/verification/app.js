@@ -131,94 +131,70 @@
             document.getElementById('metadata-info').innerHTML = parts.join(' · ');
         }
 
-        // Hardware info: one line per machine
-        const hwSection = document.getElementById('hardware-section');
-        if (hwSection) {
-            const lines = [];
-            for (const machineId of machineIds) {
-                const meta = machinesData[machineId].metadata || {};
-                const alias = machineAlias(machineId);
-                const parts = [];
-                if (meta.hardware) {
-                    if (meta.hardware.cpu_model) parts.push('<strong>CPU:</strong> ' + meta.hardware.cpu_model);
-                    if (meta.hardware.total_ram_gib) parts.push('<strong>RAM:</strong> ' + meta.hardware.total_ram_gib + ' GiB');
-                }
-                if (meta.passmark) {
-                    const pm = [];
-                    if (meta.passmark.single_thread) pm.push('ST ' + meta.passmark.single_thread.toLocaleString());
-                    if (meta.passmark.multi_thread) pm.push('MT ' + meta.passmark.multi_thread.toLocaleString());
-                    if (pm.length) parts.push('<strong>PassMark:</strong> ' + pm.join(' · '));
-                }
-                if (parts.length) {
-                    lines.push('<div class="hardware-info"><strong class="machine-label">' + alias + ':</strong> ' + parts.join(' | ') + '</div>');
-                }
-            }
-            if (lines.length) hwSection.innerHTML = lines.join('');
-        }
-
-        // ── Build ordered list of (machineId, zkvmName) rows ───────────────
-        // Group by zkVM so each zkVM's rows are adjacent:
-        //   sp1 [attester7870], sp1 [ccx43], risc0 [attester7870], risc0 [ccx43], ...
+        // ── Build (machine, zkVM) entries ─────────────────────────────────
         const allZkvmNames = [...new Set(
             machineIds.flatMap(mid => Object.keys(machinesData[mid].zkvms))
         )].sort();
 
-        // rows: [{machineId, zkvmName, results, color, isFaint}]
-        const rows = [];
+        const entries = [];
         for (const zkvmName of allZkvmNames) {
             const color = colorFor(zkvmName);
             machineIds.forEach((machineId, mIdx) => {
                 const machineZkvms = machinesData[machineId].zkvms;
                 if (!machineZkvms[zkvmName]) return;
-                rows.push({
+                entries.push({
                     machineId,
                     zkvmName,
                     results: machineZkvms[zkvmName].results,
                     security_bits: machineZkvms[zkvmName].security_bits,
-                    color,
-                    // First machine gets full opacity, additional machines get faint fill
                     bg: mIdx === 0 ? color.bg : color.bgFaint,
                     border: color.border,
+                    isSecondary: mIdx > 0,
                 });
             });
         }
 
-        if (rows.length === 0) return;
+        if (entries.length === 0) return;
 
-        // Scale chart height with number of rows
+        // Chart: one row per zkVM, both machines overlaid on same row
+        const zkvmRowIdx = {};
+        allZkvmNames.forEach((name, i) => { zkvmRowIdx[name] = i; });
+        const rowPositions = allZkvmNames.map((_, i) => i * ROW_SPACING);
+
         const chartContainer = document.querySelector('.chart-container');
         if (chartContainer) {
-            chartContainer.style.height = Math.max(420, rows.length * 100 + 120) + 'px';
+            chartContainer.style.height = Math.max(420, allZkvmNames.length * 100 + 120) + 'px';
         }
 
-        // Collect all results for global radius scale
-        const allResults = rows.flatMap(r => r.results);
+        const allResults = entries.flatMap(e => e.results);
         const radiusFn = buildRadiusScale(allResults);
 
-        const rowPositions = rows.map((_, i) => i * ROW_SPACING);
-
-        const datasets = rows.map((row, i) => {
-            const data = buildStripData(row.results, rowPositions[i], radiusFn);
+        const datasets = entries.map(entry => {
+            const rowCenter = rowPositions[zkvmRowIdx[entry.zkvmName]];
+            const data = buildStripData(entry.results, rowCenter, radiusFn);
             return {
-                label: row.zkvmName + ' [' + machineAlias(row.machineId) + ']',
+                label: entry.zkvmName,
+                _machineAlias: machineAlias(entry.machineId),
+                _isSecondary: entry.isSecondary,
                 data,
-                backgroundColor: row.bg,
-                borderColor: row.border,
-                borderWidth: 1,
+                backgroundColor: entry.bg,
+                borderColor: entry.border,
+                borderWidth: entry.isSecondary ? 1.5 : 1,
+                pointStyle: entry.isSecondary ? 'triangle' : 'circle',
                 pointRadius: data.map(d => d.r),
                 pointHoverRadius: data.map(d => d.r + 1.5),
             };
         });
 
-        // Compute medians
-        const medians = rows.map(row => median(row.results.map(r => r.verification_time_ms)));
+        const medians = entries.map(e => median(e.results.map(r => r.verification_time_ms)));
+        const medianRowPos = entries.map(e => rowPositions[zkvmRowIdx[e.zkvmName]]);
 
-        renderChart(datasets, rows, rowPositions, medians);
-        renderStats(rows);
+        renderChart(datasets, entries, allZkvmNames, rowPositions, medians, medianRowPos, machineIds, machinesData);
+        renderStats(entries);
     }
 
     // ── Median-line plugin ─────────────────────────────────────────────────
-    function medianLinePlugin(medians, rowPositions, rows) {
+    function medianLinePlugin(medians, medianRowPos, entries) {
         return {
             id: 'medianLines',
             afterDatasetsDraw(chart) {
@@ -228,14 +204,14 @@
 
                 for (let i = 0; i < medians.length; i++) {
                     const xPx = xScale.getPixelForValue(medians[i]);
-                    const yCenter = yScale.getPixelForValue(rowPositions[i]);
+                    const yCenter = yScale.getPixelForValue(medianRowPos[i]);
                     const halfH = BAND_HALF * 0.7 * (yScale.getPixelForValue(0) - yScale.getPixelForValue(ROW_SPACING)) / (-ROW_SPACING);
 
                     ctx.save();
-                    ctx.strokeStyle = rows[i].border;
+                    ctx.strokeStyle = entries[i].border;
                     ctx.lineWidth = 2;
-                    ctx.globalAlpha = 0.7;
-                    ctx.setLineDash([4, 3]);
+                    ctx.globalAlpha = entries[i].isSecondary ? 0.45 : 0.7;
+                    ctx.setLineDash(entries[i].isSecondary ? [2, 3] : [4, 3]);
                     ctx.beginPath();
                     ctx.moveTo(xPx, yCenter - halfH);
                     ctx.lineTo(xPx, yCenter + halfH);
@@ -247,26 +223,50 @@
     }
 
     // ── Chart ──────────────────────────────────────────────────────────────
-    function renderChart(datasets, rows, rowPositions, medians) {
+    function renderChart(datasets, entries, allZkvmNames, rowPositions, medians, medianRowPos, machineIds, machinesData) {
         const ctx = document.getElementById('histogram-chart').getContext('2d');
 
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const gridColor = isDark ? 'rgba(148,163,184,0.15)' : 'rgba(30,41,59,0.08)';
         const tickColor = isDark ? '#94a3b8' : '#64748b';
 
-        const machinesData = verificationData.machines;
+        const zkvmCounts = {};
+        for (const entry of entries) {
+            zkvmCounts[entry.zkvmName] = (zkvmCounts[entry.zkvmName] || 0) + entry.results.length;
+        }
 
         const chart = new Chart(ctx, {
             type: 'scatter',
             data: { datasets },
-            plugins: [medianLinePlugin(medians, rowPositions, rows)],
+            plugins: [medianLinePlugin(medians, medianRowPos, entries)],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 layout: { padding: { left: 10 } },
                 plugins: {
                     legend: {
-                        labels: { color: tickColor, font: { family: 'Inter', size: 13 } }
+                        labels: {
+                            color: tickColor,
+                            font: { family: 'Inter', size: 13 },
+                            filter: function (item, data) {
+                                // Show one legend entry per zkVM (first occurrence only)
+                                const ds = data.datasets;
+                                return !ds.slice(0, item.datasetIndex).some(d => d.label === ds[item.datasetIndex].label);
+                            },
+                        },
+                        onClick: function (e, legendItem, legend) {
+                            // Toggle all datasets sharing the same zkVM label
+                            const ci = legend.chart;
+                            const label = ci.data.datasets[legendItem.datasetIndex].label;
+                            const meta0 = ci.getDatasetMeta(legendItem.datasetIndex);
+                            const willHide = meta0.hidden === null;
+                            ci.data.datasets.forEach(function (ds, idx) {
+                                if (ds.label === label) {
+                                    ci.getDatasetMeta(idx).hidden = willHide ? true : null;
+                                }
+                            });
+                            ci.update();
+                        },
                     },
                     tooltip: {
                         mode: 'nearest',
@@ -275,9 +275,11 @@
                             title: (items) => items[0].raw.name,
                             label: (item) => {
                                 const d = item.raw;
+                                const ds = item.dataset;
                                 return [
-                                    `Time: ${d.time} ms`,
-                                    `Proof: ${formatProofSize(d.proofSize)}`,
+                                    'Machine: ' + ds._machineAlias,
+                                    'Time: ' + d.time + ' ms',
+                                    'Proof: ' + formatProofSize(d.proofSize),
                                 ];
                             },
                         }
@@ -295,10 +297,8 @@
                             callback: function (value) {
                                 const idx = rowPositions.indexOf(value);
                                 if (idx < 0) return '';
-                                const row = rows[idx];
-                                const count = row.results.length;
-                                const alias = machineAlias(row.machineId);
-                                return `${row.zkvmName} [${alias}]  (n=${count})`;
+                                const name = allZkvmNames[idx];
+                                return name + '  (n=' + zkvmCounts[name] + ')';
                             },
                             color: tickColor,
                             font: { family: 'Inter', size: 12 },
@@ -309,7 +309,7 @@
                             axis.ticks = rowPositions.map(v => ({ value: v }));
                         },
                         afterFit: function (axis) {
-                            axis.width = Math.max(axis.width, 220);
+                            axis.width = Math.max(axis.width, 200);
                         },
                         grid: { color: gridColor },
                         min: rowPositions[0] - BAND_HALF - 15,
@@ -318,6 +318,33 @@
                 }
             }
         });
+
+        // Machine legend footnote below chart (includes hardware details)
+        if (machineIds.length > 0) {
+            const section = document.getElementById('chart-section');
+            const note = document.createElement('div');
+            note.className = 'chart-footnote';
+            const lines = machineIds.map(function (mid, i) {
+                const alias = machineAlias(mid);
+                const symbol = i === 0 ? '\u25CF' : '\u25B2';
+                const meta = machinesData[mid].metadata || {};
+                const parts = [];
+                if (meta.hardware) {
+                    if (meta.hardware.cpu_model) parts.push(meta.hardware.cpu_model);
+                    if (meta.hardware.total_ram_gib) parts.push(meta.hardware.total_ram_gib + ' GiB');
+                }
+                if (meta.passmark) {
+                    const pm = [];
+                    if (meta.passmark.single_thread) pm.push('ST ' + Math.round(meta.passmark.single_thread).toLocaleString());
+                    if (meta.passmark.multi_thread) pm.push('MT ' + Math.round(meta.passmark.multi_thread).toLocaleString());
+                    if (pm.length) parts.push('PassMark ' + pm.join(' / '));
+                }
+                const hw = parts.length ? ' \u2014 ' + parts.join(' \u00B7 ') : '';
+                return '<span>' + symbol + ' <strong>' + alias + '</strong>' + hw + '</span>';
+            });
+            note.innerHTML = lines.join('<br>');
+            section.appendChild(note);
+        }
 
         // Re-render on theme change
         const observer = new MutationObserver(() => {
