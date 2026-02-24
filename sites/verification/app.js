@@ -335,60 +335,80 @@
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
-    // ── Stats table (sortable) ─────────────────────────────────────────────
+    // ── Stats table (sortable, grouped by zkVM) ────────────────────────────
+    // _statsData: [{name, color, rows: [{machine, count, mean, ...}]}]
     let _statsData = [];
     let _sortCol = null;
     let _sortAsc = true;
 
     function renderStats(rows) {
-        _statsData = rows.map(row => {
+        // Build groups in the order zkVMs first appear in `rows`
+        const groupMap = {};
+        const groupOrder = [];
+        for (const row of rows) {
+            if (!groupMap[row.zkvmName]) {
+                // Proof size and security bits are zkVM-level (same across machines)
+                const proofSizes = row.results.map(r => r.proof_size);
+                const minSize = Math.min(...proofSizes);
+                const maxSize = Math.max(...proofSizes);
+                groupMap[row.zkvmName] = {
+                    name: row.zkvmName,
+                    color: row.border,
+                    proofSizeStr: minSize === maxSize
+                        ? formatProofSize(minSize)
+                        : formatProofSize(minSize) + ' – ' + formatProofSize(maxSize),
+                    proofSizeSort: maxSize,
+                    securityBits: row.security_bits || null,
+                    rows: [],
+                };
+                groupOrder.push(row.zkvmName);
+            }
             const times = row.results.map(r => r.verification_time_ms);
-            const proofSizes = row.results.map(r => r.proof_size);
-            const minSize = Math.min(...proofSizes);
-            const maxSize = Math.max(...proofSizes);
             const mean = times.reduce((a, b) => a + b, 0) / times.length;
             const med = median(times);
-            const proofSizeStr = minSize === maxSize
-                ? formatProofSize(minSize)
-                : formatProofSize(minSize) + ' – ' + formatProofSize(maxSize);
-
-            return {
-                name: row.zkvmName,
+            groupMap[row.zkvmName].rows.push({
                 machine: machineAlias(row.machineId),
-                color: row.border,
                 count: times.length,
                 mean,
                 median: med,
                 min: Math.min(...times),
                 max: Math.max(...times),
-                proofSizeStr,
-                proofSizeSort: maxSize,
-                securityBits: row.security_bits || null,
-            };
-        });
-
+            });
+        }
+        _statsData = groupOrder.map(n => groupMap[n]);
         renderStatsRows();
         setupSortHeaders();
     }
 
     function renderStatsRows() {
         const tbody = document.querySelector('#stats-table tbody');
-        tbody.innerHTML = _statsData.map(d => `<tr>
-            <td><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${d.color};margin-right:6px;vertical-align:middle;"></span>${d.name}</td>
-            <td>${d.machine}</td>
-            <td>${d.count}</td>
-            <td>${d.mean.toFixed(1)}</td>
-            <td>${d.median.toFixed(1)}</td>
-            <td>${d.min}</td>
-            <td>${d.max}</td>
-            <td>${d.proofSizeStr}</td>
-            <td>${d.securityBits != null ? d.securityBits : 'N/A'}</td>
-        </tr>`).join('');
+        const html = [];
+        for (const group of _statsData) {
+            const n = group.rows.length;
+            group.rows.forEach((row, i) => {
+                html.push(`<tr class="${i === 0 ? 'group-start' : ''}">
+                    ${i === 0 ? `<td rowspan="${n}" style="vertical-align:middle"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${group.color};margin-right:6px;vertical-align:middle;"></span>${group.name}</td>` : ''}
+                    <td>${row.machine}</td>
+                    <td>${row.count}</td>
+                    <td>${row.mean.toFixed(1)}</td>
+                    <td>${row.median.toFixed(1)}</td>
+                    <td>${row.min}</td>
+                    <td>${row.max}</td>
+                    ${i === 0 ? `<td rowspan="${n}">${group.proofSizeStr}</td><td rowspan="${n}">${group.securityBits != null ? group.securityBits : 'N/A'}</td>` : ''}
+                </tr>`);
+            });
+        }
+        tbody.innerHTML = html.join('');
     }
 
     function setupSortHeaders() {
+        // Columns: zkVM, Machine, Count, Mean, Median, Min, Max, Proof Size, Security Bits
+        // Sorting is group-level; groups are sorted by the first sub-row's value for the key.
         const SORT_KEYS = ['name', 'machine', 'count', 'mean', 'median', 'min', 'max', 'proofSizeSort', 'securityBits'];
         const ths = document.querySelectorAll('#stats-table thead th');
+
+        const GROUP_KEYS = new Set(['name', 'proofSizeSort', 'securityBits']);
+        const groupVal = (group, key) => GROUP_KEYS.has(key) ? group[key] : (group.rows[0] ? group.rows[0][key] : null);
 
         ths.forEach((th, idx) => {
             th.addEventListener('click', () => {
@@ -400,15 +420,13 @@
                     _sortAsc = true;
                 }
                 _statsData.sort((a, b) => {
-                    const va = a[key], vb = b[key];
-                    // Null values always sort last
+                    const va = groupVal(a, key), vb = groupVal(b, key);
                     if (va == null && vb == null) return 0;
                     if (va == null) return 1;
                     if (vb == null) return -1;
                     const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
                     return _sortAsc ? cmp : -cmp;
                 });
-
                 ths.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
                 th.classList.add(_sortAsc ? 'sorted-asc' : 'sorted-desc');
                 renderStatsRows();
