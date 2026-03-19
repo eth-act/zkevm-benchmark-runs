@@ -22,6 +22,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Fetch per-opcode figures
+        run: |
+          if git ls-remote --exit-code origin repricing-figs >/dev/null 2>&1; then
+            git fetch origin repricing-figs --depth=1
+            mkdir -p data/repricing-proposal/figs
+            git archive origin/repricing-figs | tar -x -C data/repricing-proposal/figs/
+            echo "Fetched $(ls data/repricing-proposal/figs/*.png 2>/dev/null | wc -l) figures"
+          else
+            echo "repricing-figs branch not found, deploying without per-opcode figures"
+          fi
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:

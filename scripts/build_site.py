@@ -126,8 +126,34 @@ def main():
     for filename in ('index.html', 'proposal.css', 'app.js'):
         shutil.copy2(sites_dir / 'proposal' / filename, proposal_out / filename)
 
-    # Copy markdown content and figures (if available)
+    # Auto-fetch per-opcode figures from repricing-figs branch if missing
     proposal_data = repo_root / 'data' / 'repricing-proposal'
+    proposal_figs = proposal_data / 'figs'
+    has_figs = proposal_figs.exists() and any(proposal_figs.glob('*.png'))
+    if not has_figs:
+        print("  Figures not found locally, trying repricing-figs branch...")
+        proposal_figs.mkdir(parents=True, exist_ok=True)
+        try:
+            subprocess.run(
+                ['git', 'ls-remote', '--exit-code', 'origin', 'repricing-figs'],
+                check=True, capture_output=True, cwd=str(repo_root),
+            )
+            subprocess.run(
+                ['git', 'fetch', 'origin', 'repricing-figs', '--depth=1'],
+                check=True, capture_output=True, cwd=str(repo_root),
+            )
+            subprocess.run(
+                'git archive origin/repricing-figs | tar -x -C '
+                + str(proposal_figs),
+                shell=True, check=True, cwd=str(repo_root),
+            )
+            fig_count = len(list(proposal_figs.glob('*.png')))
+            print(f"  Fetched {fig_count} figures from repricing-figs branch")
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("  Warning: Could not fetch figures from repricing-figs branch")
+            print("  Building without per-opcode diagnostic plots")
+
+    # Copy markdown content and figures (if available)
     proposal_md = proposal_data / 'new_gas_proposal.md'
     if proposal_md.exists():
         # Markdown reports
@@ -138,8 +164,7 @@ def main():
             if src.exists():
                 shutil.copy2(src, proposal_out / md_file)
 
-        # Key figures only (not the ~930 per-opcode diagnostic plots)
-        proposal_figs = proposal_data / 'figs'
+        # All figures (summary + per-opcode diagnostic plots from repricing-figs branch)
         if proposal_figs.exists():
             figs_out = proposal_out / 'figs'
             figs_out.mkdir(exist_ok=True)
