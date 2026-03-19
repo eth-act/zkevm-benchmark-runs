@@ -1,0 +1,137 @@
+name: Generate Repricing Analysis
+
+on:
+  push:
+    branches:
+      - jsign-rig-analysis
+  workflow_dispatch:
+    inputs:
+      fixtures_url:
+        description: 'URL to the fixtures tar.gz archive'
+        required: false
+        default: 'https://github.com/jsign/artifacts/releases/download/fixtures-v0.0.7-5_10_15_20_25_30_60/fixtures-v0.0.7-5_10_15_20_25_30_60.tar.gz'
+      evm_gas_repricings_branch:
+        description: 'Branch of jsign/evm-gas-repricings repo to use'
+        required: false
+        default: 'jsign-repricing'
+      anchor_rate:
+        description: 'Anchor rate in gas/s for repricing analysis'
+        required: false
+        default: '8500000'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout benchmark runs
+        uses: actions/checkout@v4
+
+      - name: Clone evm-gas-repricings
+        run: |
+          git clone https://github.com/jsign/evm-gas-repricings.git \
+            --depth 1 \
+            --branch ${{ github.event.inputs.evm_gas_repricings_branch || 'jsign-repricing' }} \
+            /tmp/evm-gas-repricings
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create venv and install dependencies
+        working-directory: /tmp/evm-gas-repricings
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Download and extract fixtures
+        run: |
+          FIXTURES_URL="${{ github.event.inputs.fixtures_url || 'https://github.com/jsign/artifacts/releases/download/fixtures-v0.0.7-5_10_15_20_25_30_60/fixtures-v0.0.7-5_10_15_20_25_30_60.tar.gz' }}"
+
+          echo "Downloading fixtures from: $FIXTURES_URL"
+          curl -L -o /tmp/fixtures.tar.gz "$FIXTURES_URL"
+
+          echo "Extracting fixtures..."
+          mkdir -p /tmp/fixtures-extract
+          tar -xzf /tmp/fixtures.tar.gz -C /tmp/fixtures-extract
+
+          # Find the blockchain_tests directory regardless of archive nesting
+          BLOCKCHAIN_TESTS=$(find /tmp/fixtures-extract -type d -name "blockchain_tests" | head -1)
+          if [ -z "$BLOCKCHAIN_TESTS" ]; then
+            echo "ERROR: Could not find blockchain_tests directory in archive"
+            echo "Archive contents:"
+            ls -R /tmp/fixtures-extract | head -50
+            exit 1
+          fi
+
+          echo "Found blockchain_tests at: $BLOCKCHAIN_TESTS"
+          mkdir -p /tmp/evm-gas-repricings/zkevm/fixtures
+          cp -r "$BLOCKCHAIN_TESTS" /tmp/evm-gas-repricings/zkevm/fixtures/
+
+          echo "Fixtures structure:"
+          find /tmp/evm-gas-repricings/zkevm/fixtures -maxdepth 4 -type d
+
+      - name: Copy benchmark run data
+        run: |
+          RUNS_DIR="/tmp/evm-gas-repricings/zkevm/runs"
+          mkdir -p "$RUNS_DIR"
+
+          for config_dir in data/proving/8x5090/*M-gas-limit; do
+            if [ -d "$config_dir" ]; then
+              config_name=$(basename "$config_dir")
+              echo "Copying $config_name..."
+              cp -r "$config_dir" "$RUNS_DIR/$config_name"
+            fi
+          done
+
+          echo "Runs structure:"
+          for dir in "$RUNS_DIR"/*/; do
+            config=$(basename "$dir")
+            file_count=$(find "$dir" -name '*.json' -not -name 'hardware.json' | wc -l)
+            echo "  $config: $file_count JSON result files"
+          done
+
+      - name: Run repricing analysis
+        working-directory: /tmp/evm-gas-repricings
+        run: |
+          ANCHOR_RATE="${{ github.event.inputs.anchor_rate || '8500000' }}"
+          echo "Running repricing analysis with anchor rate: $ANCHOR_RATE gas/s"
+          .venv/bin/python src/estimate_zkevm_repricings.py --anchor-rate "$ANCHOR_RATE"
+
+      - name: Verify output files
+        working-directory: /tmp/evm-gas-repricings
+        run: |
+          if [ ! -d reports/zkevm ]; then
+            echo "ERROR: reports/zkevm directory not created"
+            exit 1
+          fi
+
+          REPORT_DIR=$(ls -dt reports/zkevm/*/ 2>/dev/null | head -1)
+          if [ -z "$REPORT_DIR" ]; then
+            echo "ERROR: No report directory found"
+            exit 1
+          fi
+
+          echo "Report directory: $REPORT_DIR"
+          echo "Report contents:"
+          find "$REPORT_DIR" -type f | sort
+
+          FILE_COUNT=$(find "$REPORT_DIR" -type f | wc -l)
+          echo "Total output files: $FILE_COUNT"
+
+          if [ "$FILE_COUNT" -eq 0 ]; then
+            echo "ERROR: No output files generated"
+            exit 1
+          fi
+
+      - name: Upload repricing reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: repricing-reports-${{ github.run_id }}
+          path: /tmp/evm-gas-repricings/reports/zkevm/
+          retention-days: 90
