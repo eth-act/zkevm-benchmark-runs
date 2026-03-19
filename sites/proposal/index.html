@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Repricing Proposal — zkEVM Benchmarks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/base.css">
+    <link rel="stylesheet" href="../shared/components.css">
+    <link rel="stylesheet" href="../shared/responsive.css">
+    <link rel="stylesheet" href="proposal.css">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                document.documentElement.style.colorScheme = saved;
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container header-row">
+            <div class="header-text">
+                <h1><a href="../" class="header-home-link">&larr; Gas Repricing Proposal</a></h1>
+                <p>Data-driven gas cost adjustments based on zkVM proving benchmarks</p>
+            </div>
+            <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <nav class="report-nav">
+            <div class="report-tabs">
+                <button class="report-tab active" data-report="proposal">Proposal</button>
+                <button class="report-tab" data-report="runtime">Runtime Estimation</button>
+                <button class="report-tab" data-report="glue">Glue Opcodes</button>
+            </div>
+            <div class="csv-downloads" id="csv-downloads"></div>
+        </nav>
+
+        <div id="loading" class="loading">Loading report...</div>
+        <div id="error" class="error-message hidden"></div>
+        <article id="content" class="proposal-content hidden"></article>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>zkEVM Benchmark Results</p>
+            <p><a href="https://github.com/eth-act/zkevm-benchmark-runs">Raw Data (GitHub)</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
