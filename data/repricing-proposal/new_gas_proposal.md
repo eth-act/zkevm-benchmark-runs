@@ -63,163 +63,23 @@ The following table shows the new gas cost for all operations and parameters wit
 
 |Opcode|Parameter|Current Gas|New Gas (Rounded)|Change|
 | :---: | :---: | :---: | :---: | :---: |
-|ADD|constant|3|38|11.67|
-|ADDMOD|constant|8|316|38.5|
-|ADDRESS|constant|2|76|37.0|
-|AND|constant|3|36|11.0|
-|BLAKE2F|constant|0|22681975|inf|
+|ADDMOD|constant|8|336|41.0|
+|BLAKE2F|constant|0|22681947|inf|
 |BLAKE2F|num_rounds|1|39|38.0|
-|BLOBHASH|constant|3|27|8.0|
-|BLS12_G1ADD|constant|375|54016|143.04|
-|BLS12_G1MSM|constant|0|41530736|inf|
-|BLS12_G1MSM|k|12000|357509|28.79|
-|BLS12_G2ADD|constant|600|59119|97.53|
-|BLS12_G2MSM|constant|0|46820178|inf|
-|BLS12_G2MSM|k|22500|512350|21.77|
-|BLS12_MAP_FP2_TO_G2|constant|23800|2026805|84.16|
-|BLS12_MAP_FP_TO_G1|constant|5500|465488|83.63|
-|BLS12_PAIRING_CHECK|constant|37700|7753889|204.67|
-|BLS12_PAIRING_CHECK|num_pairs|32600|0|-1.0|
-|BYTE|constant|3|41|12.67|
-|CALLDATACOPY|constant|3|0|-1.0|
-|CALLDATACOPY|mem_size|3|0|-1.0|
-|CALLDATALOAD|constant|3|126|41.0|
-|CALLDATASIZE|constant|2|18|8.0|
-|CALLER|constant|2|65|31.5|
-|CALLVALUE|constant|2|26|12.0|
-|CODECOPY|code_size|3|1|-0.67|
-|CODECOPY|constant|3|50|15.67|
-|CODECOPY|mem_size|0|1|inf|
-|CODESIZE|constant|2|19|8.5|
+|BLS12_G1ADD|constant|375|54018|143.05|
+|BLS12_G2ADD|constant|600|59092|97.49|
 |DIV|constant|5|449|88.8|
-|DUP1|constant|3|19|5.33|
-|DUP10|constant|3|21|6.0|
-|DUP11|constant|3|21|6.0|
-|DUP12|constant|3|21|6.0|
-|DUP13|constant|3|21|6.0|
-|DUP14|constant|3|15|4.0|
-|DUP15|constant|3|21|6.0|
-|DUP16|constant|3|21|6.0|
-|DUP2|constant|3|23|6.67|
-|DUP3|constant|3|20|5.67|
-|DUP4|constant|3|21|6.0|
-|DUP5|constant|3|21|6.0|
-|DUP6|constant|3|20|5.67|
-|DUP7|constant|3|22|6.33|
-|DUP8|constant|3|19|5.33|
-|DUP9|constant|3|21|6.0|
-|ECADD|constant|150|5132|33.21|
-|ECMUL|constant|6000|1977|-0.67|
-|ECPAIRING|constant|45000|8193266|181.07|
+|ECADD|constant|150|5103|33.02|
+|ECPAIRING|constant|45000|8193268|181.07|
 |ECPAIRING|num_pairs|34000|215306|5.33|
-|ECRECOVER|constant|3000|34197|10.4|
-|EQ|constant|3|133|43.33|
-|EXP|constant|10|9651|964.1|
-|GAS|constant|2|18|8.0|
-|GASPRICE|constant|2|18|8.0|
-|GT|constant|3|36|11.0|
-|IDENTITY|constant|15|40927|2727.47|
-|IDENTITY|msg_size|3|1|-0.67|
-|ISZERO|constant|3|68|21.67|
-|JUMP|constant|8|102|11.75|
-|JUMPDEST|constant|1|153089|153088.0|
-|JUMPI|constant|10|41|3.1|
-|KECCAK256|constant|30|384532|12816.73|
-|KECCAK256|mem_size|0|0|nan|
+|ECRECOVER|constant|3000|34144|10.38|
+|KECCAK256|constant|30|384556|12817.53|
 |KECCAK256|msg_size|6|1|-0.83|
-|LT|constant|3|35|10.67|
-|MCOPY|constant|3|61|19.33|
-|MCOPY|mem_size|3|0|-1.0|
-|MLOAD|constant|3|105|34.0|
-|MLOAD|mem_size|0|1|inf|
-|MOD|constant|5|230|45.0|
-|MODEXP|constant|200|14222|70.11|
-|MODEXP|mod|0|20|inf|
-|MSIZE|constant|2|17|7.5|
-|MSIZE|mem_size|0|1|inf|
-|MSTORE|constant|3|112|36.33|
-|MSTORE|mem_size|0|1|inf|
-|MSTORE8|constant|3|58|18.33|
-|MSTORE8|mem_size|0|0|nan|
-|MUL|constant|5|60|11.0|
-|MULMOD|constant|8|158|18.75|
-|NOT|constant|3|16|4.33|
-|OR|constant|3|17|4.67|
-|ORIGIN|constant|2|48|23.0|
-|P256VERIFY|constant|6900|9992|0.45|
-|PC|constant|2|19|8.5|
-|POINT_EVALUATION|constant|50000|4779357|94.59|
-|PUSH0|constant|2|18|8.0|
-|PUSH1|constant|3|22|6.33|
-|PUSH10|constant|3|39|12.0|
-|PUSH11|constant|3|42|13.0|
-|PUSH12|constant|3|43|13.33|
-|PUSH13|constant|3|45|14.0|
-|PUSH14|constant|3|49|15.33|
-|PUSH15|constant|3|53|16.67|
-|PUSH16|constant|3|54|17.0|
-|PUSH17|constant|3|52|16.33|
-|PUSH18|constant|3|56|17.67|
-|PUSH19|constant|3|85|27.33|
-|PUSH2|constant|3|26|7.67|
-|PUSH20|constant|3|98|31.67|
-|PUSH21|constant|3|87|28.0|
-|PUSH22|constant|3|67|21.33|
-|PUSH23|constant|3|71|22.67|
-|PUSH24|constant|3|69|22.0|
-|PUSH25|constant|3|74|23.67|
-|PUSH26|constant|3|77|24.67|
-|PUSH27|constant|3|68|21.67|
-|PUSH28|constant|3|79|25.33|
-|PUSH29|constant|3|78|25.0|
-|PUSH3|constant|3|30|9.0|
-|PUSH30|constant|3|83|26.67|
-|PUSH31|constant|3|90|29.0|
-|PUSH32|constant|3|156|51.0|
-|PUSH4|constant|3|27|8.0|
-|PUSH5|constant|3|37|11.33|
-|PUSH6|constant|3|28|8.33|
-|PUSH7|constant|3|37|11.33|
-|PUSH8|constant|3|37|11.33|
-|PUSH9|constant|3|40|12.33|
-|RETURN|constant|0|2291|inf|
-|RETURNDATACOPY|constant|3|40|12.33|
-|RETURNDATACOPY|mem_size|3|1|-0.67|
-|RETURNDATASIZE|constant|2|21|9.5|
-|REVERT|constant|0|2902|inf|
-|RIPEMD-160|constant|600|1055927|1758.88|
-|RIPEMD-160|msg_size|120|1|-0.99|
-|SAR|constant|3|104|33.67|
+|MOD|constant|5|238|46.6|
+|MULMOD|constant|8|170|20.25|
+|POINT_EVALUATION|constant|50000|4779329|94.59|
 |SDIV|constant|5|465|92.0|
-|SELFBALANCE|constant|5|363|71.6|
-|SGT|constant|3|204|67.0|
-|SHA2-256|constant|60|464186|7735.43|
-|SHA2-256|msg_size|12|1|-0.92|
-|SHL|constant|3|63|20.0|
-|SHR|constant|3|85|27.33|
-|SIGNEXTEND|constant|3|93|30.0|
-|SLT|constant|3|37|11.33|
-|SMOD|constant|5|236|46.2|
-|SUB|constant|3|40|12.33|
-|SWAP1|constant|3|187|61.33|
-|SWAP10|constant|3|152|49.67|
-|SWAP11|constant|3|151|49.33|
-|SWAP12|constant|3|156|51.0|
-|SWAP13|constant|3|135|44.0|
-|SWAP14|constant|3|154|50.33|
-|SWAP15|constant|3|177|58.0|
-|SWAP16|constant|3|179|58.67|
-|SWAP2|constant|3|124|40.33|
-|SWAP3|constant|3|119|38.67|
-|SWAP4|constant|3|235|77.33|
-|SWAP5|constant|3|158|51.67|
-|SWAP6|constant|3|174|57.0|
-|SWAP7|constant|3|193|63.33|
-|SWAP8|constant|3|160|52.33|
-|SWAP9|constant|3|132|43.0|
-|TLOAD|constant|100|156|0.56|
-|TSTORE|constant|100|854|7.54|
-|XOR|constant|3|17|4.67|
+|SMOD|constant|5|245|48.0|
 
 ## Gas costs by client
 
@@ -234,319 +94,39 @@ The following table shows the worst-case runtime (after glue adjustment) and the
 
 |Opcode|Parameter|Client|Runtime (ms)|Glue Adj. (ms)|New Gas (Rounded)|
 | :---: | :---: | :---: | :---: | :---: | :---: |
-|ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0044|0.0000|38|
-|ADD|constant|reth-v1.11.0__zisk-v0.15.0|0.0026|0.0008|22|
-|ADDMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0371|0.0105|316|
-|ADDMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0167|0.0020|142|
-|ADDRESS|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0089|0.0000|76|
-|ADDRESS|constant|reth-v1.11.0__zisk-v0.15.0|0.0049|0.0000|42|
-|AND|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0041|0.0000|36|
-|AND|constant|reth-v1.11.0__zisk-v0.15.0|0.0021|0.0008|18|
-|BLAKE2F|constant|ethrex-v9.0.0__zisk-v0.15.0|2668.4675|0.0000|22681975|
-|BLAKE2F|constant|reth-v1.11.0__zisk-v0.15.0|654.2987|0.0000|5561539|
+|ADDMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0394|0.0082|336|
+|ADDMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0187|0.0000|159|
+|BLAKE2F|constant|ethrex-v9.0.0__zisk-v0.15.0|2668.4643|0.0032|22681947|
+|BLAKE2F|constant|reth-v1.11.0__zisk-v0.15.0|654.2925|0.0062|5561487|
 |BLAKE2F|num_rounds|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
 |BLAKE2F|num_rounds|reth-v1.11.0__zisk-v0.15.0|0.0045|0.0000|39|
-|BLOBHASH|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0030|0.0014|26|
-|BLOBHASH|constant|reth-v1.11.0__zisk-v0.15.0|0.0031|0.0014|27|
-|BLS12_G1ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|6.3547|0.0035|54016|
-|BLS12_G1ADD|constant|reth-v1.11.0__zisk-v0.15.0|1.2695|0.0027|10791|
-|BLS12_G1MSM|constant|ethrex-v9.0.0__zisk-v0.15.0|4885.9689|0.0000|41530736|
-|BLS12_G1MSM|constant|reth-v1.11.0__zisk-v0.15.0|3579.1658|0.0000|30422909|
-|BLS12_G1MSM|k|ethrex-v9.0.0__zisk-v0.15.0|42.0599|0.0000|357509|
-|BLS12_G1MSM|k|reth-v1.11.0__zisk-v0.15.0|28.5624|0.0000|242781|
-|BLS12_G2ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|6.9551|0.0000|59119|
-|BLS12_G2ADD|constant|reth-v1.11.0__zisk-v0.15.0|2.9335|0.0000|24936|
-|BLS12_G2MSM|constant|ethrex-v9.0.0__zisk-v0.15.0|13.3019|0.0035|113067|
-|BLS12_G2MSM|constant|reth-v1.11.0__zisk-v0.15.0|5508.2562|0.0000|46820178|
-|BLS12_G2MSM|k|ethrex-v9.0.0__zisk-v0.15.0|60.2765|0.0000|512350|
-|BLS12_G2MSM|k|reth-v1.11.0__zisk-v0.15.0|34.5246|0.0000|293460|
-|BLS12_MAP_FP2_TO_G2|constant|ethrex-v9.0.0__zisk-v0.15.0|238.4476|0.0000|2026805|
-|BLS12_MAP_FP2_TO_G2|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|BLS12_MAP_FP_TO_G1|constant|ethrex-v9.0.0__zisk-v0.15.0|54.7632|0.0000|465488|
-|BLS12_MAP_FP_TO_G1|constant|reth-v1.11.0__zisk-v0.15.0|46.5163|0.0000|395389|
-|BLS12_PAIRING_CHECK|constant|ethrex-v9.0.0__zisk-v0.15.0|912.2222|0.0000|7753889|
-|BLS12_PAIRING_CHECK|constant|reth-v1.11.0__zisk-v0.15.0|778.9028|0.0000|6620674|
-|BLS12_PAIRING_CHECK|num_pairs|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|BLS12_PAIRING_CHECK|num_pairs|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|BYTE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0047|0.0000|41|
-|BYTE|constant|reth-v1.11.0__zisk-v0.15.0|0.0025|0.0008|21|
-|CALLDATACOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0292|0|
-|CALLDATACOPY|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0196|0|
-|CALLDATACOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|CALLDATACOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|CALLDATALOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0148|0.0014|126|
-|CALLDATALOAD|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0014|0|
-|CALLDATASIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0020|0.0000|18|
-|CALLDATASIZE|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|CALLER|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0075|0.0000|65|
-|CALLER|constant|reth-v1.11.0__zisk-v0.15.0|0.0047|0.0000|41|
-|CALLVALUE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0030|0.0000|26|
-|CALLVALUE|constant|reth-v1.11.0__zisk-v0.15.0|0.0021|0.0000|18|
-|CODECOPY|code_size|ethrex-v9.0.0__zisk-v0.15.0|0.0001|0.0000|1|
-|CODECOPY|code_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|CODECOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0058|0.0028|50|
-|CODECOPY|constant|reth-v1.11.0__zisk-v0.15.0|0.0052|0.0027|45|
-|CODECOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|CODECOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|CODESIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0021|0.0000|19|
-|CODESIZE|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
+|BLS12_G1ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|6.3551|0.0032|54018|
+|BLS12_G1ADD|constant|reth-v1.11.0__zisk-v0.15.0|1.2660|0.0061|10762|
+|BLS12_G2ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|6.9519|0.0032|59092|
+|BLS12_G2ADD|constant|reth-v1.11.0__zisk-v0.15.0|2.9274|0.0061|24884|
 |DIV|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0527|0.0000|449|
-|DIV|constant|reth-v1.11.0__zisk-v0.15.0|0.0175|0.0008|149|
-|DUP1|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|19|
-|DUP1|constant|reth-v1.11.0__zisk-v0.15.0|0.0007|0.0000|6|
-|DUP10|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP10|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP11|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP11|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP12|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP12|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|DUP13|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP13|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP14|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0014|0.0000|13|
-|DUP14|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
-|DUP15|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP15|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
-|DUP16|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP16|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
-|DUP2|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0027|0.0000|23|
-|DUP2|constant|reth-v1.11.0__zisk-v0.15.0|0.0014|0.0000|13|
-|DUP3|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|DUP3|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP4|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP4|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP5|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP5|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
-|DUP6|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|DUP6|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP7|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0025|0.0000|22|
-|DUP7|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|DUP8|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|19|
-|DUP8|constant|reth-v1.11.0__zisk-v0.15.0|0.0015|0.0000|13|
-|DUP9|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|DUP9|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|ECADD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.3339|0.0035|2839|
-|ECADD|constant|reth-v1.11.0__zisk-v0.15.0|0.6037|0.0027|5132|
-|ECMUL|constant|ethrex-v9.0.0__zisk-v0.15.0|0.2325|0.0035|1977|
-|ECMUL|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0027|0|
-|ECPAIRING|constant|ethrex-v9.0.0__zisk-v0.15.0|963.9136|0.0040|8193266|
-|ECPAIRING|constant|reth-v1.11.0__zisk-v0.15.0|945.3476|0.0031|8035455|
+|DIV|constant|reth-v1.11.0__zisk-v0.15.0|0.0183|0.0000|156|
+|ECADD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.3342|0.0032|2842|
+|ECADD|constant|reth-v1.11.0__zisk-v0.15.0|0.6003|0.0061|5103|
+|ECPAIRING|constant|ethrex-v9.0.0__zisk-v0.15.0|963.9139|0.0037|8193268|
+|ECPAIRING|constant|reth-v1.11.0__zisk-v0.15.0|945.3440|0.0067|8035424|
 |ECPAIRING|num_pairs|ethrex-v9.0.0__zisk-v0.15.0|21.4825|0.0000|182602|
 |ECPAIRING|num_pairs|reth-v1.11.0__zisk-v0.15.0|25.3300|0.0000|215306|
-|ECRECOVER|constant|ethrex-v9.0.0__zisk-v0.15.0|3.9617|0.0000|33675|
-|ECRECOVER|constant|reth-v1.11.0__zisk-v0.15.0|4.0231|0.0000|34197|
-|EQ|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0156|0.0000|133|
-|EQ|constant|reth-v1.11.0__zisk-v0.15.0|0.0127|0.0008|108|
-|EXP|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|EXP|constant|reth-v1.11.0__zisk-v0.15.0|1.1354|0.0008|9651|
-|GAS|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0021|0.0000|18|
-|GAS|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|GASPRICE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0021|0.0000|18|
-|GASPRICE|constant|reth-v1.11.0__zisk-v0.15.0|0.0019|0.0000|17|
-|GT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0042|0.0000|36|
-|GT|constant|reth-v1.11.0__zisk-v0.15.0|0.0020|0.0008|18|
-|IDENTITY|constant|ethrex-v9.0.0__zisk-v0.15.0|4.8148|0.0000|40927|
-|IDENTITY|constant|reth-v1.11.0__zisk-v0.15.0|0.1559|0.0053|1326|
-|IDENTITY|msg_size|ethrex-v9.0.0__zisk-v0.15.0|0.0003|0.0000|1|
-|IDENTITY|msg_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|ISZERO|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|19|
-|ISZERO|constant|reth-v1.11.0__zisk-v0.15.0|0.0079|0.0000|68|
-|JUMP|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0119|0.0026|102|
-|JUMP|constant|reth-v1.11.0__zisk-v0.15.0|0.0044|0.0028|38|
-|JUMPDEST|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0014|0.0000|12|
-|JUMPDEST|constant|reth-v1.11.0__zisk-v0.15.0|18.0104|0.0184|153089|
-|JUMPI|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0033|0.0025|28|
-|JUMPI|constant|reth-v1.11.0__zisk-v0.15.0|0.0048|0.0019|41|
-|KECCAK256|constant|ethrex-v9.0.0__zisk-v0.15.0|45.2390|0.0028|384532|
-|KECCAK256|constant|reth-v1.11.0__zisk-v0.15.0|30.4422|0.0041|258760|
-|KECCAK256|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|KECCAK256|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
+|ECRECOVER|constant|ethrex-v9.0.0__zisk-v0.15.0|3.9584|0.0032|33647|
+|ECRECOVER|constant|reth-v1.11.0__zisk-v0.15.0|4.0169|0.0061|34144|
+|KECCAK256|constant|ethrex-v9.0.0__zisk-v0.15.0|45.2418|0.0000|384556|
+|KECCAK256|constant|reth-v1.11.0__zisk-v0.15.0|30.4428|0.0036|258764|
 |KECCAK256|msg_size|ethrex-v9.0.0__zisk-v0.15.0|0.0006|0.0000|1|
 |KECCAK256|msg_size|reth-v1.11.0__zisk-v0.15.0|0.0005|0.0000|1|
-|LT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0041|0.0000|35|
-|LT|constant|reth-v1.11.0__zisk-v0.15.0|0.0021|0.0008|19|
-|MCOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0066|0.0000|56|
-|MCOPY|constant|reth-v1.11.0__zisk-v0.15.0|0.0071|0.0000|61|
-|MCOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MCOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MLOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0123|0.0014|105|
-|MLOAD|constant|reth-v1.11.0__zisk-v0.15.0|0.0089|0.0027|76|
-|MLOAD|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|1|
-|MLOAD|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0270|0.0009|230|
-|MOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0152|0.0008|130|
-|MODEXP|constant|ethrex-v9.0.0__zisk-v0.15.0|1.6731|0.0077|14222|
-|MODEXP|constant|reth-v1.11.0__zisk-v0.15.0|1.3809|0.0068|11739|
-|MODEXP|mod|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|19|
-|MODEXP|mod|reth-v1.11.0__zisk-v0.15.0|0.0023|0.0000|20|
-|MSIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0019|0.0000|17|
-|MSIZE|constant|reth-v1.11.0__zisk-v0.15.0|0.0015|0.0001|13|
-|MSIZE|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MSIZE|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|MSTORE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0131|0.0000|112|
-|MSTORE|constant|reth-v1.11.0__zisk-v0.15.0|0.0128|0.0016|110|
-|MSTORE|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MSTORE|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|MSTORE8|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0067|0.0000|58|
-|MSTORE8|constant|reth-v1.11.0__zisk-v0.15.0|0.0023|0.0016|20|
-|MSTORE8|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MSTORE8|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|0|
-|MUL|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0070|0.0000|60|
-|MUL|constant|reth-v1.11.0__zisk-v0.15.0|0.0043|0.0008|37|
-|MULMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0096|0.0105|82|
-|MULMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0186|0.0180|158|
-|NOT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0019|0.0000|16|
-|NOT|constant|reth-v1.11.0__zisk-v0.15.0|0.0013|0.0000|12|
-|OR|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0004|0.0000|4|
-|OR|constant|reth-v1.11.0__zisk-v0.15.0|0.0019|0.0008|17|
-|ORIGIN|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0056|0.0000|48|
-|ORIGIN|constant|reth-v1.11.0__zisk-v0.15.0|0.0052|0.0000|45|
-|P256VERIFY|constant|ethrex-v9.0.0__zisk-v0.15.0|1.1754|0.0060|9992|
-|P256VERIFY|constant|reth-v1.11.0__zisk-v0.15.0|0.1647|0.0039|1401|
-|PC|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0021|0.0000|19|
-|PC|constant|reth-v1.11.0__zisk-v0.15.0|0.0011|0.0000|10|
-|POINT_EVALUATION|constant|ethrex-v9.0.0__zisk-v0.15.0|562.2772|0.0000|4779357|
-|PUSH0|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0021|0.0000|18|
-|PUSH0|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|PUSH1|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0026|0.0000|22|
-|PUSH1|constant|reth-v1.11.0__zisk-v0.15.0|0.0016|0.0000|14|
-|PUSH10|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0045|0.0000|39|
-|PUSH10|constant|reth-v1.11.0__zisk-v0.15.0|0.0041|0.0000|35|
-|PUSH11|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0048|0.0000|42|
-|PUSH11|constant|reth-v1.11.0__zisk-v0.15.0|0.0043|0.0000|37|
-|PUSH12|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0050|0.0000|43|
-|PUSH12|constant|reth-v1.11.0__zisk-v0.15.0|0.0043|0.0000|37|
-|PUSH13|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0052|0.0000|45|
-|PUSH13|constant|reth-v1.11.0__zisk-v0.15.0|0.0046|0.0000|40|
-|PUSH14|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0057|0.0000|49|
-|PUSH14|constant|reth-v1.11.0__zisk-v0.15.0|0.0047|0.0000|40|
-|PUSH15|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0062|0.0000|53|
-|PUSH15|constant|reth-v1.11.0__zisk-v0.15.0|0.0050|0.0000|43|
-|PUSH16|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0063|0.0000|54|
-|PUSH16|constant|reth-v1.11.0__zisk-v0.15.0|0.0054|0.0000|46|
-|PUSH17|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0061|0.0000|52|
-|PUSH17|constant|reth-v1.11.0__zisk-v0.15.0|0.0054|0.0000|46|
-|PUSH18|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0066|0.0000|56|
-|PUSH18|constant|reth-v1.11.0__zisk-v0.15.0|0.0055|0.0000|47|
-|PUSH19|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0099|0.0000|85|
-|PUSH19|constant|reth-v1.11.0__zisk-v0.15.0|0.0060|0.0000|52|
-|PUSH2|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0030|0.0000|26|
-|PUSH2|constant|reth-v1.11.0__zisk-v0.15.0|0.0017|0.0000|15|
-|PUSH20|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0069|0.0000|59|
-|PUSH20|constant|reth-v1.11.0__zisk-v0.15.0|0.0115|0.0000|98|
-|PUSH21|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0102|0.0000|87|
-|PUSH21|constant|reth-v1.11.0__zisk-v0.15.0|0.0064|0.0000|55|
-|PUSH22|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0079|0.0000|67|
-|PUSH22|constant|reth-v1.11.0__zisk-v0.15.0|0.0064|0.0000|55|
-|PUSH23|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0083|0.0000|71|
-|PUSH23|constant|reth-v1.11.0__zisk-v0.15.0|0.0070|0.0000|60|
-|PUSH24|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0081|0.0000|69|
-|PUSH24|constant|reth-v1.11.0__zisk-v0.15.0|0.0075|0.0000|64|
-|PUSH25|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0086|0.0000|74|
-|PUSH25|constant|reth-v1.11.0__zisk-v0.15.0|0.0079|0.0000|68|
-|PUSH26|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0090|0.0000|77|
-|PUSH26|constant|reth-v1.11.0__zisk-v0.15.0|0.0075|0.0000|64|
-|PUSH27|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0078|0.0000|67|
-|PUSH27|constant|reth-v1.11.0__zisk-v0.15.0|0.0080|0.0000|68|
-|PUSH28|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0093|0.0000|79|
-|PUSH28|constant|reth-v1.11.0__zisk-v0.15.0|0.0087|0.0000|74|
-|PUSH29|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0092|0.0000|78|
-|PUSH29|constant|reth-v1.11.0__zisk-v0.15.0|0.0086|0.0000|74|
-|PUSH3|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0034|0.0000|30|
-|PUSH3|constant|reth-v1.11.0__zisk-v0.15.0|0.0023|0.0000|20|
-|PUSH30|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0097|0.0000|83|
-|PUSH30|constant|reth-v1.11.0__zisk-v0.15.0|0.0092|0.0000|78|
-|PUSH31|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0105|0.0000|90|
-|PUSH31|constant|reth-v1.11.0__zisk-v0.15.0|0.0083|0.0000|71|
-|PUSH32|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0106|0.0000|91|
-|PUSH32|constant|reth-v1.11.0__zisk-v0.15.0|0.0183|0.0000|156|
-|PUSH4|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0031|0.0000|27|
-|PUSH4|constant|reth-v1.11.0__zisk-v0.15.0|0.0028|0.0000|24|
-|PUSH5|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0043|0.0000|37|
-|PUSH5|constant|reth-v1.11.0__zisk-v0.15.0|0.0027|0.0000|24|
-|PUSH6|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|PUSH6|constant|reth-v1.11.0__zisk-v0.15.0|0.0033|0.0000|28|
-|PUSH7|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0043|0.0000|37|
-|PUSH7|constant|reth-v1.11.0__zisk-v0.15.0|0.0032|0.0000|28|
-|PUSH8|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0043|0.0000|37|
-|PUSH8|constant|reth-v1.11.0__zisk-v0.15.0|0.0036|0.0000|31|
-|PUSH9|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0047|0.0000|40|
-|PUSH9|constant|reth-v1.11.0__zisk-v0.15.0|0.0038|0.0000|33|
-|RETURN|constant|ethrex-v9.0.0__zisk-v0.15.0|0.2694|0.1651|2291|
-|RETURN|constant|reth-v1.11.0__zisk-v0.15.0|0.0000|0.2596|0|
-|RETURNDATACOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0042|0.0040|36|
-|RETURNDATACOPY|constant|reth-v1.11.0__zisk-v0.15.0|0.0046|0.0029|40|
-|RETURNDATACOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|RETURNDATACOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|0.0000|0.0000|1|
-|RETURNDATASIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|RETURNDATASIZE|constant|reth-v1.11.0__zisk-v0.15.0|0.0022|0.0000|19|
-|REVERT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.3413|0.1651|2902|
-|REVERT|constant|reth-v1.11.0__zisk-v0.15.0|0.0773|0.2596|657|
-|RIPEMD-160|constant|ethrex-v9.0.0__zisk-v0.15.0|124.2267|0.0087|1055927|
-|RIPEMD-160|constant|reth-v1.11.0__zisk-v0.15.0|116.7001|0.0072|991951|
-|RIPEMD-160|msg_size|ethrex-v9.0.0__zisk-v0.15.0|0.0018|0.0000|1|
-|RIPEMD-160|msg_size|reth-v1.11.0__zisk-v0.15.0|0.0005|0.0000|1|
-|SAR|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0122|0.0050|104|
-|SAR|constant|reth-v1.11.0__zisk-v0.15.0|0.0067|0.0050|57|
+|MOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0279|0.0000|238|
+|MOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0160|0.0000|136|
+|MULMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0119|0.0082|102|
+|MULMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0199|0.0167|170|
+|POINT_EVALUATION|constant|ethrex-v9.0.0__zisk-v0.15.0|562.2740|0.0032|4779329|
 |SDIV|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0547|0.0000|465|
-|SDIV|constant|reth-v1.11.0__zisk-v0.15.0|0.0181|0.0008|154|
-|SELFBALANCE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0160|0.0000|136|
-|SELFBALANCE|constant|reth-v1.11.0__zisk-v0.15.0|0.0427|0.0000|363|
-|SGT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0044|0.0000|38|
-|SGT|constant|reth-v1.11.0__zisk-v0.15.0|0.0239|0.0008|204|
-|SHA2-256|constant|ethrex-v9.0.0__zisk-v0.15.0|54.1060|0.0086|459901|
-|SHA2-256|constant|reth-v1.11.0__zisk-v0.15.0|54.6100|0.0070|464186|
-|SHA2-256|msg_size|ethrex-v9.0.0__zisk-v0.15.0|0.0006|0.0000|1|
-|SHA2-256|msg_size|reth-v1.11.0__zisk-v0.15.0|0.0007|0.0000|1|
-|SHL|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0074|0.0000|63|
-|SHL|constant|reth-v1.11.0__zisk-v0.15.0|0.0041|0.0008|35|
-|SHR|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0099|0.0050|85|
-|SHR|constant|reth-v1.11.0__zisk-v0.15.0|0.0051|0.0008|44|
-|SIGNEXTEND|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0109|0.0000|93|
-|SIGNEXTEND|constant|reth-v1.11.0__zisk-v0.15.0|0.0048|0.0008|41|
-|SLT|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0042|0.0000|37|
-|SLT|constant|reth-v1.11.0__zisk-v0.15.0|0.0035|0.0008|30|
-|SMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0277|0.0011|236|
-|SMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0213|0.0009|181|
-|SUB|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0046|0.0000|40|
-|SUB|constant|reth-v1.11.0__zisk-v0.15.0|0.0024|0.0008|21|
-|SWAP1|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0028|0.0000|24|
-|SWAP1|constant|reth-v1.11.0__zisk-v0.15.0|0.0220|0.0000|187|
-|SWAP10|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|SWAP10|constant|reth-v1.11.0__zisk-v0.15.0|0.0178|0.0000|152|
-|SWAP11|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|SWAP11|constant|reth-v1.11.0__zisk-v0.15.0|0.0177|0.0000|151|
-|SWAP12|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|20|
-|SWAP12|constant|reth-v1.11.0__zisk-v0.15.0|0.0182|0.0000|156|
-|SWAP13|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0022|0.0000|19|
-|SWAP13|constant|reth-v1.11.0__zisk-v0.15.0|0.0158|0.0000|135|
-|SWAP14|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0015|0.0000|14|
-|SWAP14|constant|reth-v1.11.0__zisk-v0.15.0|0.0181|0.0000|154|
-|SWAP15|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|SWAP15|constant|reth-v1.11.0__zisk-v0.15.0|0.0208|0.0000|177|
-|SWAP16|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|SWAP16|constant|reth-v1.11.0__zisk-v0.15.0|0.0210|0.0000|179|
-|SWAP2|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0014|0.0000|12|
-|SWAP2|constant|reth-v1.11.0__zisk-v0.15.0|0.0145|0.0000|124|
-|SWAP3|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|SWAP3|constant|reth-v1.11.0__zisk-v0.15.0|0.0140|0.0000|119|
-|SWAP4|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|SWAP4|constant|reth-v1.11.0__zisk-v0.15.0|0.0276|0.0000|235|
-|SWAP5|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|SWAP5|constant|reth-v1.11.0__zisk-v0.15.0|0.0185|0.0000|158|
-|SWAP6|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0024|0.0000|21|
-|SWAP6|constant|reth-v1.11.0__zisk-v0.15.0|0.0205|0.0000|174|
-|SWAP7|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0003|0.0000|3|
-|SWAP7|constant|reth-v1.11.0__zisk-v0.15.0|0.0226|0.0000|193|
-|SWAP8|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0026|0.0000|23|
-|SWAP8|constant|reth-v1.11.0__zisk-v0.15.0|0.0187|0.0000|160|
-|SWAP9|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0023|0.0000|20|
-|SWAP9|constant|reth-v1.11.0__zisk-v0.15.0|0.0155|0.0000|132|
-|TLOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0183|0.0000|156|
-|TLOAD|constant|reth-v1.11.0__zisk-v0.15.0|0.0095|0.0000|81|
-|TSTORE|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0536|0.0000|456|
-|TSTORE|constant|reth-v1.11.0__zisk-v0.15.0|0.1004|0.0008|854|
-|XOR|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0000|0.0000|0|
-|XOR|constant|reth-v1.11.0__zisk-v0.15.0|0.0020|0.0008|17|
+|SDIV|constant|reth-v1.11.0__zisk-v0.15.0|0.0189|0.0000|161|
+|SMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|0.0288|0.0000|245|
+|SMOD|constant|reth-v1.11.0__zisk-v0.15.0|0.0220|0.0001|188|
 
 
 The following table shows which test configurations were selected as the worst case for each operation, parameter, and client.
@@ -554,319 +134,39 @@ The following table shows which test configurations were selected as the worst c
 
 |Opcode|Parameter|Client Name|Test Name|
 | :---: | :---: | :---: | :---: |
-|ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
-|ADD|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
 |ADDMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_mod_arithmetic|
 |ADDMOD|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|ADDRESS|constant|ethrex-v9.0.0__zisk-v0.15.0|test_call_frame_context_ops|
-|ADDRESS|constant|reth-v1.11.0__zisk-v0.15.0|test_call_frame_context_ops|
-|AND|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bitwise|
-|AND|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
 |BLAKE2F|constant|ethrex-v9.0.0__zisk-v0.15.0|test_blake2f|
 |BLAKE2F|constant|reth-v1.11.0__zisk-v0.15.0|test_blake2f|
 |BLAKE2F|num_rounds|ethrex-v9.0.0__zisk-v0.15.0|test_blake2f_benchmark|
 |BLAKE2F|num_rounds|reth-v1.11.0__zisk-v0.15.0|test_blake2f_benchmark|
-|BLOBHASH|constant|ethrex-v9.0.0__zisk-v0.15.0|test_blobhash|
-|BLOBHASH|constant|reth-v1.11.0__zisk-v0.15.0|test_blobhash|
 |BLS12_G1ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
 |BLS12_G1ADD|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_G1MSM|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_G1MSM|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_G1MSM|k|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_g1_msm|
-|BLS12_G1MSM|k|reth-v1.11.0__zisk-v0.15.0|test_bls12_g1_msm|
 |BLS12_G2ADD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
 |BLS12_G2ADD|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_G2MSM|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_g2_msm|
-|BLS12_G2MSM|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_G2MSM|k|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_g2_msm|
-|BLS12_G2MSM|k|reth-v1.11.0__zisk-v0.15.0|test_bls12_g2_msm|
-|BLS12_MAP_FP2_TO_G2|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_MAP_FP2_TO_G2|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_MAP_FP_TO_G1|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_MAP_FP_TO_G1|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_PAIRING_CHECK|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_PAIRING_CHECK|constant|reth-v1.11.0__zisk-v0.15.0|test_bls12_381|
-|BLS12_PAIRING_CHECK|num_pairs|ethrex-v9.0.0__zisk-v0.15.0|test_bls12_pairing|
-|BLS12_PAIRING_CHECK|num_pairs|reth-v1.11.0__zisk-v0.15.0|test_bls12_pairing|
-|BYTE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bitwise|
-|BYTE|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
-|CALLDATACOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_calldatacopy_from_call|
-|CALLDATACOPY|constant|reth-v1.11.0__zisk-v0.15.0|test_calldatacopy_from_call|
-|CALLDATACOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_calldatacopy_from_origin|
-|CALLDATACOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|test_calldatacopy_from_origin|
-|CALLDATALOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_calldataload|
-|CALLDATALOAD|constant|reth-v1.11.0__zisk-v0.15.0|test_calldataload|
-|CALLDATASIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_calldatasize|
-|CALLDATASIZE|constant|reth-v1.11.0__zisk-v0.15.0|test_calldatasize|
-|CALLER|constant|ethrex-v9.0.0__zisk-v0.15.0|test_call_frame_context_ops|
-|CALLER|constant|reth-v1.11.0__zisk-v0.15.0|test_call_frame_context_ops|
-|CALLVALUE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_callvalue_from_origin|
-|CALLVALUE|constant|reth-v1.11.0__zisk-v0.15.0|test_callvalue_from_origin|
-|CODECOPY|code_size|ethrex-v9.0.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODECOPY|code_size|reth-v1.11.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODECOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODECOPY|constant|reth-v1.11.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODECOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODECOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|test_codecopy_benchmark|
-|CODESIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_codesize|
-|CODESIZE|constant|reth-v1.11.0__zisk-v0.15.0|test_codesize|
 |DIV|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
 |DIV|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|DUP1|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP1|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP10|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP10|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP11|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP11|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP12|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP12|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP13|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP13|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP14|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP14|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP15|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP15|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP16|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP16|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP2|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP2|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP3|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP3|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP4|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP4|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP5|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP5|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP6|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP6|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP7|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP7|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP8|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP8|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
-|DUP9|constant|ethrex-v9.0.0__zisk-v0.15.0|test_dup|
-|DUP9|constant|reth-v1.11.0__zisk-v0.15.0|test_dup|
 |ECADD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_alt_bn128|
 |ECADD|constant|reth-v1.11.0__zisk-v0.15.0|test_alt_bn128|
-|ECMUL|constant|ethrex-v9.0.0__zisk-v0.15.0|test_alt_bn128|
-|ECMUL|constant|reth-v1.11.0__zisk-v0.15.0|test_alt_bn128|
 |ECPAIRING|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bn128_pairings_amortized|
 |ECPAIRING|constant|reth-v1.11.0__zisk-v0.15.0|test_bn128_pairings_amortized|
 |ECPAIRING|num_pairs|ethrex-v9.0.0__zisk-v0.15.0|test_alt_bn128_benchmark|
 |ECPAIRING|num_pairs|reth-v1.11.0__zisk-v0.15.0|test_alt_bn128_benchmark|
 |ECRECOVER|constant|ethrex-v9.0.0__zisk-v0.15.0|test_ecrecover|
 |ECRECOVER|constant|reth-v1.11.0__zisk-v0.15.0|test_ecrecover|
-|EQ|constant|ethrex-v9.0.0__zisk-v0.15.0|test_comparison|
-|EQ|constant|reth-v1.11.0__zisk-v0.15.0|test_comparison|
-|EXP|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
-|EXP|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|GAS|constant|ethrex-v9.0.0__zisk-v0.15.0|test_gas_op|
-|GAS|constant|reth-v1.11.0__zisk-v0.15.0|test_gas_op|
-|GASPRICE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_call_frame_context_ops|
-|GASPRICE|constant|reth-v1.11.0__zisk-v0.15.0|test_call_frame_context_ops|
-|GT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_comparison|
-|GT|constant|reth-v1.11.0__zisk-v0.15.0|test_comparison|
-|IDENTITY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_identity|
-|IDENTITY|constant|reth-v1.11.0__zisk-v0.15.0|test_identity_fixed_size|
-|IDENTITY|msg_size|ethrex-v9.0.0__zisk-v0.15.0|test_identity_fixed_size|
-|IDENTITY|msg_size|reth-v1.11.0__zisk-v0.15.0|test_identity_fixed_size|
-|ISZERO|constant|ethrex-v9.0.0__zisk-v0.15.0|test_iszero|
-|ISZERO|constant|reth-v1.11.0__zisk-v0.15.0|test_iszero|
-|JUMP|constant|ethrex-v9.0.0__zisk-v0.15.0|test_jump_benchmark|
-|JUMP|constant|reth-v1.11.0__zisk-v0.15.0|test_jump_benchmark|
-|JUMPDEST|constant|ethrex-v9.0.0__zisk-v0.15.0|test_jumpdests|
-|JUMPDEST|constant|reth-v1.11.0__zisk-v0.15.0|test_jumpdest_analysis|
-|JUMPI|constant|ethrex-v9.0.0__zisk-v0.15.0|test_jumpis|
-|JUMPI|constant|reth-v1.11.0__zisk-v0.15.0|test_jumpis|
 |KECCAK256|constant|ethrex-v9.0.0__zisk-v0.15.0|test_keccak_max_permutations|
 |KECCAK256|constant|reth-v1.11.0__zisk-v0.15.0|test_keccak_max_permutations|
-|KECCAK256|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_keccak_diff_mem_msg_sizes|
-|KECCAK256|mem_size|reth-v1.11.0__zisk-v0.15.0|test_keccak_diff_mem_msg_sizes|
 |KECCAK256|msg_size|ethrex-v9.0.0__zisk-v0.15.0|test_keccak_diff_mem_msg_sizes|
 |KECCAK256|msg_size|reth-v1.11.0__zisk-v0.15.0|test_keccak_diff_mem_msg_sizes|
-|LT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_comparison|
-|LT|constant|reth-v1.11.0__zisk-v0.15.0|test_comparison|
-|MCOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_mcopy|
-|MCOPY|constant|reth-v1.11.0__zisk-v0.15.0|test_mcopy|
-|MCOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_mcopy|
-|MCOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|test_mcopy|
-|MLOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MLOAD|constant|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
-|MLOAD|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MLOAD|mem_size|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
 |MOD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_mod|
 |MOD|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|MODEXP|constant|ethrex-v9.0.0__zisk-v0.15.0|test_modexp|
-|MODEXP|constant|reth-v1.11.0__zisk-v0.15.0|test_modexp|
-|MODEXP|mod|ethrex-v9.0.0__zisk-v0.15.0|test_modexp|
-|MODEXP|mod|reth-v1.11.0__zisk-v0.15.0|test_modexp|
-|MSIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_msize|
-|MSIZE|constant|reth-v1.11.0__zisk-v0.15.0|test_msize|
-|MSIZE|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_msize|
-|MSIZE|mem_size|reth-v1.11.0__zisk-v0.15.0|test_msize|
-|MSTORE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MSTORE|constant|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
-|MSTORE|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MSTORE|mem_size|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
-|MSTORE8|constant|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MSTORE8|constant|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
-|MSTORE8|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_memory_access|
-|MSTORE8|mem_size|reth-v1.11.0__zisk-v0.15.0|test_memory_access|
-|MUL|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
-|MUL|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
 |MULMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_mod_arithmetic|
 |MULMOD|constant|reth-v1.11.0__zisk-v0.15.0|test_mod_arithmetic|
-|NOT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_not_op|
-|NOT|constant|reth-v1.11.0__zisk-v0.15.0|test_not_op|
-|OR|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bitwise|
-|OR|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
-|ORIGIN|constant|ethrex-v9.0.0__zisk-v0.15.0|test_call_frame_context_ops|
-|ORIGIN|constant|reth-v1.11.0__zisk-v0.15.0|test_call_frame_context_ops|
-|P256VERIFY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_p256verify|
-|P256VERIFY|constant|reth-v1.11.0__zisk-v0.15.0|test_p256verify|
-|PC|constant|ethrex-v9.0.0__zisk-v0.15.0|test_pc_op|
-|PC|constant|reth-v1.11.0__zisk-v0.15.0|test_pc_op|
 |POINT_EVALUATION|constant|ethrex-v9.0.0__zisk-v0.15.0|test_point_evaluation|
-|PUSH0|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH0|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH1|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH1|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH10|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH10|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH11|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH11|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH12|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH12|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH13|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH13|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH14|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH14|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH15|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH15|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH16|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH16|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH17|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH17|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH18|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH18|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH19|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH19|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH2|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH2|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH20|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH20|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH21|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH21|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH22|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH22|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH23|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH23|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH24|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH24|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH25|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH25|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH26|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH26|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH27|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH27|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH28|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH28|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH29|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH29|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH3|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH3|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH30|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH30|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH31|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH31|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH32|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH32|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH4|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH4|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH5|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH5|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH6|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH6|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH7|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH7|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH8|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH8|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|PUSH9|constant|ethrex-v9.0.0__zisk-v0.15.0|test_push|
-|PUSH9|constant|reth-v1.11.0__zisk-v0.15.0|test_push|
-|RETURN|constant|ethrex-v9.0.0__zisk-v0.15.0|test_return_revert|
-|RETURN|constant|reth-v1.11.0__zisk-v0.15.0|test_return_revert|
-|RETURNDATACOPY|constant|ethrex-v9.0.0__zisk-v0.15.0|test_returndatacopy|
-|RETURNDATACOPY|constant|reth-v1.11.0__zisk-v0.15.0|test_returndatacopy|
-|RETURNDATACOPY|mem_size|ethrex-v9.0.0__zisk-v0.15.0|test_returndatacopy|
-|RETURNDATACOPY|mem_size|reth-v1.11.0__zisk-v0.15.0|test_returndatacopy|
-|RETURNDATASIZE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_returndatasize_nonzero|
-|RETURNDATASIZE|constant|reth-v1.11.0__zisk-v0.15.0|test_returndatasize_nonzero|
-|REVERT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_return_revert|
-|REVERT|constant|reth-v1.11.0__zisk-v0.15.0|test_return_revert|
-|RIPEMD-160|constant|ethrex-v9.0.0__zisk-v0.15.0|test_ripemd160|
-|RIPEMD-160|constant|reth-v1.11.0__zisk-v0.15.0|test_ripemd160|
-|RIPEMD-160|msg_size|ethrex-v9.0.0__zisk-v0.15.0|test_ripemd160_fixed_size|
-|RIPEMD-160|msg_size|reth-v1.11.0__zisk-v0.15.0|test_ripemd160_fixed_size|
-|SAR|constant|ethrex-v9.0.0__zisk-v0.15.0|test_shifts|
-|SAR|constant|reth-v1.11.0__zisk-v0.15.0|test_shifts|
 |SDIV|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
 |SDIV|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|SELFBALANCE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_selfbalance|
-|SELFBALANCE|constant|reth-v1.11.0__zisk-v0.15.0|test_selfbalance|
-|SGT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_comparison|
-|SGT|constant|reth-v1.11.0__zisk-v0.15.0|test_comparison|
-|SHA2-256|constant|ethrex-v9.0.0__zisk-v0.15.0|test_sha256|
-|SHA2-256|constant|reth-v1.11.0__zisk-v0.15.0|test_sha256|
-|SHA2-256|msg_size|ethrex-v9.0.0__zisk-v0.15.0|test_sha256_fixed_size|
-|SHA2-256|msg_size|reth-v1.11.0__zisk-v0.15.0|test_sha256_fixed_size|
-|SHL|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bitwise|
-|SHL|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
-|SHR|constant|ethrex-v9.0.0__zisk-v0.15.0|test_shifts|
-|SHR|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
-|SIGNEXTEND|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
-|SIGNEXTEND|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|SLT|constant|ethrex-v9.0.0__zisk-v0.15.0|test_comparison|
-|SLT|constant|reth-v1.11.0__zisk-v0.15.0|test_comparison|
 |SMOD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_mod|
 |SMOD|constant|reth-v1.11.0__zisk-v0.15.0|test_mod|
-|SUB|constant|ethrex-v9.0.0__zisk-v0.15.0|test_arithmetic|
-|SUB|constant|reth-v1.11.0__zisk-v0.15.0|test_arithmetic|
-|SWAP1|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP1|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP10|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP10|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP11|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP11|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP12|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP12|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP13|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP13|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP14|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP14|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP15|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP15|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP16|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP16|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP2|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP2|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP3|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP3|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP4|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP4|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP5|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP5|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP6|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP6|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP7|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP7|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP8|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP8|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|SWAP9|constant|ethrex-v9.0.0__zisk-v0.15.0|test_swap|
-|SWAP9|constant|reth-v1.11.0__zisk-v0.15.0|test_swap|
-|TLOAD|constant|ethrex-v9.0.0__zisk-v0.15.0|test_tload|
-|TLOAD|constant|reth-v1.11.0__zisk-v0.15.0|test_tload|
-|TSTORE|constant|ethrex-v9.0.0__zisk-v0.15.0|test_tstore|
-|TSTORE|constant|reth-v1.11.0__zisk-v0.15.0|test_tstore|
-|XOR|constant|ethrex-v9.0.0__zisk-v0.15.0|test_bitwise|
-|XOR|constant|reth-v1.11.0__zisk-v0.15.0|test_bitwise|
 
 ## Errors and caveats
 
@@ -876,189 +176,27 @@ The following parameters had a poor model fit:
 
 - ADDMOD - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
-- ADDRESS - Model - ethrex-v9.0.0__zisk-v0.15.0
-
 - BLAKE2F - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
 - BLAKE2F - num_rounds - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- BLOBHASH - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
 - BLS12_G1ADD - Model - ethrex-v9.0.0__zisk-v0.15.0
 
 - BLS12_G2ADD - Model - ethrex-v9.0.0__zisk-v0.15.0
 
-- BLS12_G2MSM - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- BLS12_MAP_FP2_TO_G2 - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- BLS12_MAP_FP2_TO_G2 - slope - reth-v1.11.0__zisk-v0.15.0
-
-- BLS12_MAP_FP_TO_G1 - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- BLS12_PAIRING_CHECK - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- BLS12_PAIRING_CHECK - num_pairs - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLDATACOPY - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLDATACOPY - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLDATALOAD - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLDATALOAD - slope - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLDATASIZE - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CALLER - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- CODECOPY - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- CODECOPY - code_size - reth-v1.11.0__zisk-v0.15.0
-
-- CODECOPY - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- DUP1 - Model - reth-v1.11.0__zisk-v0.15.0
-
-- DUP1 - slope - reth-v1.11.0__zisk-v0.15.0
-
-- DUP12 - Model - reth-v1.11.0__zisk-v0.15.0
-
-- DUP12 - slope - reth-v1.11.0__zisk-v0.15.0
-
-- DUP14 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- DUP14 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- DUP2 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
 - ECADD - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- ECMUL - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- ECMUL - slope - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
 - ECPAIRING - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
-- EXP - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- EXP - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- IDENTITY - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- IDENTITY - msg_size - reth-v1.11.0__zisk-v0.15.0
-
-- IDENTITY - slope - reth-v1.11.0__zisk-v0.15.0
-
-- JUMP - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- JUMPDEST - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- JUMPI - Model - reth-v1.11.0__zisk-v0.15.0
-
 - KECCAK256 - Model - reth-v1.11.0__zisk-v0.15.0
-
-- KECCAK256 - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MCOPY - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MCOPY - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MLOAD - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- MLOAD - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
 
 - MOD - Model - reth-v1.11.0__zisk-v0.15.0
 
-- MODEXP - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MSIZE - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- MSIZE - mem_size - ethrex-v9.0.0__zisk-v0.15.0
-
-- MSTORE - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- MSTORE - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MSTORE8 - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MSTORE8 - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- MUL - Model - ethrex-v9.0.0__zisk-v0.15.0
-
 - MULMOD - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- OR - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- OR - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- PC - Model - reth-v1.11.0__zisk-v0.15.0
-
-- PC - slope - reth-v1.11.0__zisk-v0.15.0
 
 - POINT_EVALUATION - Model - ethrex-v9.0.0__zisk-v0.15.0
 
-- PUSH19 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH20 - Model - reth-v1.11.0__zisk-v0.15.0
-
-- PUSH21 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH4 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH4 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH5 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH6 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- PUSH6 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- RETURN - Model - reth-v1.11.0__zisk-v0.15.0
-
-- RETURNDATACOPY - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- RETURNDATACOPY - mem_size - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- RETURNDATASIZE - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- REVERT - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- RIPEMD-160 - Model - reth-v1.11.0__zisk-v0.15.0
-
-- RIPEMD-160 - msg_size - reth-v1.11.0__zisk-v0.15.0
-
-- SGT - Model - reth-v1.11.0__zisk-v0.15.0
-
-- SHA2-256 - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- SHR - Model - reth-v1.11.0__zisk-v0.15.0
-
 - SMOD - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
-
-- SWAP1 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP10 - slope - reth-v1.11.0__zisk-v0.15.0
-
-- SWAP14 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP14 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP2 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP2 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP7 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP7 - slope - ethrex-v9.0.0__zisk-v0.15.0
-
-- SWAP8 - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- TSTORE - Model - reth-v1.11.0__zisk-v0.15.0
-
-- XOR - Model - ethrex-v9.0.0__zisk-v0.15.0
-
-- XOR - slope - ethrex-v9.0.0__zisk-v0.15.0
 
 
 
@@ -1074,14 +212,48 @@ The following operations have no estimation for the following clients:
 The following glue opcodes had a poor fit (p-value >= 0.05), meaning their runtime could not be reliably estimated. The slope of the affected test opcodes is not adjusted for these glue opcodes' contribution:
 
 
-- **ADD** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: JUMP
-
 - **CALLDATALOAD** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
 
-- **DUP2** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: ADD, ADDMOD, AND, BYTE, DIV, EQ, EXP, GT, LT, MOD, MSTORE, MSTORE8, MUL, MULMOD, OR, SAR, SDIV, SGT, SHL, SHR, SIGNEXTEND, SLT, SMOD, SUB, TSTORE, XOR
+- **DUP1** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: KECCAK256
 
-- **JUMP** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, JUMPDEST, MULMOD, RETURN, REVERT
+- **DUP10** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
 
-- **MSTORE8** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: MCOPY
+- **DUP11** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
 
-- **PUSH1** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, BLAKE2F, BLS12_G1ADD, BLS12_G1MSM, BLS12_G2MSM, CALLDATACOPY, CALLVALUE, CODECOPY, ECADD, ECMUL, ECPAIRING, JUMP, JUMPDEST, KECCAK256, MCOPY, MOD, MODEXP, MULMOD, P256VERIFY, RETURNDATACOPY, RIPEMD-160, SHA2-256, SMOD
+- **DUP12** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP13** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP14** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP15** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP16** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP2** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, DIV, MOD, MULMOD, SDIV, SMOD
+
+- **DUP3** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP4** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MULMOD, SMOD
+
+- **DUP5** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP6** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP7** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MULMOD, SMOD
+
+- **DUP8** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **DUP9** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MOD, MULMOD, SMOD
+
+- **JUMP** (clients: reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MULMOD
+
+- **POP** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, BLAKE2F, BLS12_G1ADD, BLS12_G2ADD, ECADD, ECPAIRING, ECRECOVER, KECCAK256, MOD, MULMOD, POINT_EVALUATION, SMOD
+
+- **PUSH0** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: KECCAK256
+
+- **PUSH1** (clients: ethrex-v9.0.0__zisk-v0.15.0) — affects: ADDMOD, BLAKE2F, BLS12_G1ADD, BLS12_G2ADD, ECADD, ECPAIRING, ECRECOVER, KECCAK256, MOD, MULMOD, POINT_EVALUATION, SMOD
+
+- **PUSH2** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: ADDMOD, MULMOD
+
+- **STATICCALL** (clients: ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0) — affects: BLAKE2F, BLS12_G1ADD, BLS12_G2ADD, ECADD, ECPAIRING, ECRECOVER, POINT_EVALUATION
