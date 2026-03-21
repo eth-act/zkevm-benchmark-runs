@@ -7,8 +7,12 @@ This folder contains benchmark results for the **8x5090** hardware setup.
 | Configuration | Description | Details |
 |---------------|-------------|----------|
 | **10M-gas-limit** | EEST benchmarks with 10M gas limit | [View Results](10M-gas-limit/README.md) |
+| **15M-gas-limit** | EEST benchmarks with 15M gas limit | [View Results](15M-gas-limit/README.md) |
+| **20M-gas-limit** | EEST benchmarks with 20M gas limit | [View Results](20M-gas-limit/README.md) |
+| **25M-gas-limit** | EEST benchmarks with 25M gas limit | [View Results](25M-gas-limit/README.md) |
 | **30M-gas-limit** | EEST benchmarks with 30M gas limit | [View Results](30M-gas-limit/README.md) |
-| **60M-gas-limit** | EEST benchmarks with 60M gas limit | [View Results](60M-gas-limit/README.md) |
+| **35M-gas-limit** | EEST benchmarks with 35M gas limit | [View Results](35M-gas-limit/README.md) |
+| **5M-gas-limit** | EEST benchmarks with 5M gas limit | [View Results](5M-gas-limit/README.md) |
 
 ## Mainnet Block Range Configurations
 
@@ -19,5 +23,5 @@ This folder contains benchmark results for the **8x5090** hardware setup.
 ## Hardware Information
 
 - **Setup**: 8x5090
-- **Total Configurations**: 4 (3 gas limit, 1 mainnet range)
+- **Total Configurations**: 8 (7 gas limit, 1 mainnet range)
 
