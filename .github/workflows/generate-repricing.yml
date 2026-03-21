@@ -9,15 +9,11 @@ on:
       fixtures_url:
         description: 'URL to the fixtures tar.gz archive'
         required: false
-        default: 'https://github.com/jsign/artifacts/releases/download/fixtures-v0.0.7-5_10_15_20_25_30_60/fixtures-v0.0.7-5_10_15_20_25_30_60.tar.gz'
+        default: 'https://github.com/jsign/artifacts/releases/download/fixtures_365433e_5_10_15_20_25_30_35/fixtures_365433e_5_10_15_20_25_30_35.tar.gz'
       evm_gas_repricings_branch:
         description: 'Branch of jsign/evm-gas-repricings repo to use'
         required: false
         default: 'jsign-repricing'
-      anchor_rate:
-        description: 'Anchor rate in gas/s for repricing analysis'
-        required: false
-        default: '8500000'
 
 permissions:
   contents: write
@@ -105,9 +101,8 @@ jobs:
       - name: Run repricing analysis
         working-directory: /tmp/evm-gas-repricings
         run: |
-          ANCHOR_RATE="${{ github.event.inputs.anchor_rate || '8500000' }}"
-          echo "Running repricing analysis with anchor rate: $ANCHOR_RATE gas/s"
-          .venv/bin/python src/estimate_zkevm_repricings.py --anchor-rate "$ANCHOR_RATE"
+          echo "Running repricing analysis"
+          .venv/bin/python src/estimate_zkevm_repricings.py
 
       - name: Verify output files
         working-directory: /tmp/evm-gas-repricings
