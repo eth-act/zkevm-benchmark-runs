@@ -33,7 +33,7 @@ with the [Nethermind benchmarking tooling](https://github.com/NethermindEth/gas-
 
 
 The data includes all the tests for operations repriced in EIP-zkevm run
-between 2026-02-06 and 2026-03-11.
+between 2026-03-15 and 2026-03-21.
 
 For each operation and client, an NNLS linear regression model is fitted to estimate the
 operation run time as a function of the operation count and other operation-specific parameters.
@@ -93,16 +93,16 @@ We also plot some diagnostic graphs for each operation and client combination to
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.975
-Model:                  NNLS                    Adj. R-squared:          0.970
-No. Observations:       7                                 RMSE:        1248.82
-Df Residuals:           5                                  MAE:        1165.18
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.992
+No. Observations:       6                                 RMSE:         251.31
+Df Residuals:           4                                  MAE:         202.62
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   1490.7684    953.1882       0.070      0.0000   3754.4742
-       opcount      0.0065      0.0008       0.000      0.0040      0.0072
+         const   2505.8627    367.6073       0.000   1618.4036   2942.9950
+       opcount      0.0052      0.0003       0.000      0.0047      0.0057
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -122,16 +122,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.424
-Model:                  NNLS                    Adj. R-squared:          0.402
-No. Observations:       28                                RMSE:       28149.47
-Df Residuals:           26                                 MAE:       11018.60
+Dep. Variable:          run_duration_ms              R-squared:          0.991
+Model:                  NNLS                    Adj. R-squared:          0.990
+No. Observations:       24                                RMSE:        1106.40
+Df Residuals:           22                                 MAE:         820.78
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   7828.6420   8792.7748       0.339      0.0000  30285.1573
-       opcount      0.0202      0.0024       0.000      0.0136      0.0224
+         const   2013.5348    387.1259       0.000   1276.4052   2782.7570
+       opcount      0.0188      0.0004       0.000      0.0179      0.0195
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -153,16 +153,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.980
-Model:                  NNLS                    Adj. R-squared:          0.976
-No. Observations:       7                                 RMSE:        3534.96
-Df Residuals:           5                                  MAE:        2832.00
+Dep. Variable:          run_duration_ms              R-squared:          0.977
+Model:                  NNLS                    Adj. R-squared:          0.972
+No. Observations:       6                                 RMSE:        1492.82
+Df Residuals:           4                                  MAE:        1335.55
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000   1437.2076       1.000      0.0000   4696.4235
-       opcount      0.0195      0.0019       0.000      0.0143      0.0205
+         const   3201.6368   2156.1260       0.016    631.9756   9787.4124
+       opcount      0.0161      0.0016       0.000      0.0123      0.0197
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -182,16 +182,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.807
-Model:                  NNLS                    Adj. R-squared:          0.792
-No. Observations:       15                                RMSE:        7668.80
-Df Residuals:           13                                 MAE:        6758.31
+Dep. Variable:          run_duration_ms              R-squared:          0.865
+Model:                  NNLS                    Adj. R-squared:          0.854
+No. Observations:       15                                RMSE:        6489.66
+Df Residuals:           13                                 MAE:        5401.02
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  10641.3367   4242.8131       0.004   2952.1053  20192.6372
-       opcount      0.0366      0.0048       0.000      0.0288      0.0482
+         const   7031.0928   3006.4100       0.017    433.5494  13239.8846
+       opcount      0.0383      0.0038       0.000      0.0328      0.0483
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -215,16 +215,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.009
-Model:                  NNLS                    Adj. R-squared:         -0.189
-No. Observations:       7                                 RMSE:       52720.66
-Df Residuals:           5                                  MAE:       36746.66
+Dep. Variable:          run_duration_ms              R-squared:          0.997
+Model:                  NNLS                    Adj. R-squared:          0.996
+No. Observations:       6                                 RMSE:         196.20
+Df Residuals:           4                                  MAE:         179.33
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  28815.0070  24304.4088       0.128      0.0000  80113.4286
-       opcount      0.0042      0.0139       0.218      0.0000      0.0536
+         const   2248.2312    263.0337       0.000   1684.6326   2574.7915
+       opcount      0.0060      0.0002       0.000      0.0056      0.0064
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -244,16 +244,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.718
-Model:                  NNLS                    Adj. R-squared:          0.687
-No. Observations:       11                                RMSE:       10128.13
-Df Residuals:           9                                  MAE:        7588.81
+Dep. Variable:          run_duration_ms              R-squared:          0.822
+Model:                  NNLS                    Adj. R-squared:          0.802
+No. Observations:       11                                RMSE:        7485.73
+Df Residuals:           9                                  MAE:        6229.34
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  12139.0540   6418.5174       0.038      0.0000  27224.7224
-       opcount      0.0476      0.0090       0.000      0.0339      0.0739
+         const   9188.5122   4638.2223       0.033      0.0000  18931.1094
+       opcount      0.0474      0.0062       0.000      0.0379      0.0635
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -275,16 +275,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.978
-Model:                  NNLS                    Adj. R-squared:          0.974
-No. Observations:       7                                 RMSE:        3428.27
-Df Residuals:           5                                  MAE:        2628.16
+Dep. Variable:          run_duration_ms              R-squared:          0.998
+Model:                  NNLS                    Adj. R-squared:          0.997
+No. Observations:       6                                 RMSE:         413.57
+Df Residuals:           4                                  MAE:         357.99
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000   2228.3826       1.000      0.0000   7692.5666
-       opcount      0.0187      0.0022       0.000      0.0123      0.0194
+         const   3264.4705    639.4887       0.000   2478.4770   5131.0724
+       opcount      0.0136      0.0005       0.000      0.0126      0.0146
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -304,16 +304,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.311
-Model:                  NNLS                    Adj. R-squared:          0.279
-No. Observations:       24                                RMSE:       29423.83
-Df Residuals:           22                                 MAE:       13560.75
+Dep. Variable:          run_duration_ms              R-squared:          0.411
+Model:                  NNLS                    Adj. R-squared:          0.385
+No. Observations:       24                                RMSE:       30037.85
+Df Residuals:           22                                 MAE:       12810.09
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   8608.0015  10605.4658       0.229      0.0000  36337.2092
-       opcount      0.0325      0.0049       0.001      0.0205      0.0384
+         const      0.0000    740.5389       1.000      0.0000   2712.7502
+       opcount      0.0383      0.0062       0.000      0.0296      0.0523
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -337,16 +337,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.985
-Model:                  NNLS                    Adj. R-squared:          0.982
-No. Observations:       7                                 RMSE:        1539.02
-Df Residuals:           5                                  MAE:        1377.19
+Dep. Variable:          run_duration_ms              R-squared:          0.999
+Model:                  NNLS                    Adj. R-squared:          0.998
+No. Observations:       6                                 RMSE:         164.79
+Df Residuals:           4                                  MAE:         136.35
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const     73.6431    900.9593       0.376      0.0000   3124.0469
-       opcount      0.0059      0.0005       0.000      0.0040      0.0060
+         const   2318.6348    230.7648       0.000   1818.8092   2621.9692
+       opcount      0.0044      0.0001       0.000      0.0041      0.0045
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -366,16 +366,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.700
-Model:                  NNLS                    Adj. R-squared:          0.658
-No. Observations:       9                                 RMSE:        8953.08
-Df Residuals:           7                                  MAE:        6980.87
+Dep. Variable:          run_duration_ms              R-squared:          0.818
+Model:                  NNLS                    Adj. R-squared:          0.791
+No. Observations:       9                                 RMSE:        6493.63
+Df Residuals:           7                                  MAE:        5351.36
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  11657.8177   7898.2986       0.066      0.0000  28443.5009
-       opcount      0.0279      0.0067       0.002      0.0173      0.0445
+         const   9181.8300   5421.7292       0.040      0.0000  20127.2454
+       opcount      0.0280      0.0045       0.001      0.0202      0.0387
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -397,16 +397,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.984
-Model:                  NNLS                    Adj. R-squared:          0.979
-No. Observations:       6                                 RMSE:        2202.52
-Df Residuals:           4                                  MAE:        1721.09
+Dep. Variable:          run_duration_ms              R-squared:          0.988
+Model:                  NNLS                    Adj. R-squared:          0.985
+No. Observations:       6                                 RMSE:        1355.65
+Df Residuals:           4                                  MAE:        1041.93
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   1608.7687   1655.7933       0.141      0.0000   5877.5453
-       opcount      0.0160      0.0010       0.000      0.0133      0.0169
+         const   5630.9004   1933.1994       0.001   1233.2754   8999.0426
+       opcount      0.0114      0.0008       0.000      0.0101      0.0128
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -426,16 +426,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.044
-Model:                  NNLS                    Adj. R-squared:         -0.004
-No. Observations:       22                                RMSE:       30719.22
-Df Residuals:           20                                 MAE:       16685.14
+Dep. Variable:          run_duration_ms              R-squared:          0.211
+Model:                  NNLS                    Adj. R-squared:          0.172
+No. Observations:       22                                RMSE:       33237.86
+Df Residuals:           20                                 MAE:       14551.26
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  29339.8827  18997.3192       0.043      0.0000  57665.4375
-       opcount      0.0064      0.0063       0.225      0.0000      0.0175
+         const   5561.9642   4952.8888       0.079      0.0000  17558.2417
+       opcount      0.0166      0.0037       0.001      0.0117      0.0256
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -459,16 +459,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:         -0.200
-No. Observations:       7                                 RMSE:       51425.88
-Df Residuals:           5                                  MAE:       35421.51
+Dep. Variable:          run_duration_ms              R-squared:          0.989
+Model:                  NNLS                    Adj. R-squared:          0.986
+No. Observations:       6                                 RMSE:         377.08
+Df Residuals:           4                                  MAE:         286.13
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  36363.7143  23860.3903       0.016    673.9685  77767.6250
-       opcount      0.0000      0.0062       1.000      0.0000      0.0175
+         const   2415.9835    554.6917       0.000   1193.1322   3064.9548
+       opcount      0.0034      0.0002       0.000      0.0032      0.0039
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -488,16 +488,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.702
-Model:                  NNLS                    Adj. R-squared:          0.659
-No. Observations:       9                                 RMSE:        9211.98
-Df Residuals:           7                                  MAE:        7079.55
+Dep. Variable:          run_duration_ms              R-squared:          0.851
+Model:                  NNLS                    Adj. R-squared:          0.830
+No. Observations:       9                                 RMSE:        5586.24
+Df Residuals:           7                                  MAE:        4698.70
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  10876.7301   7756.5851       0.079      0.0000  27719.0949
-       opcount      0.0288      0.0068       0.002      0.0176      0.0444
+         const   9555.8732   5135.8361       0.019    627.2458  20177.5238
+       opcount      0.0273      0.0040       0.001      0.0198      0.0364
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -519,16 +519,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.994
-Model:                  NNLS                    Adj. R-squared:          0.993
-No. Observations:       6                                 RMSE:        1244.64
-Df Residuals:           4                                  MAE:        1157.47
+Dep. Variable:          run_duration_ms              R-squared:          0.979
+Model:                  NNLS                    Adj. R-squared:          0.974
+No. Observations:       6                                 RMSE:        2387.45
+Df Residuals:           4                                  MAE:        1927.98
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   4898.2837   1746.6816       0.000   2631.4862   8598.5652
-       opcount      0.0151      0.0007       0.000      0.0139      0.0162
+         const    802.9971   1790.5670       0.297      0.0000   5605.7235
+       opcount      0.0154      0.0011       0.000      0.0130      0.0164
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -548,16 +548,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.331
-Model:                  NNLS                    Adj. R-squared:          0.296
-No. Observations:       21                                RMSE:       33303.66
-Df Residuals:           19                                 MAE:       15829.46
+Dep. Variable:          run_duration_ms              R-squared:          0.000
+Model:                  NNLS                    Adj. R-squared:         -0.053
+No. Observations:       21                                RMSE:       61240.70
+Df Residuals:           19                                 MAE:       28443.85
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000   3385.5446       1.000      0.0000  10412.3474
-       opcount      0.0221      0.0056       0.000      0.0122      0.0322
+         const  48048.9048  25517.6940       0.002   2192.3480  77816.0131
+       opcount      0.0000      0.0068       1.000      0.0000      0.0161
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -579,16 +579,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.953
-Model:                  NNLS                    Adj. R-squared:          0.930
-No. Observations:       4                                 RMSE:        4451.94
-Df Residuals:           2                                  MAE:        4124.62
+Dep. Variable:          run_duration_ms              R-squared:          0.997
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       4                                 RMSE:         812.12
+Df Residuals:           2                                  MAE:         774.50
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      0.0527      0.0027       0.000      0.0439      0.0549
+         const      0.0000    447.1215       1.000      0.0000   1529.7258
+       opcount      0.0449      0.0007       0.000      0.0431      0.0457
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -608,16 +608,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.958
-Model:                  NNLS                    Adj. R-squared:          0.953
-No. Observations:       11                                RMSE:        3846.50
-Df Residuals:           9                                  MAE:        3028.55
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       11                                RMSE:        1111.79
+Df Residuals:           9                                  MAE:         803.50
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const    914.7297   2166.3466       0.312      0.0000   7198.7128
-       opcount      0.0183      0.0014       0.000      0.0150      0.0199
+         const   2070.6052    729.2450       0.011    418.8113   3086.6601
+       opcount      0.0166      0.0005       0.000      0.0158      0.0175
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -639,16 +639,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.963
-Model:                  NNLS                    Adj. R-squared:          0.945
-No. Observations:       4                                 RMSE:        3931.34
-Df Residuals:           2                                  MAE:        3434.13
+Dep. Variable:          run_duration_ms              R-squared:          0.991
+Model:                  NNLS                    Adj. R-squared:          0.986
+No. Observations:       4                                 RMSE:        1388.07
+Df Residuals:           2                                  MAE:        1377.50
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      0.0547      0.0024       0.000      0.0475      0.0575
+         const   1693.5627   1894.0972       0.364      0.0000   5642.9247
+       opcount      0.0454      0.0022       0.000      0.0410      0.0482
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -668,16 +668,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.982
-Model:                  NNLS                    Adj. R-squared:          0.979
-No. Observations:       10                                RMSE:        2284.13
-Df Residuals:           8                                  MAE:        2123.76
+Dep. Variable:          run_duration_ms              R-squared:          0.998
+Model:                  NNLS                    Adj. R-squared:          0.998
+No. Observations:       10                                RMSE:         706.67
+Df Residuals:           8                                  MAE:         499.37
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   4314.0540   2073.7307       0.001   1466.4572   9780.9603
-       opcount      0.0189      0.0009       0.000      0.0167      0.0203
+         const    673.3670    313.5346       0.028      0.0000   1251.4673
+       opcount      0.0201      0.0002       0.000      0.0196      0.0205
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -706,7 +706,7 @@ Df Model:               1
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
          const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount    562.2772      0.0000       0.000    562.2772    562.2772
+       opcount    564.0594      0.0000       0.000    564.0594    564.0594
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -737,7 +737,7 @@ Df Model:               1
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
          const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      6.3583      0.0000       0.000      6.3583      6.3583
+       opcount      5.9631      0.0000       0.000      5.9631      5.9631
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -757,16 +757,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.930
-Model:                  NNLS                    Adj. R-squared:          0.912
-No. Observations:       6                                 RMSE:        6228.16
-Df Residuals:           4                                  MAE:        5377.50
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       6                                 RMSE:        1276.87
+Df Residuals:           4                                  MAE:        1083.09
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000   3239.1638       1.000      0.0000  10978.3903
-       opcount      1.2722      0.1575       0.000      0.8792      1.4153
+         const      0.0000    672.3722       1.000      0.0000   2070.0451
+       opcount      1.1846      0.0329       0.000      1.0920      1.2084
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -797,7 +797,7 @@ Df Model:               1
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
          const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      6.9551      0.0000       0.000      6.9551      6.9551
+       opcount      6.5924      0.0000       0.000      6.5924      6.5924
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -817,16 +817,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.933
-Model:                  NNLS                    Adj. R-squared:          0.865
-No. Observations:       3                                 RMSE:        4487.05
-Df Residuals:           1                                  MAE:        4230.43
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.992
+No. Observations:       3                                 RMSE:        1045.38
+Df Residuals:           1                                  MAE:         985.59
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   5493.2860  12238.4331       0.345      0.0000  30822.1041
-       opcount      2.9335      0.7624       0.000      1.5668      3.7859
+         const   3111.4099   2323.3789       0.345      0.0000   6056.5017
+       opcount      2.8456      0.2037       0.000      2.5271      3.4015
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -848,16 +848,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.177
-Model:                  NNLS                    Adj. R-squared:          0.126
-No. Observations:       18                                RMSE:       34465.26
-Df Residuals:           16                                 MAE:       20402.49
+Dep. Variable:          run_duration_ms              R-squared:          0.217
+Model:                  NNLS                    Adj. R-squared:          0.165
+No. Observations:       17                                RMSE:       34136.43
+Df Residuals:           15                                 MAE:       15952.47
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  22097.0126  11906.1299       0.102      0.0000  44146.4927
-       opcount      0.3375      0.2006       0.000      0.1901      0.8867
+         const   5517.1575   7282.9093       0.279      0.0000  25617.0580
+       opcount      0.5877      0.1754       0.001      0.2724      0.9848
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -877,16 +877,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.920
-Model:                  NNLS                    Adj. R-squared:          0.915
-No. Observations:       16                                RMSE:        5151.85
-Df Residuals:           14                                 MAE:        4483.37
+Dep. Variable:          run_duration_ms              R-squared:          0.897
+Model:                  NNLS                    Adj. R-squared:          0.890
+No. Observations:       16                                RMSE:        6257.96
+Df Residuals:           14                                 MAE:        5049.91
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   5442.8593   2389.5801       0.009   1313.8845  10901.7109
-       opcount      0.6064      0.0443       0.000      0.5212      0.6964
+         const   2562.7864   2126.9736       0.149      0.0000   7631.8895
+       opcount      0.6400      0.0528       0.000      0.5353      0.7324
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -908,16 +908,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.994
-Model:                  NNLS                    Adj. R-squared:          0.988
-No. Observations:       3                                 RMSE:         400.46
-Df Residuals:           1                                  MAE:         377.56
+Dep. Variable:          run_duration_ms              R-squared:          0.999
+Model:                  NNLS                    Adj. R-squared:          0.999
+No. Observations:       3                                 RMSE:         118.09
+Df Residuals:           1                                  MAE:         111.33
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   3086.3983   1598.8675       0.114      0.0000   5348.0243
-       opcount      3.9617      0.5247       0.000      3.4320      5.7170
+         const   2878.3127   1001.1565       0.114      0.0000   3545.2195
+       opcount      3.9018      0.3791       0.000      3.7456      5.6518
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -937,16 +937,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.961
-Model:                  NNLS                    Adj. R-squared:          0.922
-No. Observations:       3                                 RMSE:        1061.13
-Df Residuals:           1                                  MAE:        1000.44
+Dep. Variable:          run_duration_ms              R-squared:          1.000
+Model:                  NNLS                    Adj. R-squared:          1.000
+No. Observations:       3                                 RMSE:          46.20
+Df Residuals:           1                                  MAE:          43.56
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   3155.4948   3403.3027       0.114      0.0000   9148.3379
-       opcount      4.0231      1.0271       0.000      2.6197      5.5291
+         const   1817.0484    585.7277       0.114      0.0000   1947.2874
+       opcount      4.2450      0.2381       0.000      4.1839      5.4033
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -963,35 +963,6 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ## ethrex-v9.0.0__zisk-v0.15.0
 
-### test_name: test_keccak
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.969
-Model:                  NNLS                    Adj. R-squared:          0.968
-No. Observations:       60                                RMSE:        5842.18
-Df Residuals:           58                                 MAE:        4407.92
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   2400.3474    817.5564       0.001    743.0782   4031.4719
-       opcount      0.0843      0.0012       0.000      0.0820      0.0866
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_regression.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_regression" width="600"/>
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diagnostics.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diagnostics" width="600"/>
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_bootstrap.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_bootstrap" width="600"/>
-
-
 ### test_name: test_keccak_diff_mem_msg_sizes
 
 
@@ -999,17 +970,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.694
-Model:                  NNLS                    Adj. R-squared:          0.688
-No. Observations:       104                               RMSE:       21076.14
-Df Residuals:           101                                MAE:        7374.45
+Dep. Variable:          run_duration_ms              R-squared:          0.309
+Model:                  NNLS                    Adj. R-squared:          0.294
+No. Observations:       96                                RMSE:       31146.66
+Df Residuals:           93                                 MAE:       12463.77
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   4697.2445   4437.9087       0.185      0.0000  15362.9449
-       opcount      0.0813      0.0045       0.000      0.0710      0.0890
-      msg_size      0.0006      0.0001       0.000      0.0005      0.0007
+         const   8110.8306   6988.1479       0.119      0.0000  25628.0952
+       opcount      0.0741      0.0197       0.000      0.0338      0.1123
+      msg_size      0.0005      0.0001       0.000      0.0004      0.0007
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1029,16 +1000,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.975
-Model:                  NNLS                    Adj. R-squared:          0.969
-No. Observations:       6                                 RMSE:        5229.28
-Df Residuals:           4                                  MAE:        4267.26
+Dep. Variable:          run_duration_ms              R-squared:          0.988
+Model:                  NNLS                    Adj. R-squared:          0.986
+No. Observations:       6                                 RMSE:        2982.49
+Df Residuals:           4                                  MAE:        2334.84
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000   1722.4248       1.000      0.0000   5560.6816
-       opcount     45.2418      2.7302       0.000     38.2995     48.0724
+         const   2956.3659   2684.8295       0.120      0.0000   8183.2221
+       opcount     39.7784      2.1407       0.000     36.6956     43.7776
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1053,35 +1024,6 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 
 ## reth-v1.11.0__zisk-v0.15.0
 
-### test_name: test_keccak
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.116
-Model:                  NNLS                    Adj. R-squared:          0.102
-No. Observations:       63                                RMSE:       36908.33
-Df Residuals:           61                                 MAE:       23418.91
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const  18858.6123   9318.5615       0.019    926.2938  37706.3509
-       opcount      0.0332      0.0150       0.015      0.0034      0.0634
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_regression" width="600"/>
-
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diagnostics" width="600"/>
-
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_bootstrap" width="600"/>
-
-
 ### test_name: test_keccak_diff_mem_msg_sizes
 
 
@@ -1089,17 +1031,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.712
-Model:                  NNLS                    Adj. R-squared:          0.706
-No. Observations:       112                               RMSE:       18633.83
-Df Residuals:           109                                MAE:       10100.28
+Dep. Variable:          run_duration_ms              R-squared:          0.086
+Model:                  NNLS                    Adj. R-squared:          0.067
+No. Observations:       96                                RMSE:       39783.37
+Df Residuals:           93                                 MAE:       15811.03
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   1906.8999   2119.0597       0.258      0.0000   7018.1296
-       opcount      0.0336      0.0075       0.000      0.0197      0.0481
-      msg_size      0.0005      0.0000       0.000      0.0004      0.0005
+         const   9688.8718   6902.8181       0.044      0.0000  26016.3845
+       opcount      0.0463      0.0213       0.008      0.0075      0.0920
+      msg_size      0.0003      0.0001       0.000      0.0002      0.0004
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1119,16 +1061,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.997
-Model:                  NNLS                    Adj. R-squared:          0.997
-No. Observations:       7                                 RMSE:        2175.65
-Df Residuals:           5                                  MAE:        1720.93
+Dep. Variable:          run_duration_ms              R-squared:          0.989
+Model:                  NNLS                    Adj. R-squared:          0.986
+No. Observations:       6                                 RMSE:        2117.56
+Df Residuals:           4                                  MAE:        1899.10
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const    866.0201   1593.0895       0.202      0.0000   5652.0858
-       opcount     30.4464      1.0425       0.000     27.0867     30.7828
+         const   2990.6792   1966.7470       0.019    198.5407   8003.7039
+       opcount     28.8863      1.3358       0.000     26.3556     31.5105
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1161,7 +1103,7 @@ Df Model:               1
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
          const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount   2668.4675      0.0000       0.000   2668.4675   2668.4675
+       opcount    672.5714      0.0000       0.000    672.5714    672.5714
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1181,17 +1123,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.082
-Model:                  NNLS                    Adj. R-squared:         -0.040
-No. Observations:       18                                RMSE:       33013.58
-Df Residuals:           15                                 MAE:       18499.82
+Dep. Variable:          run_duration_ms              R-squared:          0.304
+Model:                  NNLS                    Adj. R-squared:          0.211
+No. Observations:       18                                RMSE:       33126.32
+Df Residuals:           15                                 MAE:       17945.99
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  34877.8535  23603.6314       0.073      0.0000  69410.2606
-       opcount      0.1580      0.1217       0.160      0.0000      0.3392
-    num_rounds      0.0000      0.0041       1.000      0.0000      0.0112
+         const   7309.3089   9056.3399       0.267      0.0000  32217.5584
+       opcount      0.2139      0.0996       0.071      0.0000      0.3254
+    num_rounds      0.0251      0.0182       0.000      0.0073      0.0669
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1222,7 +1164,7 @@ Df Model:               1
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
          const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount    654.2987      0.0000       0.000    654.2987    654.2987
+       opcount    637.2208      0.0000       0.000    637.2208    637.2208
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1242,17 +1184,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.133
-Model:                  NNLS                    Adj. R-squared:          0.036
-No. Observations:       21                                RMSE:       31567.32
-Df Residuals:           18                                 MAE:       16743.20
+Dep. Variable:          run_duration_ms              R-squared:          0.280
+Model:                  NNLS                    Adj. R-squared:          0.200
+No. Observations:       21                                RMSE:       60010.59
+Df Residuals:           18                                 MAE:       30769.79
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  29079.1213  23271.9641       0.125      0.0000  70032.4905
-       opcount      0.1670      0.1152       0.136      0.0000      0.3301
-    num_rounds      0.0045      0.0034       0.155      0.0000      0.0104
+         const   2141.9828   5304.9198       0.554      0.0000  18378.2182
+       opcount      0.1320      0.1099       0.216      0.0000      0.2819
+    num_rounds      0.0389      0.0262       0.000      0.0086      0.0918
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1276,16 +1218,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:         -0.015
-No. Observations:       67                                RMSE:       36038.86
-Df Residuals:           65                                 MAE:       22123.38
+Dep. Variable:          run_duration_ms              R-squared:          0.002
+Model:                  NNLS                    Adj. R-squared:         -0.016
+No. Observations:       60                                RMSE:       42943.65
+Df Residuals:           58                                 MAE:       24505.72
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  22047.3789   4650.9060       0.000  13207.6683  30733.4486
-       opcount      1.5231     13.5043       0.392      0.0000     47.2358
+         const  22663.2480   5938.6036       0.000  12122.8660  35294.5981
+       opcount      9.9910     19.9595       0.269      0.0000     71.9713
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1305,17 +1247,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.242
-Model:                  NNLS                    Adj. R-squared:          0.193
-No. Observations:       34                                RMSE:       25407.13
-Df Residuals:           31                                 MAE:       10453.66
+Dep. Variable:          run_duration_ms              R-squared:          0.992
+Model:                  NNLS                    Adj. R-squared:          0.992
+No. Observations:       30                                RMSE:        1019.02
+Df Residuals:           27                                 MAE:         864.39
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  10308.2931  11124.8590       0.331      0.0000  37278.7728
-       opcount     83.4171     36.6219       0.070      0.0000    122.0296
-     num_pairs     21.4825      6.9833       0.030      0.0000     27.5589
+         const    422.4102    329.7976       0.108      0.0000   1119.2388
+       opcount    116.2339      3.4831       0.000    106.6531    120.2860
+     num_pairs     21.9582      0.7436       0.000     20.5086     23.4134
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1335,16 +1277,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.992
-Model:                  NNLS                    Adj. R-squared:          0.991
-No. Observations:       7                                 RMSE:        1286.98
-Df Residuals:           5                                  MAE:        1048.91
+Dep. Variable:          run_duration_ms              R-squared:          0.993
+Model:                  NNLS                    Adj. R-squared:          0.992
+No. Observations:       6                                 RMSE:         544.79
+Df Residuals:           4                                  MAE:         398.69
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000    454.4154       1.000      0.0000   1513.6745
-       opcount    963.9176     47.2487       0.000    804.5552    986.6469
+         const      0.0000    288.4781       1.000      0.0000   1113.6934
+       opcount    899.4198     31.1609       0.000    794.0548    917.5640
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1366,16 +1308,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.022
-Model:                  NNLS                    Adj. R-squared:          0.008
-No. Observations:       68                                RMSE:       18743.61
-Df Residuals:           66                                 MAE:       14177.03
+Dep. Variable:          run_duration_ms              R-squared:          0.000
+Model:                  NNLS                    Adj. R-squared:         -0.017
+No. Observations:       60                                RMSE:       35492.50
+Df Residuals:           58                                 MAE:       20567.43
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  14379.3137   2475.9074       0.000   8152.6080  18699.9686
-       opcount     10.7962     16.4094       0.071      0.0000     64.3917
+         const  21083.3660   5078.5033       0.000  10762.1061  30659.7850
+       opcount      3.6896     13.8609       0.358      0.0000     50.0135
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1395,17 +1337,17 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.989
-Model:                  NNLS                    Adj. R-squared:          0.988
-No. Observations:       34                                RMSE:        2068.39
-Df Residuals:           31                                 MAE:        1571.66
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       30                                RMSE:         775.79
+Df Residuals:           27                                 MAE:         633.19
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000    103.6128       1.000      0.0000    363.3577
-       opcount    119.5208      4.8060       0.000    107.6048    127.1092
-     num_pairs     25.3300      0.8818       0.000     23.6616     27.0273
+         const    989.8875    271.9491       0.001    492.2298   1544.3488
+       opcount    107.4290      1.6881       0.000    105.2240    111.7193
+     num_pairs     21.9121      0.7386       0.000     20.5269     23.4726
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
@@ -1425,16 +1367,16 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.994
-Model:                  NNLS                    Adj. R-squared:          0.993
-No. Observations:       7                                 RMSE:        1068.08
-Df Residuals:           5                                  MAE:         894.83
+Dep. Variable:          run_duration_ms              R-squared:          0.997
+Model:                  NNLS                    Adj. R-squared:          0.996
+No. Observations:       6                                 RMSE:         392.51
+Df Residuals:           4                                  MAE:         308.27
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000    415.7468       1.000      0.0000   1446.1077
-       opcount    945.3507     39.3557       0.000    816.2027    969.0031
+         const      0.0000    205.5692       1.000      0.0000    563.9087
+       opcount    926.8232     18.6331       0.000    881.6163    945.3908
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
