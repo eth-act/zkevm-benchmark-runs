@@ -116,6 +116,7 @@ export class BenchmarkApp {
 
         this.cacheElements();
         this.initializeTheme();
+        this.initializeCrashModal();
 
         // Parse URL state early
         const urlState = URLState.parse();
@@ -699,6 +700,39 @@ export class BenchmarkApp {
     toggleTheme() {
         const current = document.documentElement.getAttribute('data-theme') || 'dark';
         this.applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    // ========================================================================
+    // Crash Reason Modal
+    // ========================================================================
+
+    initializeCrashModal() {
+        const modal = document.getElementById('crash-modal');
+        if (!modal) return;
+
+        const body = modal.querySelector('.crash-modal-body');
+        const closeBtn = modal.querySelector('.crash-modal-close');
+        const backdrop = modal.querySelector('.crash-modal-backdrop');
+
+        const show = (reason) => {
+            body.textContent = reason;
+            modal.classList.remove('hidden');
+        };
+        const hide = () => modal.classList.add('hidden');
+
+        document.addEventListener('click', (e) => {
+            const cell = e.target.closest('[data-crash-reason]');
+            if (cell) {
+                e.stopPropagation();
+                show(cell.dataset.crashReason);
+            }
+        });
+
+        closeBtn.addEventListener('click', hide);
+        backdrop.addEventListener('click', hide);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') hide();
+        });
     }
 
     // ========================================================================

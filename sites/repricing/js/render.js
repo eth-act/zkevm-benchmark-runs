@@ -11,6 +11,12 @@ import {
     getRelativeCostStyle,
 } from './utils.js';
 
+/** Escape a string for safe use inside an HTML attribute value (double-quoted). */
+function escapeAttr(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ============================================================================
 // Cell Rendering (Unified)
 // ============================================================================
@@ -29,12 +35,13 @@ import {
  * @param {string|null} options.secondaryLabel - Override for the time line (e.g. formatted throughput)
  * @returns {string} HTML string for the cell
  */
-export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, crashInfo = null, secondaryLabel = null }) {
-    if (allCrashed) {
-        return '<td class="combined-cell status-crashed">CRASHED</td>';
-    }
-    if (crashed) {
-        return '<td class="combined-cell status-crashed">CRASHED</td>';
+export function renderProofCell({ time, relativeCost, zkvm = null, crashed = false, allCrashed = false, missing = false, crashInfo = null, secondaryLabel = null, crashReason = null }) {
+    if (allCrashed || crashed) {
+        const attrs = crashReason
+            ? ` title="${escapeAttr(crashReason.slice(0, 150))}" data-crash-reason="${escapeAttr(crashReason)}"`
+            : '';
+        const cls = crashReason ? ' crash-clickable' : '';
+        return `<td class="combined-cell status-crashed${cls}"${attrs}>CRASHED</td>`;
     }
     if (missing) {
         return '<td class="combined-cell status-na" title="No data available for this combination">-</td>';
@@ -80,7 +87,7 @@ export class Renderer {
             return renderProofCell({ missing: true });
         }
         if (result.status !== STATUS.SUCCESS) {
-            return renderProofCell({ crashed: true });
+            return renderProofCell({ crashed: true, crashReason: result.crash_reason });
         }
 
         const time = result.proving_time_ms;
@@ -102,7 +109,8 @@ export class Renderer {
         if (this.dataAccessor.isAllMissing(test)) {
             return renderProofCell({ missing: true });
         }
-        return renderProofCell({ allCrashed: true });
+        const crashReason = this.dataAccessor.getAllCrashReasons(test);
+        return renderProofCell({ allCrashed: true, crashReason });
     }
 
     // ========================================================================

@@ -232,7 +232,8 @@ export class HeatmapRenderer {
                 if (this.dataAccessor.isAllMissing(test)) {
                     return renderProofCell({ missing: true });
                 }
-                return renderProofCell({ allCrashed: true });
+                const crashReason = this.dataAccessor.getAllCrashReasons(test);
+                return renderProofCell({ allCrashed: true, crashReason });
             }
             const relativeCost = this.dataAccessor.getRelativeCost(test, VIEW.WORST);
             const worstZkvm = this.dataAccessor.getWorstCaseZkvm(test);
@@ -242,7 +243,7 @@ export class HeatmapRenderer {
 
         const result = test.results[zkvm];
         if (!result) return renderProofCell({ missing: true });
-        if (result.status !== STATUS.SUCCESS) return renderProofCell({ crashed: true });
+        if (result.status !== STATUS.SUCCESS) return renderProofCell({ crashed: true, crashReason: result.crash_reason });
 
         const time = result.proving_time_ms;
         const relativeCost = this.dataAccessor.getRelativeCost(test, zkvm);

@@ -128,6 +128,22 @@ export class DataAccessor {
     }
 
     /**
+     * Collects crash reasons from all crashed zkVMs for a test.
+     * @param {Object} test - The test object
+     * @returns {string|null} Aggregated crash reasons, or null if none
+     */
+    getAllCrashReasons(test) {
+        const reasons = [];
+        for (const zkvm of this.data.zkvms) {
+            const result = test.results[zkvm];
+            if (result && result.status !== STATUS.SUCCESS && result.crash_reason) {
+                reasons.push(`${zkvm}: ${result.crash_reason}`);
+            }
+        }
+        return reasons.length > 0 ? reasons.join('\n\n') : null;
+    }
+
+    /**
      * Checks if any zkVM succeeded for a test.
      * @param {Object} test - The test object
      * @returns {boolean} True if at least one zkVM succeeded
