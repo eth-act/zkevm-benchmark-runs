@@ -574,7 +574,7 @@ function generateComparisonTable(allElClients) {
             const zkVMData = allElClients[elClient].zkvm_data[zkvm];
 
             if (zkVMData) {
-                [...zkVMData.successful_runs, ...zkVMData.sdk_crashed_runs, ...zkVMData.prover_crashed_runs].forEach(run => {
+                [...zkVMData.successful_runs, ...zkVMData.sdk_crashed_runs].forEach(run => {
                     allTestCases.add(run.name);
                     results[zkvm][elClient][run.name] = run;
                 });
@@ -652,9 +652,6 @@ function generateComparisonTable(allElClients) {
                 } else if (result.status === 'crashed') {
                     hasCrash = true;
                     cells.push('<td class="crash-sdk">\u274C SDK</td>');
-                } else if (result.status === 'prover_crashed') {
-                    hasCrash = true;
-                    cells.push('<td class="crash-prover">\uD83D\uDCA5 Prover</td>');
                 } else {
                     hasCrash = true;
                     cells.push('<td class="crash-sdk">\u274C Error</td>');
@@ -709,14 +706,6 @@ function generateSummary(allElClients) {
                         <th>Total</th>
                         <th>Successful</th>
                         <th>SDK Crashed</th>
-    `;
-
-    // Only show Prover Crashed column in proving mode
-    if (currentMode === 'proving') {
-        html += '<th>Prover Crashed</th>';
-    }
-
-    html += `
                     </tr>
                 </thead>
                 <tbody>
@@ -732,8 +721,7 @@ function generateSummary(allElClients) {
             if (data) {
                 const successful = data.successful_runs.length;
                 const sdkCrashed = data.sdk_crashed_runs.length;
-                const proverCrashed = data.prover_crashed_runs.length;
-                const total = successful + sdkCrashed + proverCrashed;
+                const total = successful + sdkCrashed;
 
                 html += '<tr>';
 
@@ -749,11 +737,6 @@ function generateSummary(allElClients) {
                         <td>${successful}</td>
                         <td>${sdkCrashed}</td>
                 `;
-
-                // Only show Prover Crashed column in proving mode
-                if (currentMode === 'proving') {
-                    html += `<td>${proverCrashed}</td>`;
-                }
 
                 html += '</tr>';
             } else {
@@ -771,10 +754,6 @@ function generateSummary(allElClients) {
                         <td>\u2014</td>
                         <td>\u2014</td>
                 `;
-
-                if (currentMode === 'proving') {
-                    html += '<td>\u2014</td>';
-                }
 
                 html += '</tr>';
             }

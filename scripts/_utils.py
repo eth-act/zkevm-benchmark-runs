@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple, Any, Optional
 
 EEST_FIXTURE_SET_PREFIX = "eest-"
 EEST_GAS_LIMIT_RE = re.compile(r"^\d+M-gas-limit$")
+GAS_VALUE_RE = re.compile(r"benchmark-gas-value_(\d+M)")
 
 
 def format_time(ms: int) -> str:
@@ -64,21 +65,6 @@ def load_workload_info(workload_file: Path) -> Optional[str]:
         except Exception as e:
             print(f"Warning: Could not read {workload_file}: {e}")
     return None
-
-
-def load_crashes_from_file(crashes_file: Path) -> List[str]:
-    """Load crashed fixture names from _crashes.txt file."""
-    crashes = []
-    if crashes_file.exists():
-        with open(crashes_file, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    # Remove .json extension if present
-                    if line.endswith('.json'):
-                        line = line[:-5]
-                    crashes.append(line)
-    return crashes
 
 
 def process_json_file(json_file: Path, mode: str = 'proving') -> Dict[str, Any]:
@@ -137,92 +123,101 @@ def process_json_file(json_file: Path, mode: str = 'proving') -> Dict[str, Any]:
         }
 
 
-def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str], mode: str = 'proving') -> Tuple[List[Dict], List[Dict], List[Dict]]:
+def filter_json_by_gas(json_files: List[Path], gas_value: str) -> List[Path]:
+    """Filter JSON file paths to only those matching a specific gas value.
+
+    Args:
+        json_files: List of JSON file paths
+        gas_value: Gas value string (e.g., '10M')
+
+    Returns:
+        Filtered list of paths whose filenames contain benchmark-gas-value_{gas_value}
+    """
+    pattern = f"benchmark-gas-value_{gas_value}"
+    return [f for f in json_files if pattern in f.name]
+
+
+def process_zkvm_folder(zkvm_folder: Path, mode: str = 'proving',
+                        gas_value_filter: Optional[str] = None) -> Tuple[List[Dict], List[Dict]]:
     """Process a zkVM folder (e.g., sp1-v5.1.0) and categorize results.
 
     Args:
         zkvm_folder: Path to the zkVM folder
-        crashed_fixtures: List of fixture names that crashed
         mode: Either 'proving' or 'execution' to determine which data to extract
+        gas_value_filter: If set, only process JSON files matching this gas value (e.g., '10M')
 
     Returns:
-        Tuple of (successful_runs, sdk_crashed_runs, prover_crashed_runs)
+        Tuple of (successful_runs, sdk_crashed_runs)
     """
     successful_runs = []
     sdk_crashed_runs = []
-    prover_crashed_runs = []
 
-    # First, add all fixtures from _crashes.txt as prover crashes
-    for crashed_fixture in crashed_fixtures:
-        prover_crashed_runs.append({
-            'name': crashed_fixture,
-            'gas_used': 0,
-            'status': 'prover_crashed'
-        })
+    json_files = list(zkvm_folder.glob('*.json'))
+    if gas_value_filter:
+        json_files = filter_json_by_gas(json_files, gas_value_filter)
 
-    # Keep track of JSON files to detect duplicates
-    json_fixture_names = []
-    duplicates_found = []
-
-    # Then process JSON files
-    for json_file in zkvm_folder.glob('*.json'):
+    for json_file in json_files:
         result = process_json_file(json_file, mode=mode)
-        fixture_name = result['name']
-        json_fixture_names.append(fixture_name)
 
-        # Check if this fixture was in the crashed list
-        # Use exact matching (with and without .json extension)
-        crashed_fixture_matches = []
-        for crash in crashed_fixtures:
-            # Remove .json extension from crash if present for comparison
-            crash_clean = crash[:-5] if crash.endswith('.json') else crash
-            fixture_clean = fixture_name[:-5] if fixture_name.endswith('.json') else fixture_name
-
-            if crash_clean == fixture_clean:
-                crashed_fixture_matches.append(crash)
-
-        if crashed_fixture_matches:
-            # Found duplicate - fixture exists both in _crashes.txt and as JSON
-            for crash_match in crashed_fixture_matches:
-                duplicate_info = {
-                    'fixture_name': fixture_name,
-                    'crash_entry': crash_match,
-                    'json_status': result['status'],
-                    'zkvm_folder': zkvm_folder
-                }
-                duplicates_found.append(duplicate_info)
-            # Skip adding to results - already added as prover crash
-            continue
-        elif result['status'] == 'crashed':
+        if result['status'] == 'crashed':
             sdk_crashed_runs.append(result)
         elif result['status'] == 'success':
             successful_runs.append(result)
 
-    # Generate warnings for duplicates
-    if duplicates_found:
-        print(f"\n⚠️  WARNING: Found {len(duplicates_found)} duplicate fixture(s) in {zkvm_folder}:")
-        for dup in duplicates_found:
-            print(f"   - Fixture: '{dup['fixture_name']}'")
-            print(f"     • Listed in _crashes.txt as: '{dup['crash_entry']}'")
-            print(f"     • Has JSON file with status: {dup['json_status']}")
-        print("   This may indicate inconsistent benchmark data - please review.\n")
+    return successful_runs, sdk_crashed_runs
 
-    return successful_runs, sdk_crashed_runs, prover_crashed_runs
+
+def _is_flat_eest_layout(eest_dir: Path) -> bool:
+    """Check whether an eest-* directory uses the flat layout (no gas-limit subdirs).
+
+    Returns True if none of the direct children match the XM-gas-limit pattern,
+    meaning EL client folders sit directly inside the eest-* directory.
+    """
+    for child in eest_dir.iterdir():
+        if child.is_dir() and EEST_GAS_LIMIT_RE.match(child.name):
+            return False
+    return True
+
+
+def _discover_gas_values(eest_dir: Path) -> List[str]:
+    """Discover all unique gas values from JSON filenames in a flat eest-* directory.
+
+    Walks EL client / zkVM subdirectories and extracts gas values from filenames.
+
+    Returns:
+        Sorted list of gas value strings (e.g., ['5M', '10M', '15M', ...]),
+        sorted numerically.
+    """
+    gas_values = set()
+    # Walk: eest_dir / el_client / zkvm / *.json
+    for el_client_dir in eest_dir.iterdir():
+        if not el_client_dir.is_dir() or el_client_dir.name.startswith('.'):
+            continue
+        for zkvm_dir in el_client_dir.iterdir():
+            if not zkvm_dir.is_dir() or zkvm_dir.name.startswith('.'):
+                continue
+            for json_file in zkvm_dir.glob('*.json'):
+                m = GAS_VALUE_RE.search(json_file.name)
+                if m:
+                    gas_values.add(m.group(1))
+    return sorted(gas_values, key=lambda v: int(v.rstrip('M')))
 
 
 def iter_configs(hardware_path: Path):
     """Yield config info dicts for each config under a hardware directory.
 
-    Handles three cases:
-    - eest-* fixture-set dirs containing gas-limit subdirs
+    Handles four cases:
+    - eest-* fixture-set dirs containing gas-limit subdirs (old layout)
+    - eest-* fixture-set dirs with flat layout (gas value in filenames)
     - mainnet-* configs directly under hardware
     - Legacy *M-gas-limit configs directly under hardware (backward compat)
 
     Each yielded dict has keys:
-        path: Path to the config (gas-limit or mainnet) directory
+        path: Path to the config directory (gas-limit dir, or eest-* dir for flat layout)
         name: Config folder name (e.g., '10M-gas-limit')
         dataset_type: 'eest' | 'mainnet' | 'other'
         fixture_set: Fixture-set directory name or None
+        gas_value_filter: Gas value string (e.g., '10M') for flat layout, or None
     """
     if not hardware_path.exists():
         return
@@ -232,21 +227,34 @@ def iter_configs(hardware_path: Path):
             continue
 
         if entry.name.startswith(EEST_FIXTURE_SET_PREFIX):
-            # Fixture-set directory — iterate gas-limit subdirs inside
-            for sub in sorted(entry.iterdir()):
-                if sub.is_dir() and not sub.name.startswith('.'):
+            if _is_flat_eest_layout(entry):
+                # Flat layout — discover gas values from filenames
+                for gas_value in _discover_gas_values(entry):
                     yield {
-                        'path': sub,
-                        'name': sub.name,
+                        'path': entry,
+                        'name': f'{gas_value}-gas-limit',
                         'dataset_type': 'eest',
                         'fixture_set': entry.name,
+                        'gas_value_filter': gas_value,
                     }
+            else:
+                # Old layout — iterate gas-limit subdirs inside
+                for sub in sorted(entry.iterdir()):
+                    if sub.is_dir() and not sub.name.startswith('.'):
+                        yield {
+                            'path': sub,
+                            'name': sub.name,
+                            'dataset_type': 'eest',
+                            'fixture_set': entry.name,
+                            'gas_value_filter': None,
+                        }
         elif entry.name.startswith('mainnet-'):
             yield {
                 'path': entry,
                 'name': entry.name,
                 'dataset_type': 'mainnet',
                 'fixture_set': None,
+                'gas_value_filter': None,
             }
         elif EEST_GAS_LIMIT_RE.match(entry.name):
             # Legacy flat layout (pre-migration)
@@ -255,16 +263,22 @@ def iter_configs(hardware_path: Path):
                 'name': entry.name,
                 'dataset_type': 'eest',
                 'fixture_set': None,
+                'gas_value_filter': None,
             }
 
 
 def load_hardware_info(folder: Path) -> Optional[Dict[str, Any]]:
-    """Load hardware information from hardware.json file."""
-    hardware_file = folder / "hardware.json"
-    if hardware_file.exists():
-        try:
-            with open(hardware_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Warning: Could not read {hardware_file}: {e}")
+    """Load hardware information from hardware.json file.
+
+    Searches in the given folder first, then falls back to the parent directory.
+    This handles flat eest-* layouts where hardware.json is at the fixture-set level.
+    """
+    for search_dir in [folder, folder.parent]:
+        hardware_file = search_dir / "hardware.json"
+        if hardware_file.exists():
+            try:
+                with open(hardware_file, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Warning: Could not read {hardware_file}: {e}")
     return None

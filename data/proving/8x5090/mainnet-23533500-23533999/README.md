@@ -19,7 +19,7 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (proving results) on **8x
 ### Notes
 
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
-- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
+- **Crash indicators**: ❌ indicates an SDK-reported crash.
 
 | Test Case | risc0-v3.0.4<br/>(218.06KiB) | zisk-v0.14.0<br/>(244.02KiB) | Avg |
 |-----------|-----------|-----------|----------|
@@ -530,10 +530,10 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (proving results) on **8x
 
 ### Results by zkVM
 
-| zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
-|------|-------|---------------|----------------|--------------------|
-| risc0-v3.0.4 | 500 | 414 | 86 | 0 |
-| zisk-v0.14.0 | 500 | 500 | 0 | 0 |
+| zkVM | Total | ✅ Successful | ❌ SDK Crashed |
+|------|-------|---------------|----------------|
+| risc0-v3.0.4 | 500 | 414 | 86 |
+| zisk-v0.14.0 | 500 | 500 | 0 |
 
 ---
 
@@ -545,7 +545,7 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (proving results) on **8x
 ### Notes
 
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
-- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
+- **Crash indicators**: ❌ indicates an SDK-reported crash.
 
 | Test Case | zisk-v0.16.1<br/>(335.53KiB) | Avg |
 |-----------|-----------|----------|
@@ -1056,9 +1056,9 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (proving results) on **8x
 
 ### Results by zkVM
 
-| zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
-|------|-------|---------------|----------------|--------------------|
-| zisk-v0.16.1 | 500 | 499 | 1 | 0 |
+| zkVM | Total | ✅ Successful | ❌ SDK Crashed |
+|------|-------|---------------|----------------|
+| zisk-v0.16.1 | 500 | 499 | 1 |
 
 ---
 

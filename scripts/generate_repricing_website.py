@@ -17,6 +17,14 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from _utils import (
+    GAS_VALUE_RE,
+    EEST_GAS_LIMIT_RE,
+    _is_flat_eest_layout,
+    _discover_gas_values,
+    filter_json_by_gas,
+)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -499,14 +507,16 @@ def _has_el_client_data(config_dir: Path) -> bool:
     )
 
 
-def discover_eest_configs(hardware_base: Path) -> list[tuple[str | None, str, Path]]:
+def discover_eest_configs(hardware_base: Path) -> list[tuple[str | None, str, Path, str | None]]:
     """Discover all EEST configurations under a hardware directory.
 
-    Handles both:
-    - eest-* fixture-set dirs containing gas-limit subdirs (new layout)
+    Handles:
+    - eest-* fixture-set dirs with flat layout (gas value in filenames)
+    - eest-* fixture-set dirs containing gas-limit subdirs (old layout)
     - Direct *M-gas-limit dirs (legacy layout)
 
-    Returns list of (fixture_set_name, config_name, config_path) tuples.
+    Returns list of (fixture_set_name, config_name, config_path, gas_value_filter) tuples.
+    gas_value_filter is set for flat layout configs, None otherwise.
     """
     configs = []
     if not hardware_base.exists():
@@ -517,15 +527,21 @@ def discover_eest_configs(hardware_base: Path) -> list[tuple[str | None, str, Pa
             continue
 
         if entry.name.startswith("eest-"):
-            # Fixture-set directory — look for gas-limit subdirs inside
-            for sub in sorted(entry.iterdir()):
-                if sub.is_dir() and EEST_CONFIG_PATTERN.match(sub.name):
-                    if _has_el_client_data(sub):
-                        configs.append((entry.name, sub.name, sub))
+            if _is_flat_eest_layout(entry):
+                # Flat layout — discover gas values from filenames
+                if _has_el_client_data(entry):
+                    for gas_value in _discover_gas_values(entry):
+                        configs.append((entry.name, f"{gas_value}-gas-limit", entry, gas_value))
+            else:
+                # Old layout — gas-limit subdirs inside
+                for sub in sorted(entry.iterdir()):
+                    if sub.is_dir() and EEST_CONFIG_PATTERN.match(sub.name):
+                        if _has_el_client_data(sub):
+                            configs.append((entry.name, sub.name, sub, None))
         elif EEST_CONFIG_PATTERN.match(entry.name):
             # Legacy flat layout
             if _has_el_client_data(entry):
-                configs.append((None, entry.name, entry))
+                configs.append((None, entry.name, entry, None))
 
     return configs
 
@@ -547,15 +563,17 @@ def process_all_results(
     hardware_file: Path,
     config_name: str,
     hardware_id: str,
+    gas_value_filter: str | None = None,
 ) -> dict[str, Any]:
     """
     Process all benchmark results across all EL clients and generate consolidated data.
 
     Args:
-        config_path: Path to the configuration directory (e.g., .../10M-gas-limit)
+        config_path: Path to the configuration directory (e.g., .../10M-gas-limit or flat eest-* dir)
         hardware_file: Path to hardware.json
         config_name: Name of the configuration (e.g., "10M-gas-limit")
         hardware_id: Hardware identifier (e.g., "1xL40s")
+        gas_value_filter: If set, only process JSON files matching this gas value (e.g., '10M')
 
     Returns:
         Consolidated data structure ready for JSON serialization
@@ -588,6 +606,8 @@ def process_all_results(
 
             zkvm_path = el_path / zkvm
             json_files = list(zkvm_path.glob("*.json"))
+            if gas_value_filter:
+                json_files = filter_json_by_gas(json_files, gas_value_filter)
             logger.info("  Processing %s: %d files", el_zkvm, len(json_files))
 
             for json_file in json_files:
@@ -734,7 +754,7 @@ def main():
             continue
 
         logger.info("Discovered EEST configurations: %s",
-                     [(fs, cn) for fs, cn, _ in eest_configs])
+                     [(fs, cn) for fs, cn, *_ in eest_configs])
 
         # Create hardware-specific output directory
         hardware_output_dir = output_dir / hardware_id
@@ -744,13 +764,14 @@ def main():
         manifest_datasets = []
         hardware_info_sample = {}
 
-        for fixture_set, config_name, config_path in eest_configs:
+        for fixture_set, config_name, config_path, gas_value_filter in eest_configs:
             logger.info("Processing configuration: %s/%s%s", hardware_id,
                         f"{fixture_set}/" if fixture_set else "", config_name)
 
             hardware_file = config_path / "hardware.json"
 
-            output = process_all_results(config_path, hardware_file, config_name, hardware_id)
+            output = process_all_results(config_path, hardware_file, config_name, hardware_id,
+                                         gas_value_filter=gas_value_filter)
             if fixture_set:
                 output["fixture_set"] = fixture_set
 

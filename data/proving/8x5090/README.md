@@ -4,17 +4,18 @@ This folder contains benchmark results for the **8x5090** hardware setup.
 
 ## EEST Gas Limit Configurations
 
-### Fixture Set: `eest-365433e`
+### Fixture Set: `eest-fd1dd63`
 
-| Configuration | Description | Details |
-|---------------|-------------|----------|
-| **10M-gas-limit** | EEST benchmarks with 10M gas limit | [View Results](eest-365433e/10M-gas-limit/README.md) |
-| **15M-gas-limit** | EEST benchmarks with 15M gas limit | [View Results](eest-365433e/15M-gas-limit/README.md) |
-| **20M-gas-limit** | EEST benchmarks with 20M gas limit | [View Results](eest-365433e/20M-gas-limit/README.md) |
-| **25M-gas-limit** | EEST benchmarks with 25M gas limit | [View Results](eest-365433e/25M-gas-limit/README.md) |
-| **30M-gas-limit** | EEST benchmarks with 30M gas limit | [View Results](eest-365433e/30M-gas-limit/README.md) |
-| **35M-gas-limit** | EEST benchmarks with 35M gas limit | [View Results](eest-365433e/35M-gas-limit/README.md) |
-| **5M-gas-limit** | EEST benchmarks with 5M gas limit | [View Results](eest-365433e/5M-gas-limit/README.md) |
+| Configuration | Description |
+|---------------|-------------|
+| **5M-gas-limit** | EEST benchmarks with 5M gas limit |
+| **10M-gas-limit** | EEST benchmarks with 10M gas limit |
+| **15M-gas-limit** | EEST benchmarks with 15M gas limit |
+| **20M-gas-limit** | EEST benchmarks with 20M gas limit |
+| **25M-gas-limit** | EEST benchmarks with 25M gas limit |
+| **30M-gas-limit** | EEST benchmarks with 30M gas limit |
+| **35M-gas-limit** | EEST benchmarks with 35M gas limit |
+| **60M-gas-limit** | EEST benchmarks with 60M gas limit |
 
 ## Mainnet Block Range Configurations
 
@@ -25,5 +26,5 @@ This folder contains benchmark results for the **8x5090** hardware setup.
 ## Hardware Information
 
 - **Setup**: 8x5090
-- **Total Configurations**: 8 (7 gas limit, 1 mainnet range)
+- **Total Configurations**: 9 (8 gas limit, 1 mainnet range)
 
