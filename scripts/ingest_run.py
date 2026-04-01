@@ -9,7 +9,6 @@ The --fixture-set flag specifies which EEST fixture set the data belongs to.
 """
 
 import argparse
-import json
 import re
 import shutil
 import sys
@@ -62,7 +61,6 @@ def ingest(source: Path, target_base: Path, fixture_set: str, dry_run: bool):
 
     stats = []
     hw_copied = set()
-    fixture_set_created = False
 
     for el_client, zkvm, json_files in discover_structure(source):
         groups, skipped = group_by_gas(json_files)
@@ -83,23 +81,6 @@ def ingest(source: Path, target_base: Path, fixture_set: str, dry_run: bool):
 
             if not dry_run:
                 target_dir.mkdir(parents=True, exist_ok=True)
-
-            # Create fixtures.json once per fixture-set.
-            if fixture_set and not fixture_set_created:
-                fs_dir = target_base / fixture_set
-                fs_file = fs_dir / "fixtures.json"
-                if not dry_run:
-                    fs_dir.mkdir(parents=True, exist_ok=True)
-                    if not fs_file.exists():
-                        ref = fixture_set.removeprefix("eest-")
-                        with open(fs_file, "w") as fh:
-                            json.dump({"source": "ethereum/execution-spec-tests", "ref": ref}, fh, indent=2)
-                            fh.write("\n")
-                        print(f"  CREATED {fs_file}")
-                else:
-                    if not fs_file.exists():
-                        print(f"  CREATE {fs_file}")
-                fixture_set_created = True
 
             # Copy hardware.json once per config folder.
             if config not in hw_copied:

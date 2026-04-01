@@ -94,7 +94,6 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
             mode_data[hardware_name][config_key] = {
                 'dataset_type': cfg['dataset_type'],
                 'fixture_set': cfg['fixture_set'],
-                'fixture_set_info': cfg['fixture_set_info'],
                 'el_clients': {},
             }
 

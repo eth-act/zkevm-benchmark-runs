@@ -210,18 +210,6 @@ def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str], mode: st
     return successful_runs, sdk_crashed_runs, prover_crashed_runs
 
 
-def load_fixture_set_info(fixture_set_path: Path) -> Optional[Dict[str, Any]]:
-    """Load fixture set metadata from fixtures.json file."""
-    fixtures_file = fixture_set_path / "fixtures.json"
-    if fixtures_file.exists():
-        try:
-            with open(fixtures_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Warning: Could not read {fixtures_file}: {e}")
-    return None
-
-
 def iter_configs(hardware_path: Path):
     """Yield config info dicts for each config under a hardware directory.
 
@@ -235,7 +223,6 @@ def iter_configs(hardware_path: Path):
         name: Config folder name (e.g., '10M-gas-limit')
         dataset_type: 'eest' | 'mainnet' | 'other'
         fixture_set: Fixture-set directory name or None
-        fixture_set_info: Dict from fixtures.json or None
     """
     if not hardware_path.exists():
         return
@@ -246,7 +233,6 @@ def iter_configs(hardware_path: Path):
 
         if entry.name.startswith(EEST_FIXTURE_SET_PREFIX):
             # Fixture-set directory — iterate gas-limit subdirs inside
-            fixture_set_info = load_fixture_set_info(entry)
             for sub in sorted(entry.iterdir()):
                 if sub.is_dir() and not sub.name.startswith('.'):
                     yield {
@@ -254,7 +240,6 @@ def iter_configs(hardware_path: Path):
                         'name': sub.name,
                         'dataset_type': 'eest',
                         'fixture_set': entry.name,
-                        'fixture_set_info': fixture_set_info,
                     }
         elif entry.name.startswith('mainnet-'):
             yield {
@@ -262,7 +247,6 @@ def iter_configs(hardware_path: Path):
                 'name': entry.name,
                 'dataset_type': 'mainnet',
                 'fixture_set': None,
-                'fixture_set_info': None,
             }
         elif EEST_GAS_LIMIT_RE.match(entry.name):
             # Legacy flat layout (pre-migration)
@@ -271,7 +255,6 @@ def iter_configs(hardware_path: Path):
                 'name': entry.name,
                 'dataset_type': 'eest',
                 'fixture_set': None,
-                'fixture_set_info': None,
             }
 
 
