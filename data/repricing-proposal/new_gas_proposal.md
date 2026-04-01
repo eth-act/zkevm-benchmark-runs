@@ -176,7 +176,7 @@ The following parameters had a poor model fit:
 
 - ADDMOD - Model - reth-v1.11.0__zisk-v0.15.0
 
-- BLAKE2F - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
+- BLAKE2F - Model - reth-v1.11.0__zisk-v0.15.0, ethrex-v9.0.0__zisk-v0.15.0
 
 - BLS12_G1ADD - Model - ethrex-v9.0.0__zisk-v0.15.0
 
@@ -184,9 +184,9 @@ The following parameters had a poor model fit:
 
 - ECADD - Model - ethrex-v9.0.0__zisk-v0.15.0
 
-- ECPAIRING - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
+- ECPAIRING - Model - reth-v1.11.0__zisk-v0.15.0, ethrex-v9.0.0__zisk-v0.15.0
 
-- KECCAK256 - Model - ethrex-v9.0.0__zisk-v0.15.0, reth-v1.11.0__zisk-v0.15.0
+- KECCAK256 - Model - reth-v1.11.0__zisk-v0.15.0, ethrex-v9.0.0__zisk-v0.15.0
 
 - MOD - Model - reth-v1.11.0__zisk-v0.15.0
 
