@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 from _utils import (
+    iter_configs,
     load_workload_info,
     load_crashes_from_file,
     load_hardware_info,
@@ -68,7 +69,9 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
     """Collect data for a specific mode (proving or execution).
 
     Returns:
-        Dictionary organized by hardware -> config -> EL client -> zkVM -> results
+        Dictionary organized by hardware -> config_key -> EL client -> zkVM -> results.
+        For EEST configs with a fixture-set, config_key = '{fixture_set}/{gas_limit}'.
+        For mainnet configs, config_key = '{mainnet_range}'.
     """
     mode_data = {}
 
@@ -80,24 +83,20 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
         hardware_name = hardware_folder.name
         mode_data[hardware_name] = {}
 
-        # Find all config folders (gas limits and mainnet ranges)
-        config_folders = [item for item in hardware_folder.iterdir()
-                         if item.is_dir() and not item.name.startswith('.')]
-
-        for config_folder in config_folders:
-            config_name = config_folder.name
-            mode_data[hardware_name][config_name] = {}
-
-            # Determine dataset type
-            if config_name.endswith('-gas-limit'):
-                dataset_type = 'eest'
-            elif config_name.startswith('mainnet-'):
-                dataset_type = 'mainnet'
+        for cfg in iter_configs(hardware_folder):
+            config_folder = cfg['path']
+            # Build config key: include fixture-set prefix for EEST
+            if cfg['fixture_set']:
+                config_key = f"{cfg['fixture_set']}/{cfg['name']}"
             else:
-                dataset_type = 'other'
+                config_key = cfg['name']
 
-            mode_data[hardware_name][config_name]['dataset_type'] = dataset_type
-            mode_data[hardware_name][config_name]['el_clients'] = {}
+            mode_data[hardware_name][config_key] = {
+                'dataset_type': cfg['dataset_type'],
+                'fixture_set': cfg['fixture_set'],
+                'fixture_set_info': cfg['fixture_set_info'],
+                'el_clients': {},
+            }
 
             # All configurations: config -> EL client -> zkVM
             el_client_folders = [item for item in config_folder.iterdir()
@@ -105,9 +104,9 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
 
             for el_client_folder in el_client_folders:
                 el_client_name = el_client_folder.name
-                # Hardware info is always at config level
+                # Hardware info is always at config (gas-limit) level
                 el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
-                mode_data[hardware_name][config_name]['el_clients'][el_client_name] = el_client_data
+                mode_data[hardware_name][config_key]['el_clients'][el_client_name] = el_client_data
 
     return mode_data
 

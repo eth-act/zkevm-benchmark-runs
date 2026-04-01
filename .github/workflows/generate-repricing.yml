@@ -10,6 +10,10 @@ on:
         description: 'URL to the fixtures tar.gz archive'
         required: false
         default: 'https://github.com/jsign/artifacts/releases/download/fixtures_365433e_5_10_15_20_25_30_35/fixtures_365433e_5_10_15_20_25_30_35.tar.gz'
+      fixture_set:
+        description: 'Fixture set directory name under proving hardware (e.g., eest-365433e)'
+        required: false
+        default: 'eest-365433e'
       evm_gas_repricings_branch:
         description: 'Branch of jsign/evm-gas-repricings repo to use'
         required: false
@@ -83,7 +87,10 @@ jobs:
           RUNS_DIR="/tmp/evm-gas-repricings/zkevm/runs"
           mkdir -p "$RUNS_DIR"
 
-          for config_dir in data/proving/8x5090/*M-gas-limit; do
+          FIXTURE_SET="${{ github.event.inputs.fixture_set || 'eest-365433e' }}"
+          echo "Using fixture set: $FIXTURE_SET"
+
+          for config_dir in "data/proving/8x5090/${FIXTURE_SET}"/*M-gas-limit; do
             if [ -d "$config_dir" ]; then
               config_name=$(basename "$config_dir")
               echo "Copying $config_name..."

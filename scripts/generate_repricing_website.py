@@ -490,20 +490,43 @@ def get_hardware_friendly_name(hardware_id: str, hardware_info: dict[str, Any]) 
     return hardware_id
 
 
-def discover_eest_configs(proving_base: Path) -> list[str]:
-    """Discover all EEST configurations in the proving directory."""
+def _has_el_client_data(config_dir: Path) -> bool:
+    """Check if a config directory has at least one EL client with zkVM data."""
+    return any(
+        subdir.is_dir() and any(subdir.iterdir())
+        for subdir in config_dir.iterdir()
+        if subdir.is_dir() and not subdir.name.startswith('.')
+    )
+
+
+def discover_eest_configs(hardware_base: Path) -> list[tuple[str | None, str, Path]]:
+    """Discover all EEST configurations under a hardware directory.
+
+    Handles both:
+    - eest-* fixture-set dirs containing gas-limit subdirs (new layout)
+    - Direct *M-gas-limit dirs (legacy layout)
+
+    Returns list of (fixture_set_name, config_name, config_path) tuples.
+    """
     configs = []
-    if proving_base.exists():
-        for entry in sorted(proving_base.iterdir()):
-            if entry.is_dir() and EEST_CONFIG_PATTERN.match(entry.name):
-                # Check if it has at least one EL client subdirectory with zkVM data
-                has_el_client = any(
-                    subdir.is_dir() and any(subdir.iterdir())
-                    for subdir in entry.iterdir()
-                    if subdir.is_dir() and not subdir.name.startswith('.')
-                )
-                if has_el_client:
-                    configs.append(entry.name)
+    if not hardware_base.exists():
+        return configs
+
+    for entry in sorted(hardware_base.iterdir()):
+        if not entry.is_dir() or entry.name.startswith('.'):
+            continue
+
+        if entry.name.startswith("eest-"):
+            # Fixture-set directory — look for gas-limit subdirs inside
+            for sub in sorted(entry.iterdir()):
+                if sub.is_dir() and EEST_CONFIG_PATTERN.match(sub.name):
+                    if _has_el_client_data(sub):
+                        configs.append((entry.name, sub.name, sub))
+        elif EEST_CONFIG_PATTERN.match(entry.name):
+            # Legacy flat layout
+            if _has_el_client_data(entry):
+                configs.append((None, entry.name, entry))
+
     return configs
 
 
@@ -710,7 +733,8 @@ def main():
             logger.warning("No EEST configurations found for %s, skipping", hardware_id)
             continue
 
-        logger.info("Discovered EEST configurations: %s", eest_configs)
+        logger.info("Discovered EEST configurations: %s",
+                     [(fs, cn) for fs, cn, _ in eest_configs])
 
         # Create hardware-specific output directory
         hardware_output_dir = output_dir / hardware_id
@@ -720,20 +744,33 @@ def main():
         manifest_datasets = []
         hardware_info_sample = {}
 
-        for config_name in eest_configs:
-            logger.info("Processing configuration: %s/%s", hardware_id, config_name)
+        for fixture_set, config_name, config_path in eest_configs:
+            logger.info("Processing configuration: %s/%s%s", hardware_id,
+                        f"{fixture_set}/" if fixture_set else "", config_name)
 
-            config_path = hardware_base / config_name
             hardware_file = config_path / "hardware.json"
 
             output = process_all_results(config_path, hardware_file, config_name, hardware_id)
+            if fixture_set:
+                output["fixture_set"] = fixture_set
 
             # Keep a sample of hardware_info for the global manifest
             if not hardware_info_sample and output.get("hardware_info"):
                 hardware_info_sample = output["hardware_info"]
 
+            # Build dataset ID and output filename
+            if fixture_set:
+                dataset_id = f"{fixture_set}/{config_name}"
+                output_filename = f"results-{fixture_set}-{config_name}.json"
+                display_ref = fixture_set.removeprefix("eest-")
+                display_name = f"EEST {output['gas_limit']} Gas Limit ({display_ref})"
+            else:
+                dataset_id = config_name
+                output_filename = f"results-{config_name}.json"
+                display_name = f"EEST {output['gas_limit']} Gas Limit"
+
             # Write output file for this configuration
-            output_file = hardware_output_dir / f"results-{config_name}.json"
+            output_file = hardware_output_dir / output_filename
             with open(output_file, "w") as f:
                 json.dump(output, f, indent=2)
 
@@ -749,14 +786,17 @@ def main():
                 logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
 
             # Add to per-hardware manifest
-            manifest_datasets.append({
-                "id": config_name,
-                "name": f"EEST {output['gas_limit']} Gas Limit",
-                "file": f"results-{config_name}.json",
+            manifest_entry = {
+                "id": dataset_id,
+                "name": display_name,
+                "file": output_filename,
                 "gas_limit": output["gas_limit"],
                 "test_count": len(output["tests"]),
                 "zkvm_count": len(output["zkvms"]),
-            })
+            }
+            if fixture_set:
+                manifest_entry["fixture_set"] = fixture_set
+            manifest_datasets.append(manifest_entry)
 
         # Sort datasets by gas limit (numeric sort, descending)
         def sort_key(d):

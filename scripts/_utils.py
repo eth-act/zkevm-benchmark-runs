@@ -6,8 +6,12 @@ and the website generator scripts.
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
+
+EEST_FIXTURE_SET_PREFIX = "eest-"
+EEST_GAS_LIMIT_RE = re.compile(r"^\d+M-gas-limit$")
 
 
 def format_time(ms: int) -> str:
@@ -204,6 +208,71 @@ def process_zkvm_folder(zkvm_folder: Path, crashed_fixtures: List[str], mode: st
         print("   This may indicate inconsistent benchmark data - please review.\n")
 
     return successful_runs, sdk_crashed_runs, prover_crashed_runs
+
+
+def load_fixture_set_info(fixture_set_path: Path) -> Optional[Dict[str, Any]]:
+    """Load fixture set metadata from fixtures.json file."""
+    fixtures_file = fixture_set_path / "fixtures.json"
+    if fixtures_file.exists():
+        try:
+            with open(fixtures_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not read {fixtures_file}: {e}")
+    return None
+
+
+def iter_configs(hardware_path: Path):
+    """Yield config info dicts for each config under a hardware directory.
+
+    Handles three cases:
+    - eest-* fixture-set dirs containing gas-limit subdirs
+    - mainnet-* configs directly under hardware
+    - Legacy *M-gas-limit configs directly under hardware (backward compat)
+
+    Each yielded dict has keys:
+        path: Path to the config (gas-limit or mainnet) directory
+        name: Config folder name (e.g., '10M-gas-limit')
+        dataset_type: 'eest' | 'mainnet' | 'other'
+        fixture_set: Fixture-set directory name or None
+        fixture_set_info: Dict from fixtures.json or None
+    """
+    if not hardware_path.exists():
+        return
+
+    for entry in sorted(hardware_path.iterdir()):
+        if not entry.is_dir() or entry.name.startswith('.'):
+            continue
+
+        if entry.name.startswith(EEST_FIXTURE_SET_PREFIX):
+            # Fixture-set directory — iterate gas-limit subdirs inside
+            fixture_set_info = load_fixture_set_info(entry)
+            for sub in sorted(entry.iterdir()):
+                if sub.is_dir() and not sub.name.startswith('.'):
+                    yield {
+                        'path': sub,
+                        'name': sub.name,
+                        'dataset_type': 'eest',
+                        'fixture_set': entry.name,
+                        'fixture_set_info': fixture_set_info,
+                    }
+        elif entry.name.startswith('mainnet-'):
+            yield {
+                'path': entry,
+                'name': entry.name,
+                'dataset_type': 'mainnet',
+                'fixture_set': None,
+                'fixture_set_info': None,
+            }
+        elif EEST_GAS_LIMIT_RE.match(entry.name):
+            # Legacy flat layout (pre-migration)
+            yield {
+                'path': entry,
+                'name': entry.name,
+                'dataset_type': 'eest',
+                'fixture_set': None,
+                'fixture_set_info': None,
+            }
 
 
 def load_hardware_info(folder: Path) -> Optional[Dict[str, Any]]:

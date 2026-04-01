@@ -2,12 +2,14 @@
 """Ingest zkEVM benchmark run folders into the data directory structure.
 
 Moves JSON result files from a flat run folder into the canonical structure:
-  data/{mode}/{hardware}/{X}M-gas-limit/{el-client}/{zkvm}/
+  data/{mode}/{hardware}/{fixture-set}/{X}M-gas-limit/{el-client}/{zkvm}/
 
 Gas limit is extracted from each filename's benchmark-gas-value_XM pattern.
+The --fixture-set flag specifies which EEST fixture set the data belongs to.
 """
 
 import argparse
+import json
 import re
 import shutil
 import sys
@@ -51,7 +53,7 @@ def group_by_gas(json_files):
     return groups, skipped
 
 
-def ingest(source: Path, target_base: Path, dry_run: bool):
+def ingest(source: Path, target_base: Path, fixture_set: str, dry_run: bool):
     """Ingest one source folder into target_base."""
     hw_file = source / "hardware.json"
     if not hw_file.exists():
@@ -60,6 +62,7 @@ def ingest(source: Path, target_base: Path, dry_run: bool):
 
     stats = []
     hw_copied = set()
+    fixture_set_created = False
 
     for el_client, zkvm, json_files in discover_structure(source):
         groups, skipped = group_by_gas(json_files)
@@ -75,14 +78,32 @@ def ingest(source: Path, target_base: Path, dry_run: bool):
         for gas_value in sorted(groups, key=lambda v: int(v.rstrip("M"))):
             files = groups[gas_value]
             config = f"{gas_value}-gas-limit"
-            target_dir = target_base / config / el_client / zkvm
+            config_base = target_base / fixture_set / config if fixture_set else target_base / config
+            target_dir = config_base / el_client / zkvm
 
             if not dry_run:
                 target_dir.mkdir(parents=True, exist_ok=True)
 
+            # Create fixtures.json once per fixture-set.
+            if fixture_set and not fixture_set_created:
+                fs_dir = target_base / fixture_set
+                fs_file = fs_dir / "fixtures.json"
+                if not dry_run:
+                    fs_dir.mkdir(parents=True, exist_ok=True)
+                    if not fs_file.exists():
+                        ref = fixture_set.removeprefix("eest-")
+                        with open(fs_file, "w") as fh:
+                            json.dump({"source": "ethereum/execution-spec-tests", "ref": ref}, fh, indent=2)
+                            fh.write("\n")
+                        print(f"  CREATED {fs_file}")
+                else:
+                    if not fs_file.exists():
+                        print(f"  CREATE {fs_file}")
+                fixture_set_created = True
+
             # Copy hardware.json once per config folder.
             if config not in hw_copied:
-                hw_dest = target_base / config / "hardware.json"
+                hw_dest = config_base / "hardware.json"
                 if dry_run:
                     print(f"  COPY {hw_file} -> {hw_dest}")
                 else:
@@ -104,6 +125,8 @@ def ingest(source: Path, target_base: Path, dry_run: bool):
     # Print summary table.
     if stats:
         print()
+        if fixture_set:
+            print(f"Fixture set: {fixture_set}")
         print(f"{'Gas':>5}  {'EL Client':<20}  {'zkVM':<18}  {'Moved':>6}  {'Overwrote':>9}")
         print("-" * 68)
         total = 0
@@ -131,6 +154,8 @@ def main():
     parser.add_argument("--mode", default="proving",
                         choices=["proving", "executions"],
                         help="Data mode (default: proving)")
+    parser.add_argument("--fixture-set",
+                        help="EEST fixture set name (e.g., eest-365433e)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Show what would happen without moving files")
     args = parser.parse_args()
@@ -147,7 +172,7 @@ def main():
             ok = False
             continue
         print(f"Ingesting {source.name} ...")
-        if not ingest(source, target_base, args.dry_run):
+        if not ingest(source, target_base, args.fixture_set, args.dry_run):
             ok = False
 
     sys.exit(0 if ok else 1)

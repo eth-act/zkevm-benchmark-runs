@@ -7,6 +7,25 @@ let currentFilters = {
     crashesOnly: false
 };
 
+// Format a config key for display.
+// e.g. "eest-365433e/10M-gas-limit" -> "10M-gas-limit (eest-365433e)"
+// e.g. "mainnet-23533500-23533999" -> "mainnet-23533500-23533999"
+function formatConfigLabel(configKey) {
+    const slash = configKey.indexOf('/');
+    if (slash !== -1) {
+        const fixtureSet = configKey.substring(0, slash);
+        const gasLimit = configKey.substring(slash + 1);
+        return `${gasLimit} (${fixtureSet})`;
+    }
+    return configKey;
+}
+
+// Check if a config key represents a mainnet dataset.
+function isMainnetConfig(configKey) {
+    // mainnet-* is always at the top level (no fixture-set prefix)
+    return configKey.startsWith('mainnet-');
+}
+
 // Tab information text
 const TAB_INFO = {
     'execution': 'Contains execution-only runs (i.e. no proving) to detect completeness faults usually related to zkVM limits (e.g. execution length, input length, or guest program OOM). These are shown in the "SDK Crashed" column. Non-crashed execution durations aren\'t meaningful to compare proving performance.',
@@ -211,7 +230,7 @@ function populateConfigFilter() {
     sortedConfigs.forEach(name => {
         const option = document.createElement('option');
         option.value = name;
-        option.textContent = name;
+        option.textContent = formatConfigLabel(name);
         select.appendChild(option);
     });
 
@@ -488,7 +507,7 @@ function generateResultsSection(hardware, config, allElClients) {
 
     let html = `
         <div class="results-section">
-            <h2 data-section="${sectionId}">${hardware} - ${config}</h2>
+            <h2 data-section="${sectionId}">${hardware} - ${formatConfigLabel(config)}</h2>
             <div class="results-section-content" id="${sectionId}">
     `;
 
@@ -804,7 +823,7 @@ function updateReproduceSectionVisibility() {
     const reproduceSection = document.getElementById('reproduce-section');
 
     // Only show for execution mode AND non-mainnet datasets (EEST only)
-    const isMainnetDataset = currentFilters.config !== 'all' && currentFilters.config.startsWith('mainnet-');
+    const isMainnetDataset = currentFilters.config !== 'all' && isMainnetConfig(currentFilters.config);
 
     if (currentMode === 'execution' && !isMainnetDataset) {
         reproduceSection.classList.remove('hidden');
