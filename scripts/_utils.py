@@ -12,7 +12,7 @@ from typing import Dict, List, Tuple, Any, Optional
 
 EEST_FIXTURE_SET_PREFIX = "eest-"
 EEST_GAS_LIMIT_RE = re.compile(r"^\d+M-gas-limit$")
-GAS_VALUE_RE = re.compile(r"benchmark-gas-value_(\d+M)")
+GAS_VALUE_RE = re.compile(r"benchmark(?:-gas-value)?_(\d+M)")
 
 
 def format_time(ms: int) -> str:
@@ -133,8 +133,8 @@ def filter_json_by_gas(json_files: List[Path], gas_value: str) -> List[Path]:
     Returns:
         Filtered list of paths whose filenames contain benchmark-gas-value_{gas_value}
     """
-    pattern = f"benchmark-gas-value_{gas_value}"
-    return [f for f in json_files if pattern in f.name]
+    pat = re.compile(rf"benchmark(?:-gas-value)?_{re.escape(gas_value)}")
+    return [f for f in json_files if pat.search(f.name)]
 
 
 def process_zkvm_folder(zkvm_folder: Path, mode: str = 'proving',
