@@ -117,79 +117,131 @@ function panel(title) {
 }
 
 function makeOpcodeTable(opcodes) {
-    const sorted = [...opcodes].sort((a, b) => b.cost - a.cost);
-    return buildTable(
+    return makeSortableTable(
         ['Opcode', 'Count', 'Count %', 'Cost', 'Cost %', 'Rank'],
-        sorted.map(o => [
-            `<code>${o.name}</code>`,
-            formatNumber(o.count),
-            formatPct(o.count_pct),
-            formatCost(o.cost),
-            formatPct(o.cost_pct),
-            o.rank ? `#${o.rank}` : '',
-        ]),
-        [false, true, true, true, true, true]
+        opcodes,
+        [
+            { value: o => o.name,      format: o => `<code>${o.name}</code>`, numeric: false },
+            { value: o => o.count,     format: o => formatNumber(o.count),    numeric: true },
+            { value: o => o.count_pct, format: o => formatPct(o.count_pct),   numeric: true },
+            { value: o => o.cost,      format: o => formatCost(o.cost),       numeric: true },
+            { value: o => o.cost_pct,  format: o => formatPct(o.cost_pct),    numeric: true },
+            { value: o => o.rank,      format: o => o.rank ? `#${o.rank}` : '', numeric: true },
+        ],
+        { col: 3, dir: 'desc' }
     );
 }
 
 function makeMarkIdTable(marks) {
-    return buildTable(
+    return makeSortableTable(
         ['Phase', 'Total Cost', 'Cost %', 'Main', 'Opcodes', 'Precompiles', 'Memory'],
-        marks.map(m => [
-            m.name,
-            formatCost(m.total_cost),
-            formatPct(m.total_cost_pct),
-            formatCost(m.main_cost),
-            formatCost(m.opcode_cost),
-            formatCost(m.precompile_cost),
-            formatCost(m.memory_cost),
-        ]),
-        [false, true, true, true, true, true, true]
+        marks,
+        [
+            { value: m => m.name,            format: m => m.name,                       numeric: false },
+            { value: m => m.total_cost,      format: m => formatCost(m.total_cost),     numeric: true },
+            { value: m => m.total_cost_pct,  format: m => formatPct(m.total_cost_pct),  numeric: true },
+            { value: m => m.main_cost,       format: m => formatCost(m.main_cost),      numeric: true },
+            { value: m => m.opcode_cost,     format: m => formatCost(m.opcode_cost),    numeric: true },
+            { value: m => m.precompile_cost, format: m => formatCost(m.precompile_cost),numeric: true },
+            { value: m => m.memory_cost,     format: m => formatCost(m.memory_cost),    numeric: true },
+        ]
     );
 }
 
 function makeFunctionTable(funcs) {
-    return buildTable(
+    return makeSortableTable(
         ['Function', 'Cost', 'Cost %', 'Calls', 'Cost/Call'],
-        funcs.map(f => [
-            `<span class="fn-name" title="${escapeHtml(f.function)}">${escapeHtml(f.function_short)}</span>`,
-            formatCost(f.cost),
-            formatPct(f.cost_pct),
-            formatNumber(f.calls),
-            formatCost(f.cost_per_call),
-        ]),
-        [false, true, true, true, true]
+        funcs,
+        [
+            { value: f => f.function_short, format: f => `<span class="fn-name" title="${escapeHtml(f.function)}">${escapeHtml(f.function_short)}</span>`, numeric: false },
+            { value: f => f.cost,           format: f => formatCost(f.cost),          numeric: true },
+            { value: f => f.cost_pct,       format: f => formatPct(f.cost_pct),       numeric: true },
+            { value: f => f.calls,          format: f => formatNumber(f.calls),       numeric: true },
+            { value: f => f.cost_per_call,  format: f => formatCost(f.cost_per_call), numeric: true },
+        ]
     );
 }
 
-function buildTable(headers, rows, numCols) {
+function makeSortableTable(headers, data, columns, defaultSort) {
     const wrap = document.createElement('div');
     wrap.className = 'table-container';
     const table = document.createElement('table');
     table.className = 'compact-table';
 
+    // State
+    let sortCol = defaultSort ? defaultSort.col : null;
+    let sortDir = defaultSort ? defaultSort.dir : 'desc';
+    let items = [...data];
+
+    // thead
     const thead = document.createElement('thead');
     const headRow = document.createElement('tr');
-    headers.forEach(h => {
+    const ths = headers.map((h, i) => {
         const th = document.createElement('th');
         th.textContent = h;
+        th.className = 'sortable';
+        th.addEventListener('click', () => {
+            if (sortCol === i) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortCol = i;
+                sortDir = columns[i].numeric ? 'desc' : 'asc';
+            }
+            renderRows();
+            updateSortIndicators();
+        });
         headRow.appendChild(th);
+        return th;
     });
     thead.appendChild(headRow);
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    for (const row of rows) {
-        const tr = document.createElement('tr');
-        row.forEach((cell, i) => {
-            const td = document.createElement('td');
-            if (numCols && numCols[i]) td.className = 'num';
-            td.innerHTML = cell;
-            tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-    }
     table.appendChild(tbody);
+
+    function updateSortIndicators() {
+        ths.forEach((th, i) => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+            if (i === sortCol) th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        });
+    }
+
+    function renderRows() {
+        const sorted = [...items];
+        if (sortCol !== null) {
+            const col = columns[sortCol];
+            sorted.sort((a, b) => {
+                const va = col.value(a);
+                const vb = col.value(b);
+                if (va == null && vb == null) return 0;
+                if (va == null) return 1;
+                if (vb == null) return -1;
+                let cmp;
+                if (col.numeric) {
+                    cmp = va - vb;
+                } else {
+                    cmp = String(va).localeCompare(String(vb));
+                }
+                return sortDir === 'asc' ? cmp : -cmp;
+            });
+        }
+        tbody.innerHTML = '';
+        for (const item of sorted) {
+            const tr = document.createElement('tr');
+            columns.forEach((col, i) => {
+                const td = document.createElement('td');
+                if (col.numeric) td.className = 'num';
+                td.innerHTML = col.format(item);
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        }
+    }
+
+    // Initial render
+    if (defaultSort) updateSortIndicators();
+    renderRows();
+
     wrap.appendChild(table);
     return wrap;
 }
