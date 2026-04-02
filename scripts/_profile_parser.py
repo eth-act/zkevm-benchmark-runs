@@ -260,79 +260,6 @@ def extract_test_id(filename: str) -> str:
     return name
 
 
-def extract_operation(test_id: str) -> str | None:
-    """Extract the EVM operation name from a test ID's parameters.
-
-    Looks for known opcode/precompile names in the test parameters.
-    Returns the canonical operation name or None.
-    """
-    # Extract bracket params
-    m = re.search(r'\[(.*)\]', test_id)
-    if not m:
-        return None
-    params = m.group(1).upper()
-
-    # Also check the test function name
-    func_part = test_id.split('[')[0].upper()
-
-    # Check for known operations in params
-    known_ops = [
-        'EXTCODECOPY', 'EXTCODESIZE', 'EXTCODEHASH',
-        'BALANCE', 'SLOAD', 'SSTORE', 'TSTORE', 'TLOAD',
-        'KECCAK256', 'SHA256', 'ECRECOVER', 'MODEXP',
-        'CREATE2', 'CALL', 'STATICCALL', 'DELEGATECALL',
-        'CODECOPY', 'CALLDATACOPY', 'RETURNDATACOPY',
-        'MLOAD', 'MSTORE', 'MSTORE8', 'MCOPY',
-        'LOG0', 'LOG1', 'LOG2', 'LOG3', 'LOG4',
-        'ADD', 'MUL', 'SUB', 'DIV', 'MOD', 'EXP',
-        'ADDMOD', 'MULMOD', 'SIGNEXTEND',
-        'SHL', 'SHR', 'SAR',
-        'AND', 'OR', 'XOR', 'NOT', 'BYTE',
-        'EQ', 'LT', 'GT', 'SLT', 'SGT', 'ISZERO',
-        'BLOCKHASH', 'COINBASE', 'TIMESTAMP', 'NUMBER',
-        'PREVRANDAO', 'GASLIMIT', 'CHAINID', 'SELFBALANCE',
-        'BASEFEE', 'BLOBBASEFEE',
-        'POP', 'JUMP', 'JUMPI', 'PC', 'GAS',
-        'PUSH', 'DUP', 'SWAP',
-        'IDENTITY', 'RIPEMD160', 'BLAKE2F',
-        'BN128_ADD', 'BN128_MUL', 'BN128_PAIRING',
-        'BLS12_G1ADD', 'BLS12_G1MUL', 'BLS12_G1MSM',
-        'BLS12_G2ADD', 'BLS12_G2MUL', 'BLS12_G2MSM',
-        'BLS12_PAIRING', 'BLS12_MAP_FP_TO_G1', 'BLS12_MAP_FP2_TO_G2',
-        'P256VERIFY', 'POINT_EVALUATION',
-    ]
-
-    for op in known_ops:
-        if op in params:
-            return op
-
-    # Try to extract from function name patterns
-    if 'ERC20_MINT' in func_part:
-        return 'SSTORE'
-    if 'ERC20_APPROVE' in func_part:
-        return 'SSTORE'
-    if 'ERC20_BALANCEOF' in func_part or 'ERC20_BALANCE' in func_part:
-        return 'SLOAD'
-    if 'SLOAD' in func_part:
-        return 'SLOAD'
-    if 'SSTORE' in func_part:
-        return 'SSTORE'
-    if 'TSTORE' in func_part:
-        return 'TSTORE'
-    if 'KECCAK' in func_part:
-        return 'KECCAK256'
-    if 'CREATE2' in func_part:
-        return 'CREATE2'
-    if 'ACCOUNT_ACCESS' in func_part:
-        return 'BALANCE'
-    if 'ACCOUNT_QUERY' in func_part:
-        return 'EXTCODECOPY'
-    if 'STATEROOT' in func_part or 'DEPTH' in func_part:
-        return None  # Mixed/structural test
-
-    return None
-
-
 def parse_profile_file(path: Path) -> dict:
     """Parse a profile file and return structured data with metadata."""
     text = path.read_text()
@@ -342,12 +269,10 @@ def parse_profile_file(path: Path) -> dict:
         data = parse_error_file(text)
         data['filename'] = filename
         data['test_id'] = extract_test_id(filename)
-        data['operation'] = extract_operation(data['test_id'])
         return data
 
     profile = parse_profile(text)
     profile['status'] = 'success'
     profile['filename'] = filename
     profile['test_id'] = extract_test_id(filename)
-    profile['operation'] = extract_operation(profile['test_id'])
     return profile

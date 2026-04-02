@@ -17,7 +17,7 @@ from pathlib import Path
 
 # Add scripts directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
-from _profile_parser import parse_profile_file, extract_operation
+from _profile_parser import parse_profile_file
 
 
 def test_hash(test_id: str) -> str:
@@ -237,7 +237,6 @@ def generate(profiles_base: Path, output_dir: Path):
                     test_map[tid] = {
                         'id': tid,
                         'name': short_test_name(tid),
-                        'operation': p.get('operation'),
                         'hash': test_hash(tid),
                         'el_clients': {},
                     }
@@ -288,7 +287,6 @@ def generate(profiles_base: Path, output_dir: Path):
                 detail = {
                     'test_id': p['test_id'],
                     'name': short_test_name(p['test_id']),
-                    'operation': p.get('operation'),
                     'el_client': el_client,
                     'report': p['report'],
                     'cost_by_opcode': p['cost_by_opcode'],

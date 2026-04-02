@@ -1,7 +1,6 @@
 const PARAMS = {
     fixtureSet: 'fs',
     search: 'q',
-    operation: 'op',
     status: 'st',
     sort: 'sort',
     sortDir: 'dir',
@@ -14,7 +13,6 @@ export function readState() {
     return {
         fixtureSet: p.get(PARAMS.fixtureSet) || '',
         search: p.get(PARAMS.search) || '',
-        operation: p.get(PARAMS.operation) || '',
         status: p.get(PARAMS.status) || 'all',
         sort: p.get(PARAMS.sort) || 'name',
         sortDir: p.get(PARAMS.sortDir) || 'asc',
@@ -27,7 +25,6 @@ export function pushState(state) {
     const p = new URLSearchParams();
     if (state.fixtureSet) p.set(PARAMS.fixtureSet, state.fixtureSet);
     if (state.search) p.set(PARAMS.search, state.search);
-    if (state.operation) p.set(PARAMS.operation, state.operation);
     if (state.status && state.status !== 'all') p.set(PARAMS.status, state.status);
     if (state.sort && state.sort !== 'name') p.set(PARAMS.sort, state.sort);
     if (state.sortDir && state.sortDir !== 'asc') p.set(PARAMS.sortDir, state.sortDir);

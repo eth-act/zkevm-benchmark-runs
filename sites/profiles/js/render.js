@@ -63,11 +63,6 @@ export function renderTestTableHeader(thead, elClients) {
     thTest.textContent = 'Test';
     row1.appendChild(thTest);
 
-    const thOp = document.createElement('th');
-    thOp.setAttribute('rowspan', '2');
-    thOp.dataset.sort = 'operation';
-    thOp.textContent = 'Operation';
-    row1.appendChild(thOp);
 
     for (const el of elClients) {
         const th = document.createElement('th');
@@ -119,7 +114,6 @@ export function renderTestList(tbody, tests, elClients) {
 
         let cells = `
             <td title="${escapeAttr(t.id)}"><span class="test-link">${t.name}</span></td>
-            <td>${t.operation || '-'}</td>
         `;
 
         for (let i = 0; i < elClients.length; i++) {

@@ -74,13 +74,6 @@ export class App {
             }, 200);
         });
 
-        // Operation filter
-        const opFilter = document.getElementById('op-filter');
-        opFilter.addEventListener('change', () => {
-            this.state.operation = opFilter.value;
-            pushState(this.state);
-            this.renderTestList();
-        });
 
         // Status filters
         document.querySelectorAll('[data-status]').forEach(btn => {
@@ -153,17 +146,6 @@ export class App {
             this.aggregates.el_clients
         );
 
-        // Populate operation filter
-        const opFilter = document.getElementById('op-filter');
-        opFilter.innerHTML = '<option value="">All</option>';
-        const ops = new Set(this.allTests.map(t => t.operation).filter(Boolean));
-        for (const op of [...ops].sort()) {
-            const opt = document.createElement('option');
-            opt.value = op;
-            opt.textContent = op;
-            opFilter.appendChild(opt);
-        }
-        if (this.state.operation) opFilter.value = this.state.operation;
 
         this.render();
     }
@@ -202,20 +184,15 @@ export class App {
             const q = this.state.search.toLowerCase();
             tests = tests.filter(t =>
                 t.name.toLowerCase().includes(q) ||
-                t.id.toLowerCase().includes(q) ||
-                (t.operation || '').toLowerCase().includes(q)
+                t.id.toLowerCase().includes(q)
             );
         }
 
-        // Filter by operation
-        if (this.state.operation) {
-            tests = tests.filter(t => t.operation === this.state.operation);
-        }
 
-        // Filter by status — match if ANY client has the filtered status
+        // Filter by status — match only if ALL clients have the filtered status
         if (this.state.status !== 'all') {
             tests = tests.filter(t =>
-                Object.values(t.el_clients).some(d => d.status === this.state.status)
+                Object.values(t.el_clients).every(d => d.status === this.state.status)
             );
         }
 
@@ -230,7 +207,6 @@ export class App {
 
             switch (this.state.sort) {
                 case 'name': return dir * a.name.localeCompare(b.name);
-                case 'operation': return dir * (a.operation || '').localeCompare(b.operation || '');
                 case 'cost': return dir * ((da.total_cost || 0) - (db.total_cost || 0));
                 case 'top_opcode': return dir * (da.top_opcode || '').localeCompare(db.top_opcode || '');
                 case 'status': return dir * (da.status || '').localeCompare(db.status || '');
