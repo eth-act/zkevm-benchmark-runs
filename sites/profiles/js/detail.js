@@ -1,4 +1,4 @@
-import { COST_CATEGORIES, PHASE_COLORS, formatNumber, formatCost, formatPct } from './constants.js';
+import { COST_CATEGORIES, formatNumber, formatCost, formatPct } from './constants.js';
 
 export async function loadAndRenderDetail(container, fixtureSet, elClients, testHash, testInfo) {
     container.innerHTML = '';
@@ -90,7 +90,6 @@ function renderDetailContent(container, detail) {
     // Execution Phases (MARK_ID)
     if (detail.mark_ids?.length) {
         const markPanel = panel('Execution Phases');
-        markPanel.appendChild(makePhaseBar(detail.mark_ids));
         markPanel.appendChild(makeMarkIdTable(detail.mark_ids));
         grid.appendChild(markPanel);
     }
@@ -131,27 +130,6 @@ function makeOpcodeTable(opcodes) {
         ]),
         [false, true, true, true, true, true]
     );
-}
-
-function makePhaseBar(marks) {
-    const total = marks.reduce((s, m) => s + m.total_cost, 0);
-    if (!total) return document.createDocumentFragment();
-
-    const bar = document.createElement('div');
-    bar.className = 'phase-bar';
-
-    marks.forEach((m, i) => {
-        const pct = (m.total_cost / total) * 100;
-        if (pct < 0.05) return;
-        const seg = document.createElement('div');
-        seg.className = 'phase-bar-seg';
-        seg.style.width = `${pct}%`;
-        seg.style.background = PHASE_COLORS[i % PHASE_COLORS.length];
-        seg.title = `${m.name}: ${pct.toFixed(1)}%`;
-        bar.appendChild(seg);
-    });
-
-    return bar;
 }
 
 function makeMarkIdTable(marks) {

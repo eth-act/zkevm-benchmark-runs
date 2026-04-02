@@ -6,13 +6,6 @@ export const COST_CATEGORIES = [
     { key: 'memory', label: 'Memory', cssClass: 'seg-memory' },
 ];
 
-export const PHASE_COLORS = [
-    '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-    '#0ea5e9', '#f97316', '#14b8a6', '#e879f9', '#64748b',
-    '#ec4899', '#22d3ee', '#84cc16', '#a855f7', '#f43f5e',
-    '#06b6d4', '#d946ef', '#facc15', '#fb923c',
-];
-
 export function formatNumber(n) {
     if (n == null) return '-';
     return n.toLocaleString('en-US');
