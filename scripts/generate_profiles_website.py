@@ -292,7 +292,6 @@ def generate(profiles_base: Path, output_dir: Path):
                     'el_client': el_client,
                     'report': p['report'],
                     'cost_by_opcode': p['cost_by_opcode'],
-                    'frops_by_opcode': p['frops_by_opcode'],
                     'top_step_functions': p['top_step_functions'][:20],
                     'top_cost_functions': p['top_cost_functions'][:20],
                     'mark_ids': p['mark_ids'],

@@ -53,24 +53,103 @@ export function renderCostDistribution(container, aggregates, elClients) {
     container.appendChild(legend);
 }
 
-export function renderTestList(tbody, tests, elClients, primaryEl) {
+export function renderTestTableHeader(thead, elClients) {
+    thead.innerHTML = '';
+
+    const row1 = document.createElement('tr');
+    const thTest = document.createElement('th');
+    thTest.setAttribute('rowspan', '2');
+    thTest.dataset.sort = 'name';
+    thTest.textContent = 'Test';
+    row1.appendChild(thTest);
+
+    const thOp = document.createElement('th');
+    thOp.setAttribute('rowspan', '2');
+    thOp.dataset.sort = 'operation';
+    thOp.textContent = 'Operation';
+    row1.appendChild(thOp);
+
+    for (const el of elClients) {
+        const th = document.createElement('th');
+        th.setAttribute('colspan', '3');
+        th.className = 'el-group-header';
+        th.textContent = el;
+        row1.appendChild(th);
+    }
+
+    const row2 = document.createElement('tr');
+    for (let i = 0; i < elClients.length; i++) {
+        const el = elClients[i];
+        const isLast = i === elClients.length - 1;
+
+        const thCost = document.createElement('th');
+        thCost.dataset.sort = 'cost';
+        thCost.dataset.el = el;
+        thCost.classList.add('el-group-first');
+        thCost.textContent = 'Cost';
+        row2.appendChild(thCost);
+
+        const thTopOp = document.createElement('th');
+        thTopOp.dataset.sort = 'top_opcode';
+        thTopOp.dataset.el = el;
+        thTopOp.textContent = 'Top Opcode';
+        row2.appendChild(thTopOp);
+
+        const thStatus = document.createElement('th');
+        thStatus.dataset.sort = 'status';
+        thStatus.dataset.el = el;
+        thStatus.textContent = 'Status';
+        if (!isLast) thStatus.classList.add('el-group-last');
+        row2.appendChild(thStatus);
+    }
+
+    thead.appendChild(row1);
+    thead.appendChild(row2);
+}
+
+function escapeAttr(s) {
+    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+export function renderTestList(tbody, tests, elClients) {
     tbody.innerHTML = '';
     for (const t of tests) {
         const tr = document.createElement('tr');
         tr.dataset.hash = t.hash;
 
-        // Pick the primary EL client data for display
-        const el = primaryEl !== 'all' ? primaryEl : elClients[0];
-        const d = t.el_clients[el] || Object.values(t.el_clients)[0] || {};
-
-        const isSuccess = d.status === 'success';
-        tr.innerHTML = `
-            <td title="${t.id}"><span class="test-link">${t.name}</span></td>
+        let cells = `
+            <td title="${escapeAttr(t.id)}"><span class="test-link">${t.name}</span></td>
             <td>${t.operation || '-'}</td>
-            <td class="num">${isSuccess ? formatCost(d.total_cost) : '-'}</td>
-            <td>${isSuccess ? (d.top_opcode || '-') : '-'}</td>
-            <td><span class="status-badge ${d.status}">${d.status}</span></td>
         `;
+
+        for (let i = 0; i < elClients.length; i++) {
+            const el = elClients[i];
+            const d = t.el_clients[el];
+            const isLast = i === elClients.length - 1;
+            const lastClass = !isLast ? ' el-group-last' : '';
+
+            if (d && d.status === 'success') {
+                cells += `
+                    <td class="num el-group-first">${formatCost(d.total_cost)}</td>
+                    <td>${d.top_opcode || '-'}</td>
+                    <td class="${lastClass}"><span class="status-badge success">success</span></td>
+                `;
+            } else if (d && d.status === 'error') {
+                cells += `
+                    <td class="num el-group-first">-</td>
+                    <td>-</td>
+                    <td class="${lastClass}"><span class="status-badge error">error</span></td>
+                `;
+            } else {
+                cells += `
+                    <td class="num el-missing el-group-first">-</td>
+                    <td class="el-missing">-</td>
+                    <td class="el-missing${lastClass}">-</td>
+                `;
+            }
+        }
+
+        tr.innerHTML = cells;
         tbody.appendChild(tr);
     }
 }

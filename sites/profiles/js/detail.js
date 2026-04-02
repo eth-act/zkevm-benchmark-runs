@@ -73,8 +73,6 @@ function renderDetailContent(container, detail) {
     stats.innerHTML = `
         <strong>Total Cost:</strong> ${formatCost(detail.report?.total_cost)}
         &nbsp;|&nbsp;
-        <strong>FROPs:</strong> ${formatNumber(detail.report?.frops?.count)} (${formatPct(detail.report?.frops?.pct)})
-        &nbsp;|&nbsp;
         <strong>RAM Usage:</strong> ${formatNumber(detail.report?.ram_usage?.count)} (${formatPct(detail.report?.ram_usage?.pct)})
     `;
     distPanel.appendChild(stats);
@@ -89,20 +87,15 @@ function renderDetailContent(container, detail) {
     opcodePanel.appendChild(makeOpcodeTable(detail.cost_by_opcode || []));
     grid.appendChild(opcodePanel);
 
-    // FROPs by Opcode
-    const fropsPanel = panel('FROPs by Opcode');
-    fropsPanel.appendChild(makeFropsTable(detail.frops_by_opcode || []));
-    grid.appendChild(fropsPanel);
-
-    container.appendChild(grid);
-
     // Execution Phases (MARK_ID)
     if (detail.mark_ids?.length) {
         const markPanel = panel('Execution Phases');
         markPanel.appendChild(makePhaseBar(detail.mark_ids));
         markPanel.appendChild(makeMarkIdTable(detail.mark_ids));
-        container.appendChild(markPanel);
+        grid.appendChild(markPanel);
     }
+
+    container.appendChild(grid);
 
     // Top Functions by Cost
     if (detail.top_cost_functions?.length) {
@@ -135,22 +128,6 @@ function makeOpcodeTable(opcodes) {
             formatCost(o.cost),
             formatPct(o.cost_pct),
             o.rank ? `#${o.rank}` : '',
-        ]),
-        [false, true, true, true, true, true]
-    );
-}
-
-function makeFropsTable(frops) {
-    const sorted = [...frops].sort((a, b) => b.cost - a.cost);
-    return buildTable(
-        ['FROP', 'Count', 'Hit %', 'Cost', 'Cost %', 'Rank'],
-        sorted.map(f => [
-            `<code>${f.name}</code>`,
-            formatNumber(f.count),
-            formatPct(f.hit_pct),
-            formatCost(f.cost),
-            formatPct(f.cost_pct),
-            f.rank ? `#${f.rank}` : '',
         ]),
         [false, true, true, true, true, true]
     );

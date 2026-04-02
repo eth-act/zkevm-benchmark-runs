@@ -148,7 +148,7 @@
     border-color: var(--accent);
 }
 
-/* Sortable table headers */
+/* Two-level table headers */
 #tests-table th {
     cursor: pointer;
     user-select: none;
@@ -158,6 +158,54 @@
     color: var(--accent);
 }
 
+.el-group-header {
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: default !important;
+}
+
+.el-group-header:hover {
+    color: var(--text-primary) !important;
+}
+
+#tests-thead tr:nth-child(2) th {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+}
+
+/* Visual separators between EL client groups */
+.el-group-header {
+    border-left: 2px solid var(--border);
+}
+
+.el-group-header:not(:last-child) {
+    border-right: 2px solid var(--border);
+}
+
+td.el-group-first,
+th.el-group-first {
+    border-left: 2px solid var(--border);
+}
+
+td.el-group-last,
+th.el-group-last {
+    border-right: 2px solid var(--border);
+}
+
+/* Missing data */
+td.el-missing {
+    color: var(--text-muted);
+}
+
+/* Compact table to fit extra columns */
+#tests-table th,
+#tests-table td {
+    padding: 8px 10px;
+    font-size: 0.8125rem;
+}
+
 /* Clickable test rows */
 #tests-table tbody tr {
     cursor: pointer;
@@ -165,6 +213,14 @@
 
 #tests-table tbody tr:hover td {
     background: var(--bg-secondary);
+}
+
+/* Test name column — truncate long names, full name visible on hover (title) */
+#tests-table td:first-child {
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Test name link hint */

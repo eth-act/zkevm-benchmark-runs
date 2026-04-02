@@ -1,5 +1,5 @@
 import { readState, pushState } from './state.js';
-import { renderCostDistribution, renderTestList } from './render.js';
+import { renderCostDistribution, renderTestList, renderTestTableHeader } from './render.js';
 import { loadAndRenderDetail } from './detail.js';
 
 export class App {
@@ -61,14 +61,6 @@ export class App {
             this.render();
         });
 
-        // EL client selector
-        const elSelect = document.getElementById('el-client');
-        elSelect.addEventListener('change', () => {
-            this.state.elClient = elSelect.value;
-            pushState(this.state);
-            this.render();
-        });
-
         // Search
         const search = document.getElementById('search');
         search.value = this.state.search;
@@ -101,19 +93,22 @@ export class App {
             });
         });
 
-        // Table sort
-        document.querySelectorAll('#tests-table th[data-sort]').forEach(th => {
-            th.addEventListener('click', () => {
-                const col = th.dataset.sort;
-                if (this.state.sort === col) {
-                    this.state.sortDir = this.state.sortDir === 'asc' ? 'desc' : 'asc';
-                } else {
-                    this.state.sort = col;
-                    this.state.sortDir = 'asc';
-                }
-                pushState(this.state);
-                this.renderTestList();
-            });
+        // Table sort (event delegation since headers are dynamic)
+        document.getElementById('tests-thead').addEventListener('click', (e) => {
+            const th = e.target.closest('th[data-sort]');
+            if (!th) return;
+            const col = th.dataset.sort;
+            const el = th.dataset.el || '';
+
+            if (this.state.sort === col && this.state.sortEl === el) {
+                this.state.sortDir = this.state.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.state.sort = col;
+                this.state.sortEl = el;
+                this.state.sortDir = 'asc';
+            }
+            pushState(this.state);
+            this.renderTestList();
         });
 
         // Test row clicks
@@ -152,22 +147,11 @@ export class App {
         this.aggregates = await resp.json();
         this.allTests = this.aggregates.tests || [];
 
-        // Update EL client selector
-        const elSelect = document.getElementById('el-client');
-        const currentVal = elSelect.value;
-        elSelect.innerHTML = '<option value="all">All</option>';
-        for (const el of this.aggregates.el_clients) {
-            const opt = document.createElement('option');
-            opt.value = el;
-            opt.textContent = el;
-            elSelect.appendChild(opt);
-        }
-        if (this.state.elClient && this.aggregates.el_clients.includes(this.state.elClient)) {
-            elSelect.value = this.state.elClient;
-        } else {
-            elSelect.value = 'all';
-            this.state.elClient = 'all';
-        }
+        // Build dynamic table headers
+        renderTestTableHeader(
+            document.getElementById('tests-thead'),
+            this.aggregates.el_clients
+        );
 
         // Populate operation filter
         const opFilter = document.getElementById('op-filter');
@@ -185,7 +169,7 @@ export class App {
     }
 
     render() {
-        const elClients = this.getActiveElClients();
+        const elClients = this.aggregates.el_clients;
 
         // Restore status filter button
         document.querySelectorAll('[data-status]').forEach(b => {
@@ -207,15 +191,9 @@ export class App {
         }
     }
 
-    getActiveElClients() {
-        if (this.state.elClient !== 'all') {
-            return [this.state.elClient];
-        }
-        return this.aggregates.el_clients;
-    }
-
     renderTestList() {
         let tests = this.allTests;
+        const elClients = this.aggregates.el_clients;
 
         // Filter by search
         if (this.state.search) {
@@ -232,35 +210,37 @@ export class App {
             tests = tests.filter(t => t.operation === this.state.operation);
         }
 
-        // Filter by status
+        // Filter by status — match if ANY client has the filtered status
         if (this.state.status !== 'all') {
-            const el = this.state.elClient !== 'all' ? this.state.elClient : this.aggregates.el_clients[0];
-            tests = tests.filter(t => {
-                const d = t.el_clients[el] || Object.values(t.el_clients)[0];
-                return d && d.status === this.state.status;
-            });
+            tests = tests.filter(t =>
+                Object.values(t.el_clients).some(d => d.status === this.state.status)
+            );
         }
 
-        // Sort
-        const el = this.state.elClient !== 'all' ? this.state.elClient : this.aggregates.el_clients[0];
+        // Sort — use sortEl to determine which client's data to sort by
+        const sortEl = this.state.sortEl && elClients.includes(this.state.sortEl)
+            ? this.state.sortEl
+            : elClients[0];
         const dir = this.state.sortDir === 'asc' ? 1 : -1;
         tests = [...tests].sort((a, b) => {
-            const da = a.el_clients[el] || Object.values(a.el_clients)[0] || {};
-            const db = b.el_clients[el] || Object.values(b.el_clients)[0] || {};
+            const da = a.el_clients[sortEl] || {};
+            const db = b.el_clients[sortEl] || {};
 
             switch (this.state.sort) {
                 case 'name': return dir * a.name.localeCompare(b.name);
                 case 'operation': return dir * (a.operation || '').localeCompare(b.operation || '');
                 case 'cost': return dir * ((da.total_cost || 0) - (db.total_cost || 0));
+                case 'top_opcode': return dir * (da.top_opcode || '').localeCompare(db.top_opcode || '');
                 case 'status': return dir * (da.status || '').localeCompare(db.status || '');
                 default: return dir * a.name.localeCompare(b.name);
             }
         });
 
         // Update sort indicators
-        document.querySelectorAll('#tests-table th[data-sort]').forEach(th => {
+        document.querySelectorAll('#tests-thead th[data-sort]').forEach(th => {
             th.classList.remove('sorted-asc', 'sorted-desc');
-            if (th.dataset.sort === this.state.sort) {
+            const thEl = th.dataset.el || '';
+            if (th.dataset.sort === this.state.sort && thEl === (this.state.sortEl || '')) {
                 th.classList.add(`sorted-${this.state.sortDir}`);
             }
         });
@@ -269,8 +249,7 @@ export class App {
         renderTestList(
             document.querySelector('#tests-table tbody'),
             tests,
-            this.aggregates.el_clients,
-            this.state.elClient
+            elClients
         );
     }
 

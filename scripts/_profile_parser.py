@@ -57,7 +57,6 @@ def parse_profile(text: str) -> dict:
     result = {
         'report': {},
         'cost_by_opcode': [],
-        'frops_by_opcode': [],
         'top_step_functions': [],
         'top_cost_functions': [],
         'mark_ids': [],
@@ -134,28 +133,13 @@ def parse_profile(text: str) -> dict:
                 i += 1
             continue
 
-        # FROPS BY OPCODE section
+        # FROPS BY OPCODE section — skip (not used by dashboard)
         elif line.startswith('FROPS BY OPCODE') and not line.startswith('|'):
-            i += 2  # skip header underline
+            i += 1
             while i < len(lines):
                 row = lines[i].rstrip()
                 if not row or row.startswith('TOP ') or row.startswith('MARK_ID') or row.startswith('DETAIL'):
                     break
-                m = re.match(
-                    r'\s*FROP\s+(\S+)\s+([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d.]+)%\s*(#\d+)?',
-                    row
-                )
-                if m:
-                    rank_str = m.group(6)
-                    rank = int(rank_str[1:]) if rank_str else None
-                    result['frops_by_opcode'].append({
-                        'name': m.group(1),
-                        'count': _parse_int(m.group(2)),
-                        'hit_pct': _parse_float(m.group(3)),
-                        'cost': _parse_int(m.group(4)),
-                        'cost_pct': _parse_float(m.group(5)),
-                        'rank': rank,
-                    })
                 i += 1
             continue
 
