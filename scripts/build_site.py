@@ -181,6 +181,28 @@ def main():
         print("  Warning: No proposal data at data/repricing-proposal/")
         print("  The proposal page will show a 'not available' message")
 
+    # =========================================================================
+    # 7. Profiles site
+    # =========================================================================
+    print("Building profiles site...")
+    profiles_out = output / 'profiles'
+    profiles_out.mkdir()
+
+    # Copy static files
+    shutil.copy2(sites_dir / 'profiles' / 'index.html', profiles_out / 'index.html')
+    shutil.copy2(sites_dir / 'profiles' / 'profiles.css', profiles_out / 'profiles.css')
+    shutil.copytree(sites_dir / 'profiles' / 'js', profiles_out / 'js')
+
+    # Generate data
+    profiles_data_out = profiles_out / 'data'
+    profiles_data_out.mkdir()
+    subprocess.run(
+        [sys.executable, str(scripts_dir / 'generate_profiles_website.py'),
+         '--output', str(profiles_data_out)],
+        check=True,
+        cwd=str(scripts_dir),
+    )
+
     print(f"\nSite built successfully in {output}")
 
 

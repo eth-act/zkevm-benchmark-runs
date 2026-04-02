@@ -1,0 +1,317 @@
+/* ============================================================================
+   Profiles Dashboard Styles
+   ============================================================================ */
+
+.container {
+    max-width: 1400px;
+}
+
+/* Header controls */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* Panels */
+.panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.panel h2 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.panel-subtitle {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+/* Cost distribution bars */
+.cost-dist-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.cost-dist-label {
+    width: 130px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.cost-dist-bar {
+    flex: 1;
+    height: 28px;
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.cost-dist-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+    transition: width 0.3s ease;
+}
+
+.cost-dist-segment.seg-base { background: #64748b; }
+.cost-dist-segment.seg-main { background: #6366f1; }
+.cost-dist-segment.seg-opcodes { background: #f59e0b; }
+.cost-dist-segment.seg-precompiles { background: #10b981; }
+.cost-dist-segment.seg-memory { background: #ef4444; }
+
+.cost-dist-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.cost-dist-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.cost-dist-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* Test list */
+.test-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.test-list-header h2 {
+    font-size: 1rem;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-row select {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+}
+
+.btn-filter {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.btn-filter:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-filter.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+/* Sortable table headers */
+#tests-table th {
+    cursor: pointer;
+    user-select: none;
+}
+
+#tests-table th:hover {
+    color: var(--accent);
+}
+
+/* Clickable test rows */
+#tests-table tbody tr {
+    cursor: pointer;
+}
+
+#tests-table tbody tr:hover td {
+    background: var(--bg-secondary);
+}
+
+/* Test name link hint */
+.test-link {
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.test-link::after {
+    content: ' \2192';
+    font-size: 0.75em;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+#tests-table tbody tr:hover .test-link::after {
+    opacity: 1;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+}
+
+.status-badge.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--error);
+}
+
+/* Numeric cells */
+td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: 'Space Grotesk', monospace;
+}
+
+/* Detail view */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.detail-header h2 {
+    font-size: 1rem;
+    word-break: break-all;
+}
+
+#detail-content .panel {
+    margin-bottom: 12px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Function name — full path shown below on hover */
+.fn-name {
+    position: relative;
+}
+
+.fn-name::after {
+    content: attr(title);
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    word-break: break-all;
+    line-height: 1.3;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease, margin-top 0.2s ease;
+    margin-top: 0;
+}
+
+tr:hover .fn-name::after {
+    max-height: 4em;
+    margin-top: 2px;
+}
+
+/* Phase bar (mini horizontal bar in detail view) */
+.phase-bar {
+    display: flex;
+    height: 20px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    margin-bottom: 8px;
+}
+
+.phase-bar-seg {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* EL client comparison tabs */
+.el-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 12px;
+}
+
+.el-tab {
+    padding: 6px 14px;
+    font-size: 0.8125rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+}
+
+.el-tab:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.el-tab:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.el-tab.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+/* Compact table variant for detail view */
+.compact-table th,
+.compact-table td {
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zisk Proving Cost Profiles &mdash; zkEVM Benchmarks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/base.css">
+    <link rel="stylesheet" href="../shared/components.css">
+    <link rel="stylesheet" href="../shared/responsive.css">
+    <link rel="stylesheet" href="profiles.css">
+    <script>
+        (function () {
+            var saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                document.documentElement.style.colorScheme = saved;
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container header-row">
+            <div class="header-text">
+                <h1><a href="../" class="header-home-link">&larr; Zisk Proving Cost Profiles</a></h1>
+                <p>Detailed cost breakdowns from ziskemu profiling</p>
+            </div>
+            <div class="header-controls">
+                <div class="control-inline">
+                    <label for="fixture-set">Fixture Set</label>
+                    <select id="fixture-set"></select>
+                </div>
+                <div class="control-inline">
+                    <label for="el-client">EL Client</label>
+                    <select id="el-client">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="loading">Loading profile data...</div>
+        <div id="error" class="error-message hidden"></div>
+
+        <div id="app" class="hidden">
+            <!-- Overview Section -->
+            <div id="overview-section">
+                <!-- Cost Distribution -->
+                <section class="panel">
+                    <h2>Cost Distribution</h2>
+                    <p class="panel-subtitle">Average proving cost breakdown across all tests</p>
+                    <div id="cost-dist-bars"></div>
+                </section>
+            </div>
+
+            <!-- Test List -->
+            <section class="panel" id="test-list-section">
+                <div class="test-list-header">
+                    <h2>Tests <span id="test-count" class="text-secondary"></span></h2>
+                    <div class="control-search">
+                        <input type="text" id="search" placeholder="Filter tests..." aria-label="Search tests">
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-section">
+                        <span class="filter-label">Operation:</span>
+                        <select id="op-filter">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="filter-section">
+                        <span class="filter-label">Status:</span>
+                        <button class="btn btn-filter active" data-status="all">All</button>
+                        <button class="btn btn-filter" data-status="success">Success</button>
+                        <button class="btn btn-filter" data-status="error">Errors</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="tests-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="name">Test</th>
+                                <th data-sort="operation">Operation</th>
+                                <th data-sort="cost">Total Cost</th>
+                                <th data-sort="top_opcode">Top Opcode</th>
+                                <th data-sort="status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Detail View (shown when a test is selected) -->
+            <div id="detail-section" class="hidden">
+                <div class="detail-header">
+                    <button id="detail-back" class="btn btn-tertiary">&larr; Back to list</button>
+                    <h2 id="detail-title"></h2>
+                </div>
+                <div id="detail-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>zkEVM Benchmark Results</p>
+            <p><a href="https://github.com/eth-act/zkevm-benchmark-runs">Raw Data (GitHub)</a></p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
