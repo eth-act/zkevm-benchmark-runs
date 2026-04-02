@@ -185,9 +185,11 @@ export class App {
 
         this.renderTestList();
 
-        // If URL has test selected, show detail
+        // If URL has test selected, show detail; otherwise hide it
         if (this.state.test) {
             this.showDetail(this.state.test);
+        } else {
+            this.hideDetail();
         }
     }
 
