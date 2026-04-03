@@ -82,7 +82,7 @@ export const URLState = {
         }
 
         // Heatmap sort mode (only if not default 'name')
-        if (state.heatmapSort && state.heatmapSort !== 'name') {
+        if (state.heatmapSort && state.heatmapSort !== 'cost') {
             params.set(URL_PARAMS.HM_SORT, state.heatmapSort);
         }
 

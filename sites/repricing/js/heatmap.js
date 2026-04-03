@@ -101,19 +101,19 @@ export class HeatmapRenderer {
      */
     _getGroupSortScore(group, columns) {
         let maxCost = 0;
-        let anyAllCrashed = false;
+        let anyCrashed = false;
 
         for (const col of columns) {
             const summary = this.computeCellSummary(group.tests, col.id);
-            if (summary.total > 0 && summary.crashed === summary.total) {
-                anyAllCrashed = true;
+            if (summary.crashed > 0) {
+                anyCrashed = true;
             }
             if (summary.worstCost !== null && summary.worstCost > maxCost) {
                 maxCost = summary.worstCost;
             }
         }
 
-        return anyAllCrashed ? 10000 + maxCost : maxCost;
+        return anyCrashed ? 10000 + maxCost : maxCost;
     }
 
     /**
@@ -195,7 +195,7 @@ export class HeatmapRenderer {
         // Annotations below the bar
         const annotations = [];
 
-        if (crashed === total) {
+        if (crashed > 0) {
             annotations.push('<span class="hm-cell-worst hm-worst-crashed">CRASHED</span>');
         } else {
             if (worstCost !== null) {
@@ -204,9 +204,6 @@ export class HeatmapRenderer {
             }
             if (minThroughput !== null) {
                 annotations.push(`<span class="hm-cell-throughput">${this._formatThroughput(minThroughput)}</span>`);
-            }
-            if (crashed > 0) {
-                annotations.push(`<span class="hm-cell-crash-badge">${crashed}/${total} crashed</span>`);
             }
         }
 

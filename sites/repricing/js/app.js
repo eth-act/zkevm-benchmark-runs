@@ -47,7 +47,7 @@ export class BenchmarkApp {
         // ====================================================================
         // Heatmap State
         // ====================================================================
-        this.heatmapSortMode = 'name';
+        this.heatmapSortMode = 'cost';
         this.heatmapExpandedOps = new Set();
 
         // ====================================================================
@@ -168,7 +168,7 @@ export class BenchmarkApp {
             this.pendingURLState = null;
 
             // Restore heatmap sort button state from URL
-            if (this.heatmapSortMode !== 'name') {
+            if (this.heatmapSortMode !== 'cost') {
                 this.elements.heatmapSection?.querySelectorAll('[data-hm-sort]').forEach(b =>
                     b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
                 );
@@ -294,7 +294,7 @@ export class BenchmarkApp {
         // Reset filter state
         this.selectedOperations.clear();
         this.heatmapExpandedOps.clear();
-        this.heatmapSortMode = 'name';
+        this.heatmapSortMode = 'cost';
         this.minRelativeCost = null;
 
         // Reset search input
