@@ -106,6 +106,49 @@ function escapeAttr(s) {
     return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 }
 
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
+
+export function renderPagination(container, page, totalPages, totalTests, pageSize) {
+    container.innerHTML = '';
+
+    const prev = document.createElement('button');
+    prev.textContent = '\u2190 Prev';
+    prev.disabled = page <= 1;
+    prev.dataset.action = 'prev';
+    container.appendChild(prev);
+
+    const info = document.createElement('span');
+    info.className = 'page-info';
+    if (pageSize === 0) {
+        info.textContent = `${totalTests} tests`;
+    } else {
+        info.textContent = `Page ${page} of ${totalPages} (${totalTests} tests)`;
+    }
+    container.appendChild(info);
+
+    const next = document.createElement('button');
+    next.textContent = 'Next \u2192';
+    next.disabled = page >= totalPages;
+    next.dataset.action = 'next';
+    container.appendChild(next);
+
+    const sizeSelect = document.createElement('select');
+    for (const opt of PAGE_SIZE_OPTIONS) {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = `${opt} / page`;
+        if (opt === pageSize) o.selected = true;
+        sizeSelect.appendChild(o);
+    }
+    const allOpt = document.createElement('option');
+    allOpt.value = '0';
+    allOpt.textContent = 'All';
+    if (pageSize === 0) allOpt.selected = true;
+    sizeSelect.appendChild(allOpt);
+    sizeSelect.dataset.action = 'pageSize';
+    container.appendChild(sizeSelect);
+}
+
 export function renderTestList(tbody, tests, elClients) {
     tbody.innerHTML = '';
     for (const t of tests) {

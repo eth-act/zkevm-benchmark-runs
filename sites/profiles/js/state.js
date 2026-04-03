@@ -6,6 +6,8 @@ const PARAMS = {
     sortDir: 'dir',
     sortEl: 'sel',
     test: 'test',
+    page: 'p',
+    pageSize: 'ps',
 };
 
 export function readState() {
@@ -18,6 +20,8 @@ export function readState() {
         sortDir: p.get(PARAMS.sortDir) || 'asc',
         sortEl: p.get(PARAMS.sortEl) || '',
         test: p.get(PARAMS.test) || '',
+        page: parseInt(p.get(PARAMS.page), 10) || 1,
+        pageSize: parseInt(p.get(PARAMS.pageSize), 10) || 50,
     };
 }
 
@@ -30,6 +34,8 @@ export function pushState(state) {
     if (state.sortDir && state.sortDir !== 'asc') p.set(PARAMS.sortDir, state.sortDir);
     if (state.sortEl) p.set(PARAMS.sortEl, state.sortEl);
     if (state.test) p.set(PARAMS.test, state.test);
+    if (state.page && state.page !== 1) p.set(PARAMS.page, state.page);
+    if (state.pageSize && state.pageSize !== 50) p.set(PARAMS.pageSize, state.pageSize);
     const qs = p.toString();
     const url = qs ? `?${qs}` : window.location.pathname;
     window.history.pushState(null, '', url);

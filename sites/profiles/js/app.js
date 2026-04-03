@@ -1,5 +1,5 @@
 import { readState, pushState } from './state.js';
-import { renderCostDistribution, renderTestList, renderTestTableHeader } from './render.js';
+import { renderCostDistribution, renderTestList, renderTestTableHeader, renderPagination } from './render.js';
 import { loadAndRenderDetail } from './detail.js';
 
 export class App {
@@ -69,6 +69,7 @@ export class App {
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 this.state.search = search.value;
+                this.state.page = 1;
                 pushState(this.state);
                 this.renderTestList();
             }, 200);
@@ -81,6 +82,7 @@ export class App {
                 document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.state.status = btn.dataset.status;
+                this.state.page = 1;
                 pushState(this.state);
                 this.renderTestList();
             });
@@ -100,6 +102,7 @@ export class App {
                 this.state.sortEl = el;
                 this.state.sortDir = 'asc';
             }
+            this.state.page = 1;
             pushState(this.state);
             this.renderTestList();
         });
@@ -118,6 +121,27 @@ export class App {
             this.state.test = '';
             pushState(this.state);
             this.hideDetail();
+        });
+
+        // Pagination controls
+        document.getElementById('pagination').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            if (btn.dataset.action === 'prev' && this.state.page > 1) {
+                this.state.page--;
+            } else if (btn.dataset.action === 'next') {
+                this.state.page++;
+            }
+            pushState(this.state);
+            this.renderTestList();
+        });
+        document.getElementById('pagination').addEventListener('change', (e) => {
+            if (e.target.dataset.action === 'pageSize') {
+                this.state.pageSize = parseInt(e.target.value, 10);
+                this.state.page = 1;
+                pushState(this.state);
+                this.renderTestList();
+            }
         });
 
         // Theme toggle
@@ -223,7 +247,21 @@ export class App {
             }
         });
 
-        document.getElementById('test-count').textContent = `(${tests.length})`;
+        const totalTests = tests.length;
+        const pageSize = this.state.pageSize;
+
+        if (pageSize > 0) {
+            const totalPages = Math.max(1, Math.ceil(totalTests / pageSize));
+            if (this.state.page > totalPages) this.state.page = totalPages;
+            if (this.state.page < 1) this.state.page = 1;
+            const start = (this.state.page - 1) * pageSize;
+            tests = tests.slice(start, start + pageSize);
+            renderPagination(document.getElementById('pagination'), this.state.page, totalPages, totalTests, pageSize);
+        } else {
+            renderPagination(document.getElementById('pagination'), 1, 1, totalTests, 0);
+        }
+
+        document.getElementById('test-count').textContent = `(${totalTests})`;
         renderTestList(
             document.querySelector('#tests-table tbody'),
             tests,
