@@ -88,6 +88,7 @@ export const URL_PARAMS = Object.freeze({
     PAGE: 'page',
     PAGE_SIZE: 'pageSize',
     MIN_RELATIVE: 'minRel',
+    HM_SORT: 'hmSort',
 });
 
 // ============================================================================

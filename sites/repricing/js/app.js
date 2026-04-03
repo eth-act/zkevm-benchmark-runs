@@ -167,6 +167,13 @@ export class BenchmarkApp {
             applyPendingURLState(this.pendingURLState, this, this.data, this.elements);
             this.pendingURLState = null;
 
+            // Restore heatmap sort button state from URL
+            if (this.heatmapSortMode !== 'name') {
+                this.elements.heatmapSection?.querySelectorAll('[data-hm-sort]').forEach(b =>
+                    b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
+                );
+            }
+
             // Initial render
             this.refresh({ updateUrl: false });
             this.updateFooter();
@@ -650,6 +657,7 @@ export class BenchmarkApp {
                     b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
                 );
                 this.renderHeatmap();
+                this.updateURL();
             });
         }
     }
@@ -754,6 +762,7 @@ export class BenchmarkApp {
             search: this.elements.search?.value || '',
             hideCrashed: this.elements.hideCrashed?.checked || false,
             minRelativeCost: this.minRelativeCost,
+            heatmapSort: this.heatmapSortMode,
             selectedOperations: this.selectedOperations,
         }, {
             hardware: this.globalManifest?.default_hardware,

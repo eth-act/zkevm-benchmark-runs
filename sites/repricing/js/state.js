@@ -30,6 +30,7 @@ export const URLState = {
             hideCrashed: params.get(URL_PARAMS.HIDE_CRASHED) === '1',
             operations: params.get(URL_PARAMS.OPERATIONS)?.split(',').filter(Boolean) || null,
             minRelativeCost: parseFloat(params.get(URL_PARAMS.MIN_RELATIVE)) || null,
+            heatmapSort: params.get(URL_PARAMS.HM_SORT),
         };
     },
 
@@ -80,6 +81,11 @@ export const URLState = {
             params.set(URL_PARAMS.MIN_RELATIVE, state.minRelativeCost.toString());
         }
 
+        // Heatmap sort mode (only if not default 'name')
+        if (state.heatmapSort && state.heatmapSort !== 'name') {
+            params.set(URL_PARAMS.HM_SORT, state.heatmapSort);
+        }
+
         // Operations filter (only if not all selected)
         if (state.selectedOperations &&
             state.selectedOperations.size > 0 &&
@@ -116,6 +122,7 @@ export function applyURLStateToApp(urlState, appState) {
     if (urlState.target && urlState.target > 0) appState.targetMGasPerS = urlState.target;
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;
     if (urlState.minRelativeCost) appState.minRelativeCost = urlState.minRelativeCost;
+    if (urlState.heatmapSort) appState.heatmapSortMode = urlState.heatmapSort;
 
     // Return state that needs to be applied after data loads
     return {
