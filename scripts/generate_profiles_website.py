@@ -8,16 +8,24 @@ Reads .prof files from data/profiles/zisk/ and produces:
 """
 
 import argparse
+import os
+import re
 import hashlib
 import json
 import statistics
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
 # Add scripts directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 from _profile_parser import parse_profile_file
+
+DEFAULT_PARSE_WORKERS = min(4, os.cpu_count() or 1)
+PARSE_CHUNK_SIZE = 32
+PROFILE_SUFFIXES = ('.prof', '.error.txt')
+TEST_PARAMS_RE = re.compile(r'\[(.*)\]')
 
 
 def test_hash(test_id: str) -> str:
@@ -43,8 +51,7 @@ def short_test_name(test_id: str) -> str:
         func_name = func_name[5:]
 
     # Extract params
-    import re
-    m = re.search(r'\[(.*)\]', func_and_params)
+    m = TEST_PARAMS_RE.search(func_and_params)
     if not m:
         return func_name
 
@@ -170,6 +177,40 @@ def compute_aggregates(profiles: list[dict]) -> dict:
     }
 
 
+def safe_parse_profile_file(path: Path) -> tuple[Path, dict | None, str | None]:
+    """Parse one profile file and capture errors for batch processing."""
+    try:
+        return path, parse_profile_file(path), None
+    except Exception as exc:
+        return path, None, str(exc)
+
+
+def parse_profile_batch(profile_files: list[Path],
+                        executor: ProcessPoolExecutor | None) -> list[dict]:
+    """Parse a batch of profile files, preserving the input order."""
+    if not profile_files:
+        return []
+
+    if executor is None or len(profile_files) == 1:
+        results = map(safe_parse_profile_file, profile_files)
+    else:
+        results = executor.map(
+            safe_parse_profile_file,
+            profile_files,
+            chunksize=PARSE_CHUNK_SIZE,
+        )
+
+    profiles = []
+    for path, profile, error in results:
+        if error is not None:
+            print(f"  Warning: failed to parse {path.name}: {error}",
+                  file=sys.stderr)
+            continue
+        profiles.append(profile)
+
+    return profiles
+
+
 def generate(profiles_base: Path, output_dir: Path):
     """Main generation logic."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -184,124 +225,127 @@ def generate(profiles_base: Path, output_dir: Path):
         'fixture_sets': [],
     }
 
-    for fs_name in fixture_sets:
-        fs_dir = profiles_base / fs_name
-        el_clients = sorted([
-            d.name for d in fs_dir.iterdir() if d.is_dir()
-        ])
+    executor = None
+    if DEFAULT_PARSE_WORKERS > 1:
+        executor = ProcessPoolExecutor(max_workers=DEFAULT_PARSE_WORKERS)
 
-        fs_info = {
-            'id': fs_name,
-            'el_clients': el_clients,
-            'test_count': {},
-            'error_count': {},
-        }
+    try:
+        for fs_name in fixture_sets:
+            fs_dir = profiles_base / fs_name
+            el_clients = sorted([
+                d.name for d in fs_dir.iterdir() if d.is_dir()
+            ])
 
-        # Parse all profiles per EL client
-        all_profiles = {}  # el_client -> list of parsed profiles
-        for el_client in el_clients:
-            el_dir = fs_dir / el_client
-            profiles = []
+            fs_info = {
+                'id': fs_name,
+                'el_clients': el_clients,
+                'test_count': {},
+                'error_count': {},
+            }
 
-            for f in sorted(el_dir.iterdir()):
-                if f.name.endswith('.prof') or f.name.endswith('.error.txt'):
-                    try:
-                        profile = parse_profile_file(f)
-                        profiles.append(profile)
-                    except Exception as e:
-                        print(f"  Warning: failed to parse {f.name}: {e}",
-                              file=sys.stderr)
+            # Parse all profiles per EL client
+            all_profiles = {}  # el_client -> list of parsed profiles
+            for el_client in el_clients:
+                el_dir = fs_dir / el_client
+                profile_files = [
+                    path for path in sorted(el_dir.iterdir())
+                    if path.name.endswith(PROFILE_SUFFIXES)
+                ]
+                profiles = parse_profile_batch(profile_files, executor)
 
-            all_profiles[el_client] = profiles
-            success_count = sum(1 for p in profiles if p['status'] == 'success')
-            error_count = sum(1 for p in profiles if p['status'] == 'error')
-            fs_info['test_count'][el_client] = success_count
-            fs_info['error_count'][el_client] = error_count
-            print(f"  {el_client}: {success_count} profiles, {error_count} errors")
+                all_profiles[el_client] = profiles
+                success_count = sum(1 for p in profiles if p['status'] == 'success')
+                error_count = sum(1 for p in profiles if p['status'] == 'error')
+                fs_info['test_count'][el_client] = success_count
+                fs_info['error_count'][el_client] = error_count
+                print(f"  {el_client}: {success_count} profiles, {error_count} errors")
 
-        manifest['fixture_sets'].append(fs_info)
+            manifest['fixture_sets'].append(fs_info)
 
-        # Compute aggregates per EL client
-        aggregates_per_client = {}
-        for el_client in el_clients:
-            aggregates_per_client[el_client] = compute_aggregates(
-                all_profiles[el_client]
-            )
-
-        # Build test list (union of all EL clients)
-        test_map = {}  # test_id -> {el_client -> summary}
-        for el_client in el_clients:
-            for p in all_profiles[el_client]:
-                tid = p['test_id']
-                if tid not in test_map:
-                    test_map[tid] = {
-                        'id': tid,
-                        'name': short_test_name(tid),
-                        'hash': test_hash(tid),
-                        'el_clients': {},
-                    }
-
-                if p['status'] == 'success':
-                    # Find top opcode by cost
-                    top_op = None
-                    if p.get('cost_by_opcode'):
-                        top_op_entry = max(p['cost_by_opcode'],
-                                          key=lambda x: x['cost'])
-                        top_op = f"{top_op_entry['name']} ({top_op_entry['cost_pct']}%)"
-
-                    test_map[tid]['el_clients'][el_client] = {
-                        'status': 'success',
-                        'steps': p['report'].get('steps', 0),
-                        'total_cost': p['report'].get('total_cost', 0),
-                        'top_opcode': top_op,
-                    }
-                else:
-                    test_map[tid]['el_clients'][el_client] = {
-                        'status': 'error',
-                        'error': p.get('error', '')[:200],
-                    }
-
-        tests = sorted(test_map.values(), key=lambda t: t['name'])
-
-        # Write aggregates file
-        aggregates = {
-            'generated_at': now,
-            'fixture_set': fs_name,
-            'el_clients': el_clients,
-            'aggregates': aggregates_per_client,
-            'tests': tests,
-        }
-
-        agg_file = output_dir / f'aggregates-{fs_name}.json'
-        agg_file.write_text(json.dumps(aggregates, separators=(',', ':')))
-        print(f"  Wrote {agg_file.name} ({len(tests)} tests)")
-
-        # Write detail files per test per EL client
-        detail_count = 0
-        for el_client in el_clients:
-            for p in all_profiles[el_client]:
-                if p['status'] != 'success':
-                    continue
-
-                h = test_hash(p['test_id'])
-                detail = {
-                    'test_id': p['test_id'],
-                    'name': short_test_name(p['test_id']),
-                    'el_client': el_client,
-                    'report': p['report'],
-                    'cost_by_opcode': p['cost_by_opcode'],
-                    'top_step_functions': p['top_step_functions'][:20],
-                    'top_cost_functions': p['top_cost_functions'][:20],
-                    'mark_ids': p['mark_ids'],
-                }
-
-                detail_file = output_dir / f'detail-{fs_name}-{el_client}-{h}.json'
-                detail_file.write_text(
-                    json.dumps(detail, separators=(',', ':'))
+            # Compute aggregates per EL client
+            aggregates_per_client = {}
+            for el_client in el_clients:
+                aggregates_per_client[el_client] = compute_aggregates(
+                    all_profiles[el_client]
                 )
-                detail_count += 1
 
-        print(f"  Wrote {detail_count} detail files")
+            # Build test list (union of all EL clients)
+            test_map = {}  # test_id -> {el_client -> summary}
+            for el_client in el_clients:
+                for p in all_profiles[el_client]:
+                    tid = p['test_id']
+                    if tid not in test_map:
+                        test_map[tid] = {
+                            'id': tid,
+                            'name': short_test_name(tid),
+                            'hash': test_hash(tid),
+                            'el_clients': {},
+                        }
+
+                    if p['status'] == 'success':
+                        # Find top opcode by cost
+                        top_op = None
+                        if p.get('cost_by_opcode'):
+                            top_op_entry = max(p['cost_by_opcode'],
+                                              key=lambda x: x['cost'])
+                            top_op = f"{top_op_entry['name']} ({top_op_entry['cost_pct']}%)"
+
+                        test_map[tid]['el_clients'][el_client] = {
+                            'status': 'success',
+                            'steps': p['report'].get('steps', 0),
+                            'total_cost': p['report'].get('total_cost', 0),
+                            'top_opcode': top_op,
+                        }
+                    else:
+                        test_map[tid]['el_clients'][el_client] = {
+                            'status': 'error',
+                            'error': p.get('error', '')[:200],
+                        }
+
+            tests = sorted(test_map.values(), key=lambda t: t['name'])
+
+            # Write aggregates file
+            aggregates = {
+                'generated_at': now,
+                'fixture_set': fs_name,
+                'el_clients': el_clients,
+                'aggregates': aggregates_per_client,
+                'tests': tests,
+            }
+
+            agg_file = output_dir / f'aggregates-{fs_name}.json'
+            agg_file.write_text(json.dumps(aggregates, separators=(',', ':')))
+            print(f"  Wrote {agg_file.name} ({len(tests)} tests)")
+
+            # Write detail files per test per EL client
+            detail_count = 0
+            for el_client in el_clients:
+                for p in all_profiles[el_client]:
+                    if p['status'] != 'success':
+                        continue
+
+                    h = test_hash(p['test_id'])
+                    detail = {
+                        'test_id': p['test_id'],
+                        'name': short_test_name(p['test_id']),
+                        'el_client': el_client,
+                        'report': p['report'],
+                        'cost_by_opcode': p['cost_by_opcode'],
+                        'top_step_functions': p['top_step_functions'][:20],
+                        'top_cost_functions': p['top_cost_functions'][:20],
+                        'mark_ids': p['mark_ids'],
+                    }
+
+                    detail_file = output_dir / f'detail-{fs_name}-{el_client}-{h}.json'
+                    detail_file.write_text(
+                        json.dumps(detail, separators=(',', ':'))
+                    )
+                    detail_count += 1
+
+            print(f"  Wrote {detail_count} detail files")
+    finally:
+        if executor is not None:
+            executor.shutdown()
 
     # Write manifest
     manifest_file = output_dir / 'manifest.json'

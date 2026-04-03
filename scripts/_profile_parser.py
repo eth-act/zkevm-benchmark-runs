@@ -5,9 +5,27 @@ for use by generate_profiles_website.py.
 """
 
 import re
+from functools import lru_cache
 from pathlib import Path
 
+DETAIL_PREFIX = 'DETAIL '
+COST_DISTRIBUTION_PREFIXES = ('BASE', 'MAIN', 'OPCODES', 'PRECOMPILES', 'MEMORY')
+COST_BY_OPCODE_BREAK_PREFIXES = ('FROPS BY', 'TOP ', 'MARK_ID', DETAIL_PREFIX)
+FROPS_BY_OPCODE_BREAK_PREFIXES = ('TOP ', 'MARK_ID', DETAIL_PREFIX)
+TOP_STEP_BREAK_PREFIXES = ('TOP COST', DETAIL_PREFIX, 'MARK_ID')
+TOP_COST_BREAK_PREFIXES = (DETAIL_PREFIX, 'MARK_ID')
+MULTI_COLON_RE = re.compile(r'::+')
+STEPS_RE = re.compile(r'([\d,]+)\s*$')
+COST_BY_OPCODE_RE = re.compile(
+    r'\s*OP\s+(\S+)\s+([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d.]+)%\s*(#\d+)?'
+)
+TOP_FUNCTION_RE = re.compile(
+    r'\s*([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d,]+)\s+(.*)'
+)
+TEST_ID_SUFFIX_RE = re.compile(r'_\d+M\.txt$')
 
+
+@lru_cache(maxsize=None)
 def simplify_function_name(full_name: str) -> str:
     """Simplify a Rust function path by stripping generic type parameters.
 
@@ -30,7 +48,7 @@ def simplify_function_name(full_name: str) -> str:
 
     # Clean up artifacts: " as " remnants, leading/trailing ::
     name = name.replace(' as ', '::')
-    name = re.sub(r'::+', '::', name)
+    name = MULTI_COLON_RE.sub('::', name)
     name = name.strip(':')
 
     # Keep last 2 segments
@@ -64,18 +82,19 @@ def parse_profile(text: str) -> dict:
 
     i = 0
     while i < len(lines):
-        line = lines[i].rstrip()
+        line = lines[i]
+
+        if line.startswith(DETAIL_PREFIX):
+            break
 
         # REPORT section
         if line.startswith('STEPS'):
-            m = re.search(r'([\d,]+)\s*$', line)
+            m = STEPS_RE.search(line)
             if m:
                 result['report']['steps'] = _parse_int(m.group(1))
 
         # Cost distribution
-        elif line.startswith('BASE') or line.startswith('MAIN') or \
-             line.startswith('OPCODES') or line.startswith('PRECOMPILES') or \
-             line.startswith('MEMORY'):
+        elif line.startswith(COST_DISTRIBUTION_PREFIXES):
             parts = line.split()
             if len(parts) >= 3:
                 category = parts[0].lower()
@@ -112,13 +131,10 @@ def parse_profile(text: str) -> dict:
         elif line.startswith('COST BY OPCODE') and not line.startswith('|'):
             i += 2  # skip header underline
             while i < len(lines):
-                row = lines[i].rstrip()
-                if not row or row.startswith('FROPS BY') or row.startswith('TOP ') or row.startswith('MARK_ID') or row.startswith('DETAIL'):
+                row = lines[i]
+                if not row or row.startswith(COST_BY_OPCODE_BREAK_PREFIXES):
                     break
-                m = re.match(
-                    r'\s*OP\s+(\S+)\s+([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d.]+)%\s*(#\d+)?',
-                    row
-                )
+                m = COST_BY_OPCODE_RE.match(row)
                 if m:
                     rank_str = m.group(6)
                     rank = int(rank_str[1:]) if rank_str else None
@@ -137,8 +153,8 @@ def parse_profile(text: str) -> dict:
         elif line.startswith('FROPS BY OPCODE') and not line.startswith('|'):
             i += 1
             while i < len(lines):
-                row = lines[i].rstrip()
-                if not row or row.startswith('TOP ') or row.startswith('MARK_ID') or row.startswith('DETAIL'):
+                row = lines[i]
+                if not row or row.startswith(FROPS_BY_OPCODE_BREAK_PREFIXES):
                     break
                 i += 1
             continue
@@ -147,13 +163,10 @@ def parse_profile(text: str) -> dict:
         elif line.startswith('TOP STEP FUNCTIONS'):
             i += 2  # skip header underline
             while i < len(lines):
-                row = lines[i].rstrip()
-                if not row or row.startswith('TOP COST') or row.startswith('DETAIL') or row.startswith('MARK_ID'):
+                row = lines[i]
+                if not row or row.startswith(TOP_STEP_BREAK_PREFIXES):
                     break
-                m = re.match(
-                    r'\s*([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d,]+)\s+(.*)',
-                    row
-                )
+                m = TOP_FUNCTION_RE.match(row)
                 if m:
                     func_name = m.group(5).strip()
                     result['top_step_functions'].append({
@@ -171,13 +184,10 @@ def parse_profile(text: str) -> dict:
         elif line.startswith('TOP COST FUNCTIONS'):
             i += 2  # skip header underline
             while i < len(lines):
-                row = lines[i].rstrip()
-                if not row or row.startswith('DETAIL') or row.startswith('MARK_ID'):
+                row = lines[i]
+                if not row or row.startswith(TOP_COST_BREAK_PREFIXES):
                     break
-                m = re.match(
-                    r'\s*([\d,]+)\s+([\d.]+)%\s+([\d,]+)\s+([\d,]+)\s+(.*)',
-                    row
-                )
+                m = TOP_FUNCTION_RE.match(row)
                 if m:
                     func_name = m.group(5).strip()
                     result['top_cost_functions'].append({
@@ -195,7 +205,7 @@ def parse_profile(text: str) -> dict:
         elif line.startswith('MARK_ID') and 'INDEX' in line:
             i += 2  # skip header underline
             while i < len(lines):
-                row = lines[i].rstrip()
+                row = lines[i]
                 if not row:
                     i += 1
                     continue
@@ -226,14 +236,13 @@ def parse_error_file(text: str) -> dict:
     """Parse an .error.txt file into a structured dict."""
     result = {'status': 'error', 'fixture': '', 'timestamp': '', 'error': ''}
     lines = text.splitlines()
-    for line in lines:
+    for idx, line in enumerate(lines):
         if line.startswith('fixture:'):
             result['fixture'] = line[len('fixture:'):].strip()
         elif line.startswith('timestamp_utc:'):
             result['timestamp'] = line[len('timestamp_utc:'):].strip()
         elif line.startswith('error:'):
             # Error text spans remaining lines
-            idx = lines.index(line)
             result['error'] = '\n'.join(lines[idx + 1:]).strip()
             break
     return result
@@ -254,24 +263,42 @@ def extract_test_id(filename: str) -> str:
         if name.endswith(suffix):
             name = name[:-len(suffix)]
     # Strip the trailing _90M.txt (or similar pattern)
-    name = re.sub(r'_\d+M\.txt$', '', name)
+    name = TEST_ID_SUFFIX_RE.sub('', name)
     # Convert __ to ::
     name = name.replace('__', '::', 1)
     return name
 
 
+def _read_profile_prefix(path: Path) -> str:
+    """Read only the dashboard-relevant sections of a .prof file."""
+    lines = []
+    in_detail_section = False
+    with path.open() as f:
+        for line in f:
+            if line.startswith('MARK_ID'):
+                in_detail_section = False
+                lines.append(line)
+                continue
+            if line.startswith(DETAIL_PREFIX):
+                in_detail_section = True
+                continue
+            if in_detail_section:
+                continue
+            lines.append(line)
+    return ''.join(lines)
+
+
 def parse_profile_file(path: Path) -> dict:
     """Parse a profile file and return structured data with metadata."""
-    text = path.read_text()
     filename = path.name
 
     if filename.endswith('.error.txt'):
-        data = parse_error_file(text)
+        data = parse_error_file(path.read_text())
         data['filename'] = filename
         data['test_id'] = extract_test_id(filename)
         return data
 
-    profile = parse_profile(text)
+    profile = parse_profile(_read_profile_prefix(path))
     profile['status'] = 'success'
     profile['filename'] = filename
     profile['test_id'] = extract_test_id(filename)
