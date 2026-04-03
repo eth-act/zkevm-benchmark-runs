@@ -651,7 +651,8 @@ function generateComparisonTable(allElClients) {
                     cells.push(`<td>${formatTime(time)}</td>`);
                 } else if (result.status === 'crashed') {
                     hasCrash = true;
-                    cells.push('<td class="crash-sdk">\u274C SDK</td>');
+                    const reason = (result.crash_reason || 'Unknown error').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+                    cells.push(`<td class="crash-sdk crash-clickable" onclick="showCrashDetails('${reason}')" title="Click to see details">\u274C SDK</td>`);
                 } else {
                     hasCrash = true;
                     cells.push('<td class="crash-sdk">\u274C Error</td>');
@@ -810,3 +811,31 @@ function updateReproduceSectionVisibility() {
         reproduceSection.classList.add('hidden');
     }
 }
+
+// Crash details modal
+function showCrashDetails(reason) {
+    const modal = document.getElementById('crash-modal');
+    modal.querySelector('.crash-modal-body').textContent = reason;
+    modal.classList.remove('hidden');
+}
+
+(function() {
+    const modal = document.getElementById('crash-modal');
+    const closeBtn = modal.querySelector('.crash-modal-close');
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+})();
