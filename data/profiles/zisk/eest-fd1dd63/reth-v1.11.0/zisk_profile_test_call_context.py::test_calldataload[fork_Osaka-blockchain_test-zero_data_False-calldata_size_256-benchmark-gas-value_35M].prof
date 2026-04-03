@@ -1,0 +1,945 @@
+Loading symbols from ELF file: /data/program.elf
+Loaded 1747 function symbols (0 marked as selected ROI)
+Loaded 9 profile tags
+
+REPORT                                  
+----------------------------------------
+STEPS                          1,480,254
+
+COST DISTRIBUTION                   COST       %
+------------------------------------------------
+BASE                         293,601,280  62.84%
+MAIN                         100,657,272  21.54%
+OPCODES                       30,930,715   6.62%
+PRECOMPILES                   30,030,942   6.43%
+MEMORY                        12,020,522   2.57%
+
+TOTAL                        467,240,731 100.00%
+
+FROPS                         14,768,839   3.16%
+RAM USAGE                        598,154   0.11%
+
+COST BY OPCODE                     COUNT       %            COST       % RANK
+-----------------------------------------------------------------------------
+OP ltu                            33,250   2.25%       1,995,000   0.43%
+OP lt                                990   0.07%          59,400   0.01%
+OP eq                             15,974   1.08%         958,440   0.21%
+OP add                           118,237   7.99%       2,955,925   0.63%
+OP sub                             8,300   0.56%         498,000   0.11%
+OP and                           106,604   7.20%       6,396,240   1.37% #3
+OP or                            132,963   8.98%       7,977,780   1.71% #2
+OP xor                            17,958   1.21%       1,077,480   0.23%
+OP add_w                             553   0.04%          33,180   0.01%
+OP sub_w                              34   0.00%           2,040   0.00%
+OP sll                            52,691   3.56%       2,792,623   0.60%
+OP srl                            64,384   4.35%       3,412,352   0.73%
+OP sra                            25,447   1.72%       1,348,691   0.29%
+OP srl_w                          15,224   1.03%         806,872   0.17%
+OP signextend_b                      562   0.04%          29,786   0.01%
+OP signextend_h                       97   0.01%           5,141   0.00%
+OP signextend_w                    3,970   0.27%         210,410   0.05%
+OP pubout                             32   0.00%               0   0.00%
+OP muluh                             935   0.06%          88,825   0.02%
+OP mul                             2,969   0.20%         282,055   0.06%
+OP divu                                5   0.00%             475   0.00%
+OP dma_memcpy                      5,590   0.38%         234,780   0.05%
+OP dma_memcmp                      1,428   0.10%          59,976   0.01%
+OP dma_inputcpy                        3   0.00%             126   0.00%
+OP dma_xmemset                       374   0.03%          15,708   0.00%
+OP _dma_pre                        1,268   0.09%         111,584   0.02%
+OP _dma_post                       1,770   0.12%         155,760   0.03%
+OP keccak                            312   0.02%      23,571,600   5.04% #1
+OP arith256_mod                       27   0.00%          38,448   0.01%
+OP secp256k1_add                     685   0.05%         975,440   0.21%
+OP secp256k1_dbl                     763   0.05%       1,086,512   0.23%
+OP fcall_param                        26   0.00%               0   0.00%
+OP fcall                               8   0.00%               0   0.00%
+OP fcall_get                           6   0.00%               0   0.00%
+OP sha256                            434   0.03%       3,781,008   0.81% #4
+
+FROPS BY OPCODE                    COUNT    HIT            COST       % RANK
+----------------------------------------------------------------------------
+FROP ltu                          15,331  31.56%         919,860   0.20%
+FROP lt                           25,866  96.31%       1,551,960   0.33% #4
+FROP eq                           61,709  79.44%       3,702,540   0.79% #2
+FROP add                          15,425  11.54%         385,625   0.08%
+FROP sub                           5,551  40.08%         333,060   0.07%
+FROP and                           5,035   4.51%         302,100   0.06%
+FROP or                           26,354  16.54%       1,581,240   0.34% #3
+FROP xor                           1,369   7.08%          82,140   0.02%
+FROP add_w                           877  61.33%          52,620   0.01%
+FROP sub_w                           249  87.99%          14,940   0.00%
+FROP sll                         105,393  66.67%       5,585,829   1.20% #1
+FROP srl                           3,483   5.13%         184,599   0.04%
+FROP sra                              38   0.15%           2,014   0.00%
+FROP srl_w                           434   2.77%          23,002   0.00%
+FROP muluh                           173  15.61%          16,435   0.00%
+FROP mul                             325   9.87%          30,875   0.01%
+
+TOP STEP FUNCTIONS (STEPS, % STEPS, CALLS, FUNCTION)
+----------------------------------------------------
+      1,327,428  89.68%          1       1,327,428 <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+        835,121  56.42%          1         835,121 <reth_evm::execute::BasicBlockExecutor<&reth_evm_ethereum::EthEvmConfig, stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>> as reth_evm::execute::Executor<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::execute
+        744,541  50.30%          1         744,541 <alloy_evm::eth::block::EthBlockExecutor<alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap>, &alloc::sync::Arc<reth_chainspec::spec::ChainSpec>, &reth_evm_ethereum::receipt::RethReceiptBuilder> as alloy_evm::block::BlockExecutor>::execute_block::<alloy_consensus::transaction::recovered::Recovered<&alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<alloy_primitives::bits::address::Address>, core::slice::iter::Iter<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>, <reth_primitives_traits::block::recovered::RecoveredBlock<alloy_consensus::block::Block<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>>::transactions_recovered::{closure#0}>>
+        690,767  46.67%          7          98,681 <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+        436,508  29.49%      3,074             142 revm_interpreter::instructions::system::calldataload::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+        300,445  20.30%          1         300,445 <tries::zeth::SparseState as tries::StatelessTrie>::new
+        177,921  12.02%          6          29,653 <revm_bytecode::legacy::raw::LegacyRawBytecode>::into_analyzed
+        138,723   9.37%         81           1,712 ziskos::zisklib::lib::keccak256::keccak256
+         84,126   5.68%          4          21,031 <alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap> as alloy_evm::evm::Evm>::transact_system_call
+         74,155   5.01%          1          74,155 <stateless_validator_common::new_payload_request::ExecutionPayloadV3 as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+         73,760   4.98%          2          36,880 <revm_precompile::Precompiles>::new
+         73,738   4.98%          1          73,738 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::osaka::{closure#0}>::{closure#0}>::{closure#0}>
+         70,637   4.77%         14           5,045 libssz_merkle::merkleize::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+         64,086   4.33%          1          64,086 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::prague::{closure#0}>::{closure#0}>::{closure#0}>
+         63,504   4.29%          3          21,168 stateless::recover_block::verify_and_compute_sender
+         57,742   3.90%          1          57,742 <libssz_types::list::SszList<libssz_types::list::SszList<u8, 1073741824>, 1048576> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+         56,915   3.84%          3          18,971 <stateless_validator_reth_zisk::crypto::CustomEvmCrypto as alloy_consensus::crypto::backend::CryptoProvider>::verify_and_compute_signer_unchecked
+         56,828   3.84%          3          18,942 secp256k1_ecdsa_verify_and_address_recover_c
+         46,515   3.14%      3,093              15 revm_interpreter::instructions::stack::push0::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+         44,321   2.99%          1          44,321 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::cancun::{closure#0}>::{closure#0}>::{closure#0}>
+         41,442   2.80%          6           6,907 <revm_precompile::Precompiles as core::clone::Clone>::clone
+         36,443   2.46%         19           1,918 <revm_context_interface::journaled_state::account::JournaledAccount<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>::sload_concrete_error
+         36,437   2.46%          1          36,437 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::berlin::{closure#0}>::{closure#0}>::{closure#0}>
+         32,444   2.19%          3          10,814 ziskos::zisklib::lib::secp256k1::curve::secp256k1_triple_scalar_mul_with_g
+         31,689   2.14%        217             146 foldhash::hash_bytes_long
+
+TOP COST FUNCTIONS (COST, % COST, CALLS, COST/CALL, FUNCTION)
+-------------------------------------------------------------
+    154,888,226  33.15%          1     154,888,226 <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+     84,829,891  18.16%          1      84,829,891 <reth_evm::execute::BasicBlockExecutor<&reth_evm_ethereum::EthEvmConfig, stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>> as reth_evm::execute::Executor<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::execute
+     76,324,968  16.34%          1      76,324,968 <alloy_evm::eth::block::EthBlockExecutor<alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap>, &alloc::sync::Arc<reth_chainspec::spec::ChainSpec>, &reth_evm_ethereum::receipt::RethReceiptBuilder> as alloy_evm::block::BlockExecutor>::execute_block::<alloy_consensus::transaction::recovered::Recovered<&alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<alloy_primitives::bits::address::Address>, core::slice::iter::Iter<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>, <reth_primitives_traits::block::recovered::RecoveredBlock<alloy_consensus::block::Block<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>>::transactions_recovered::{closure#0}>>
+     71,292,898  15.26%          7      10,184,699 <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+     46,331,411   9.92%      3,074          15,072 revm_interpreter::instructions::system::calldataload::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+     43,128,484   9.23%          1      43,128,484 <tries::zeth::SparseState as tries::StatelessTrie>::new
+     36,621,225   7.84%         81         452,113 ziskos::zisklib::lib::keccak256::keccak256
+     16,248,177   3.48%          6       2,708,029 <revm_bytecode::legacy::raw::LegacyRawBytecode>::into_analyzed
+     11,251,735   2.41%         14         803,695 libssz_merkle::merkleize::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+     10,812,531   2.31%          1      10,812,531 <stateless_validator_common::new_payload_request::ExecutionPayloadV3 as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+      9,701,104   2.08%          3       3,233,701 stateless::recover_block::verify_and_compute_sender
+      9,610,594   2.06%          4       2,402,648 <alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap> as alloy_evm::evm::Evm>::transact_system_call
+      8,398,627   1.80%          3       2,799,542 <stateless_validator_reth_zisk::crypto::CustomEvmCrypto as alloy_consensus::crypto::backend::CryptoProvider>::verify_and_compute_signer_unchecked
+      8,389,921   1.80%          3       2,796,640 secp256k1_ecdsa_verify_and_address_recover_c
+      8,258,778   1.77%          1       8,258,778 <libssz_types::list::SszList<libssz_types::list::SszList<u8, 1073741824>, 1048576> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+      6,977,971   1.49%          2       3,488,985 <revm_precompile::Precompiles>::new
+      6,975,995   1.49%          1       6,975,995 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::osaka::{closure#0}>::{closure#0}>::{closure#0}>
+      6,045,363   1.29%          1       6,045,363 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::prague::{closure#0}>::{closure#0}>::{closure#0}>
+      5,589,832   1.20%          3       1,863,277 ziskos::zisklib::lib::secp256k1::curve::secp256k1_triple_scalar_mul_with_g
+      4,915,947   1.05%         19         258,734 <revm_context_interface::journaled_state::account::JournaledAccount<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>::sload_concrete_error
+      4,800,407   1.03%        125          38,403 sha256_c
+      4,217,571   0.90%      3,093           1,363 revm_interpreter::instructions::stack::push0::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+      4,198,574   0.90%          1       4,198,574 <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::cancun::{closure#0}>::{closure#0}>::{closure#0}>
+      4,046,505   0.87%          6         674,417 <revm_precompile::Precompiles as core::clone::Clone>::clone
+      3,787,690   0.81%          8         473,461 revm_interpreter::instructions::host::sload::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+
+DETAIL FUNCTION <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+--------------------------------------------------------------------------------------------------------------------------------
+STEPS                          1,327,428  89.68%
+COST                         154,888,226  33.15%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            32,956       1,977,360   1.28%
+|    OP lt                                979          58,740   0.04%
+|    OP eq                             14,189         851,340   0.55%
+|    OP add                           104,087       2,602,175   1.68%
+|    OP sub                             8,194         491,640   0.32%
+|    OP and                           102,102       6,126,120   3.96% #3
+|    OP or                            123,904       7,434,240   4.80% #2
+|    OP xor                            17,024       1,021,440   0.66%
+|    OP add_w                             553          33,180   0.02%
+|    OP sub_w                              34           2,040   0.00%
+|    OP sll                            49,389       2,617,617   1.69%
+|    OP srl                            57,678       3,056,934   1.97% #4
+|    OP sra                            25,446       1,348,638   0.87%
+|    OP srl_w                          13,710         726,630   0.47%
+|    OP signextend_b                      525          27,825   0.02%
+|    OP signextend_h                       59           3,127   0.00%
+|    OP signextend_w                    2,201         116,653   0.08%
+|    OP muluh                             932          88,540   0.06%
+|    OP mul                             2,711         257,545   0.17%
+|    OP divu                                5             475   0.00%
+|    OP dma_memcpy                      5,003         210,126   0.14%
+|    OP dma_memcmp                      1,425          59,850   0.04%
+|    OP dma_inputcpy                        3             126   0.00%
+|    OP dma_xmemset                       263          11,046   0.01%
+|    OP _dma_pre                        1,033          90,904   0.06%
+|    OP _dma_post                       1,616         142,208   0.09%
+|    OP keccak                            312      23,571,600  15.22% #1
+|    OP arith256_mod                       27          38,448   0.02%
+|    OP secp256k1_add                     685         975,440   0.63%
+|    OP secp256k1_dbl                     763       1,086,512   0.70%
+|    OP fcall_param                        24               0   0.00%
+|    OP fcall                               6               0   0.00%
+|    OP fcall_get                           6               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1       1,327,428 100.00% main
+
+DETAIL FUNCTION <reth_evm::execute::BasicBlockExecutor<&reth_evm_ethereum::EthEvmConfig, stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>> as reth_evm::execute::Executor<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::execute
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                            835,121  56.42%
+COST                          84,829,891  18.16%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                             6,991         419,460   0.49%
+|    OP lt                                470          28,200   0.03%
+|    OP eq                             10,279         616,740   0.73%
+|    OP add                            58,156       1,453,900   1.71%
+|    OP sub                             7,555         453,300   0.53%
+|    OP and                            89,773       5,386,380   6.35% #2
+|    OP or                             89,887       5,393,220   6.36% #1
+|    OP xor                             3,405         204,300   0.24%
+|    OP add_w                              36           2,160   0.00%
+|    OP sub_w                               6             360   0.00%
+|    OP sll                            40,994       2,172,682   2.56%
+|    OP srl                            50,759       2,690,227   3.17% #3
+|    OP sra                               223          11,819   0.01%
+|    OP srl_w                          12,358         654,974   0.77%
+|    OP signextend_b                      325          17,225   0.02%
+|    OP signextend_h                       18             954   0.00%
+|    OP signextend_w                    2,063         109,339   0.13%
+|    OP muluh                             894          84,930   0.10%
+|    OP mul                             2,096         199,120   0.23%
+|    OP divu                                3             285   0.00%
+|    OP dma_memcpy                      4,102         172,284   0.20%
+|    OP dma_memcmp                        335          14,070   0.02%
+|    OP dma_xmemset                       122           5,124   0.01%
+|    OP _dma_pre                          319          28,072   0.03%
+|    OP _dma_post                         489          43,032   0.05%
+|    OP keccak                             29       2,190,950   2.58% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1         835,121 100.00% <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+
+DETAIL FUNCTION <alloy_evm::eth::block::EthBlockExecutor<alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap>, &alloc::sync::Arc<reth_chainspec::spec::ChainSpec>, &reth_evm_ethereum::receipt::RethReceiptBuilder> as alloy_evm::block::BlockExecutor>::execute_block::<alloy_consensus::transaction::recovered::Recovered<&alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<alloy_primitives::bits::address::Address>, core::slice::iter::Iter<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>, <reth_primitives_traits::block::recovered::RecoveredBlock<alloy_consensus::block::Block<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>>::transactions_recovered::{closure#0}>>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                            744,541  50.30%
+COST                          76,324,968  16.34%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                             6,709         402,540   0.53%
+|    OP lt                                298          17,880   0.02%
+|    OP eq                              7,715         462,900   0.61%
+|    OP add                            47,374       1,184,350   1.55%
+|    OP sub                             6,936         416,160   0.55%
+|    OP and                            86,982       5,218,920   6.84% #2
+|    OP or                             88,476       5,308,560   6.96% #1
+|    OP xor                             2,196         131,760   0.17%
+|    OP add_w                              33           1,980   0.00%
+|    OP sub_w                               6             360   0.00%
+|    OP sll                            40,016       2,120,848   2.78%
+|    OP srl                            50,187       2,659,911   3.48% #3
+|    OP sra                               135           7,155   0.01%
+|    OP srl_w                          12,358         654,974   0.86%
+|    OP signextend_b                      220          11,660   0.02%
+|    OP signextend_h                       16             848   0.00%
+|    OP signextend_w                      107           5,671   0.01%
+|    OP muluh                             565          53,675   0.07%
+|    OP mul                             1,416         134,520   0.18%
+|    OP divu                                3             285   0.00%
+|    OP dma_memcpy                      3,848         161,616   0.21%
+|    OP dma_memcmp                        299          12,558   0.02%
+|    OP dma_xmemset                        99           4,158   0.01%
+|    OP _dma_pre                          244          21,472   0.03%
+|    OP _dma_post                         409          35,992   0.05%
+|    OP keccak                             29       2,190,950   2.87% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1         744,541 100.00% <reth_evm::execute::BasicBlockExecutor<&reth_evm_ethereum::EthEvmConfig, stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>> as reth_evm::execute::Executor<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::execute
+
+DETAIL FUNCTION <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                            690,767  46.67%
+COST                          71,292,898  15.26%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                             6,608         396,480   0.56%
+|    OP lt                                190          11,400   0.02%
+|    OP eq                              6,604         396,240   0.56%
+|    OP add                            42,307       1,057,675   1.48%
+|    OP sub                             6,663         399,780   0.56%
+|    OP and                            84,324       5,059,440   7.10% #2
+|    OP or                             86,169       5,170,140   7.25% #1
+|    OP xor                             1,487          89,220   0.13%
+|    OP add_w                              16             960   0.00%
+|    OP sub_w                               5             300   0.00%
+|    OP sll                            39,301       2,082,953   2.92% #4
+|    OP srl                            49,852       2,642,156   3.71% #3
+|    OP sra                                85           4,505   0.01%
+|    OP srl_w                          12,356         654,868   0.92%
+|    OP signextend_b                      128           6,784   0.01%
+|    OP signextend_w                       67           3,551   0.00%
+|    OP muluh                             363          34,485   0.05%
+|    OP mul                               898          85,310   0.12%
+|    OP dma_memcpy                      3,489         146,538   0.21%
+|    OP dma_memcmp                        157           6,594   0.01%
+|    OP dma_xmemset                        79           3,318   0.00%
+|    OP _dma_pre                          124          10,912   0.02%
+|    OP _dma_post                         242          21,296   0.03%
+|    OP keccak                             27       2,039,850   2.86%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  4          81,782  11.84% <alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap> as alloy_evm::evm::Evm>::transact_system_call
+|                  3         608,985  88.16% <alloy_evm::eth::block::EthBlockExecutor<alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap>, &alloc::sync::Arc<reth_chainspec::spec::ChainSpec>, &reth_evm_ethereum::receipt::RethReceiptBuilder> as alloy_evm::block::BlockExecutor>::execute_block::<alloy_consensus::transaction::recovered::Recovered<&alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<alloy_primitives::bits::address::Address>, core::slice::iter::Iter<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>, <reth_primitives_traits::block::recovered::RecoveredBlock<alloy_consensus::block::Block<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>>::transactions_recovered::{closure#0}>>
+
+DETAIL FUNCTION revm_interpreter::instructions::system::calldataload::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                            436,508  29.49%
+COST                          46,331,411   9.92%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP eq                              3,074         184,440   0.40%
+|    OP add                            18,444         461,100   1.00%
+|    OP and                            70,702       4,242,120   9.16% #2
+|    OP or                             79,898       4,793,880  10.35% #1
+|    OP sll                            35,721       1,893,213   4.09% #4
+|    OP srl                            49,168       2,605,904   5.62% #3
+|    OP srl_w                          12,292         651,476   1.41%
+|    OP dma_memcpy                      3,074         129,108   0.28%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|              3,074         436,508 100.00% <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+
+DETAIL FUNCTION <tries::zeth::SparseState as tries::StatelessTrie>::new
+-----------------------------------------------------------------------
+STEPS                            300,445  20.30%
+COST                          43,128,484   9.23%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            25,548       1,532,880   3.55% #2
+|    OP lt                                224          13,440   0.03%
+|    OP eq                                347          20,820   0.05%
+|    OP add                            28,145         703,625   1.63%
+|    OP sub                               133           7,980   0.02%
+|    OP and                             1,108          66,480   0.15%
+|    OP or                             23,342       1,400,520   3.25% #3
+|    OP xor                             3,413         204,780   0.47%
+|    OP sub_w                              20           1,200   0.00%
+|    OP sll                             3,452         182,956   0.42%
+|    OP srl                               157           8,321   0.02%
+|    OP sra                            25,218       1,336,554   3.10% #4
+|    OP srl_w                              40           2,120   0.00%
+|    OP signextend_b                       89           4,717   0.01%
+|    OP signextend_h                        1              53   0.00%
+|    OP signextend_w                        1              53   0.00%
+|    OP mul                               143          13,585   0.03%
+|    OP dma_memcpy                        161           6,762   0.02%
+|    OP dma_memcmp                          9             378   0.00%
+|    OP dma_xmemset                        39           1,638   0.00%
+|    OP _dma_pre                           61           5,368   0.01%
+|    OP _dma_post                          62           5,456   0.01%
+|    OP keccak                            202      15,261,100  35.39% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1         300,445 100.00% <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+
+DETAIL FUNCTION ziskos::zisklib::lib::keccak256::keccak256
+----------------------------------------------------------
+STEPS                            138,723   9.37%
+COST                          36,621,225   7.84%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               233          13,980   0.04%
+|    OP add                             1,633          40,825   0.11%
+|    OP sub                                 8             480   0.00%
+|    OP and                               729          43,740   0.12%
+|    OP or                             25,372       1,522,320   4.16% #2
+|    OP xor                             4,638         278,280   0.76% #3
+|    OP sll                             3,639         192,867   0.53% #4
+|    OP dma_memcpy                        162           6,804   0.02%
+|    OP dma_xmemset                       162           6,804   0.02%
+|    OP _dma_pre                           25           2,200   0.01%
+|    OP _dma_post                          90           7,920   0.02%
+|    OP keccak                            312      23,571,600  64.37% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 22           3,278   2.36% <revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::storage::{closure#0}
+|                 15         104,723  75.49% <tries::zeth::SparseState as tries::StatelessTrie>::new
+|                 10           8,084   5.83% <alloy_trie::hash_builder::HashBuilder>::update
+|                  8           1,743   1.26% <zeth_mpt::mpt::node::Node<zeth_mpt::mpt::memoize::Cache>>::memoize
+|                  7           1,043   0.75% <revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::load_cache_account_with
+|                  6             894   0.64% <reth_trie_common::hashed_state::HashedPostState>::from_bundle_state::<reth_trie_common::key::KeccakKeyHasher, &hashbrown::map::HashMap<alloy_primitives::bits::address::Address, revm_database::states::bundle_account::BundleAccount, alloy_primitives::map::hasher::DefaultHashBuilder>>
+|                  5           4,042   2.91% <alloy_trie::hash_builder::HashBuilder>::update
+|                  3           3,744   2.70% stateless::recover_block::verify_and_compute_sender
+|                  2           4,140   2.98% <alloy_consensus::block::header::Header as alloy_primitives::sealed::Sealable>::hash_slow
+|                  2           4,688   3.38% <alloy_consensus::block::header::Header>::hash_slow
+
+DETAIL FUNCTION <revm_bytecode::legacy::raw::LegacyRawBytecode>::into_analyzed
+------------------------------------------------------------------------------
+STEPS                            177,921  12.02%
+COST                          16,248,177   3.48%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            25,275       1,516,500   9.33% #1
+|    OP lt                                135           8,100   0.05% #4
+|    OP eq                                 18           1,080   0.01%
+|    OP add                            25,525         638,125   3.93% #3
+|    OP sub                                41           2,460   0.02%
+|    OP and                                65           3,900   0.02%
+|    OP or                                  8             480   0.00%
+|    OP srl                                 6             318   0.00%
+|    OP sra                            25,218       1,336,554   8.23% #2
+|    OP dma_memcpy                          3             126   0.00%
+|    OP dma_xmemset                         5             210   0.00%
+|    OP _dma_pre                            2             176   0.00%
+|    OP _dma_post                           7             616   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  6         177,921 100.00% <tries::zeth::SparseState as tries::StatelessTrie>::new
+
+DETAIL FUNCTION libssz_merkle::merkleize::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+---------------------------------------------------------------------------------------------------
+STEPS                             70,637   4.77%
+COST                          11,251,735   2.41%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                46           2,760   0.02%
+|    OP lt                                  4             240   0.00%
+|    OP eq                                188          11,280   0.10%
+|    OP add                             3,210          80,250   0.71%
+|    OP sub                                43           2,580   0.02%
+|    OP and                             3,370         202,200   1.80% #4
+|    OP or                              7,956         477,360   4.24% #2
+|    OP xor                                24           1,440   0.01%
+|    OP sll                             2,558         135,574   1.20%
+|    OP srl                             6,290         333,370   2.96% #3
+|    OP srl_w                             851          45,103   0.40%
+|    OP signextend_w                    1,656          87,768   0.78%
+|    OP mul                                35           3,325   0.03%
+|    OP dma_memcpy                        385          16,170   0.14%
+|    OP dma_xmemset                        92           3,864   0.03%
+|    OP _dma_pre                          135          11,880   0.11%
+|    OP _dma_post                          43           3,784   0.03%
+|    OP sha256                            414       3,606,768  32.06% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  5           9,106  12.89% main
+|                  4          42,480  60.14% <libssz_types::list::SszList<libssz_types::list::SszList<u8, 1073741824>, 1048576> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  2          13,379  18.94% <stateless_validator_common::new_payload_request::ExecutionPayloadV3 as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  1             218   0.31% <libssz_types::list::SszList<u8, 32> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  1           1,495   2.12% <libssz_types::list::SszList<stateless_validator_common::new_payload_request::Withdrawal, 16> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  1           3,959   5.60% <libssz_types::list::SszList<[u8; 32], 4096> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+
+DETAIL FUNCTION <stateless_validator_common::new_payload_request::ExecutionPayloadV3 as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             74,155   5.01%
+COST                          10,812,531   2.31%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                87           5,220   0.05%
+|    OP lt                                  7             420   0.00%
+|    OP eq                                474          28,440   0.26%
+|    OP add                             5,194         129,850   1.20%
+|    OP sub                                52           3,120   0.03%
+|    OP and                             3,273         196,380   1.82% #4
+|    OP or                              6,888         413,280   3.82% #2
+|    OP xor                                17           1,020   0.01%
+|    OP sll                             2,281         120,893   1.12%
+|    OP srl                             5,387         285,511   2.64% #3
+|    OP srl_w                             779          41,287   0.38%
+|    OP signextend_w                    1,416          75,048   0.69%
+|    OP muluh                               3             285   0.00%
+|    OP mul                                24           2,280   0.02%
+|    OP dma_memcpy                        427          17,934   0.17%
+|    OP dma_xmemset                        99           4,158   0.04%
+|    OP _dma_pre                          188          16,544   0.15%
+|    OP _dma_post                         104           9,152   0.08%
+|    OP sha256                            354       3,084,048  28.52% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1          74,155 100.00% main
+
+DETAIL FUNCTION stateless::recover_block::verify_and_compute_sender
+-------------------------------------------------------------------
+STEPS                             63,504   4.29%
+COST                           9,701,104   2.08%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                21           1,260   0.01%
+|    OP eq                              1,483          88,980   0.92%
+|    OP add                             4,808         120,200   1.24%
+|    OP sub                                27           1,620   0.02%
+|    OP and                             5,436         326,160   3.36%
+|    OP or                              4,442         266,520   2.75%
+|    OP xor                             7,443         446,580   4.60% #4
+|    OP add_w                             364          21,840   0.23%
+|    OP sll                             2,291         121,423   1.25%
+|    OP srl                             4,773         252,969   2.61%
+|    OP srl_w                               6             318   0.00%
+|    OP mul                                24           2,280   0.02%
+|    OP dma_memcpy                         42           1,764   0.02%
+|    OP dma_memcmp                        691          29,022   0.30%
+|    OP dma_inputcpy                        3             126   0.00%
+|    OP dma_xmemset                         9             378   0.00%
+|    OP _dma_pre                           22           1,936   0.02%
+|    OP _dma_post                         706          62,128   0.64%
+|    OP keccak                              9         679,950   7.01% #3
+|    OP arith256_mod                       27          38,448   0.40%
+|    OP secp256k1_add                     685         975,440  10.05% #2
+|    OP secp256k1_dbl                     763       1,086,512  11.20% #1
+|    OP fcall_param                        24               0   0.00%
+|    OP fcall                               6               0   0.00%
+|    OP fcall_get                           6               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  3          63,504 100.00% <stateless_validator_reth::guest::StatelessValidatorRethGuest>::compute_inner::<ere_platform_zisk::ZiskPlatform>
+
+DETAIL FUNCTION <alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap> as alloy_evm::evm::Evm>::transact_system_call
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             84,126   5.68%
+COST                           9,610,594   2.06%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               439          26,340   0.27%
+|    OP lt                                160           9,600   0.10%
+|    OP eq                                365          21,900   0.23%
+|    OP add                             5,744         143,600   1.49% #4
+|    OP sub                               467          28,020   0.29%
+|    OP and                             3,918         235,080   2.45% #3
+|    OP or                              4,679         280,740   2.92% #2
+|    OP xor                             1,317          79,020   0.82%
+|    OP add_w                               9             540   0.01%
+|    OP sub_w                               4             240   0.00%
+|    OP sll                             1,349          71,497   0.74%
+|    OP srl                               590          31,270   0.33%
+|    OP sra                                73           3,869   0.04%
+|    OP srl_w                              64           3,392   0.04%
+|    OP signextend_b                      109           5,777   0.06%
+|    OP signextend_w                       44           2,332   0.02%
+|    OP muluh                             327          31,065   0.32%
+|    OP mul                               747          70,965   0.74%
+|    OP dma_memcpy                        378          15,876   0.17%
+|    OP dma_memcmp                        126           5,292   0.06%
+|    OP dma_xmemset                        79           3,318   0.03%
+|    OP _dma_pre                          103           9,064   0.09%
+|    OP _dma_post                         209          18,392   0.19%
+|    OP keccak                             26       1,964,300  20.44% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  4          84,126 100.00% <alloy_evm::eth::block::EthBlockExecutor<alloy_evm::eth::EthEvm<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>, revm_inspector::noop::NoOpInspector, alloy_evm::precompiles::PrecompilesMap>, &alloc::sync::Arc<reth_chainspec::spec::ChainSpec>, &reth_evm_ethereum::receipt::RethReceiptBuilder> as alloy_evm::block::BlockExecutor>::execute_block::<alloy_consensus::transaction::recovered::Recovered<&alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>, core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<core::slice::iter::Iter<alloy_primitives::bits::address::Address>, core::slice::iter::Iter<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>, <reth_primitives_traits::block::recovered::RecoveredBlock<alloy_consensus::block::Block<alloy_consensus::transaction::envelope::EthereumTxEnvelope<alloy_consensus::transaction::eip4844::TxEip4844>>>>::transactions_recovered::{closure#0}>>
+
+DETAIL FUNCTION <stateless_validator_reth_zisk::crypto::CustomEvmCrypto as alloy_consensus::crypto::backend::CryptoProvider>::verify_and_compute_signer_unchecked
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             56,915   3.84%
+COST                           8,398,627   1.80%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                 3             180   0.00%
+|    OP eq                              1,468          88,080   1.05%
+|    OP add                             4,400         110,000   1.31%
+|    OP and                             5,226         313,560   3.73% #4
+|    OP or                              3,647         218,820   2.61%
+|    OP xor                             7,260         435,600   5.19% #3
+|    OP add_w                             364          21,840   0.26%
+|    OP sll                             2,088         110,664   1.32%
+|    OP srl                             4,560         241,680   2.88%
+|    OP dma_memcpy                         18             756   0.01%
+|    OP dma_memcmp                        691          29,022   0.35%
+|    OP dma_inputcpy                        3             126   0.00%
+|    OP dma_xmemset                         3             126   0.00%
+|    OP _dma_pre                            6             528   0.01%
+|    OP _dma_post                         691          60,808   0.72%
+|    OP arith256_mod                       27          38,448   0.46%
+|    OP secp256k1_add                     685         975,440  11.61% #2
+|    OP secp256k1_dbl                     763       1,086,512  12.94% #1
+|    OP fcall_param                        24               0   0.00%
+|    OP fcall                               6               0   0.00%
+|    OP fcall_get                           6               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  3          56,915 100.00% stateless::recover_block::verify_and_compute_sender
+
+DETAIL FUNCTION secp256k1_ecdsa_verify_and_address_recover_c
+------------------------------------------------------------
+STEPS                             56,828   3.84%
+COST                           8,389,921   1.80%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                 3             180   0.00%
+|    OP eq                              1,468          88,080   1.05%
+|    OP add                             4,385         109,625   1.31%
+|    OP and                             5,214         312,840   3.73% #4
+|    OP or                              3,647         218,820   2.61%
+|    OP xor                             7,260         435,600   5.19% #3
+|    OP add_w                             364          21,840   0.26%
+|    OP sll                             2,088         110,664   1.32%
+|    OP srl                             4,560         241,680   2.88%
+|    OP dma_memcpy                         15             630   0.01%
+|    OP dma_memcmp                        691          29,022   0.35%
+|    OP dma_inputcpy                        3             126   0.00%
+|    OP dma_xmemset                         3             126   0.00%
+|    OP _dma_pre                            3             264   0.00%
+|    OP _dma_post                         688          60,544   0.72%
+|    OP arith256_mod                       27          38,448   0.46%
+|    OP secp256k1_add                     685         975,440  11.63% #2
+|    OP secp256k1_dbl                     763       1,086,512  12.95% #1
+|    OP fcall_param                        24               0   0.00%
+|    OP fcall                               6               0   0.00%
+|    OP fcall_get                           6               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  3          56,828 100.00% <stateless_validator_reth_zisk::crypto::CustomEvmCrypto as alloy_consensus::crypto::backend::CryptoProvider>::verify_and_compute_signer_unchecked
+
+DETAIL FUNCTION <libssz_types::list::SszList<libssz_types::list::SszList<u8, 1073741824>, 1048576> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             57,742   3.90%
+COST                           8,258,778   1.77%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                74           4,440   0.05%
+|    OP lt                                  6             360   0.00%
+|    OP eq                                443          26,580   0.32%
+|    OP add                             4,515         112,875   1.37%
+|    OP sub                                43           2,580   0.03%
+|    OP and                             2,285         137,100   1.66% #4
+|    OP or                              5,063         303,780   3.68% #2
+|    OP xor                                12             720   0.01%
+|    OP sll                             1,511          80,083   0.97%
+|    OP srl                             3,982         211,046   2.56% #3
+|    OP srl_w                             469          24,857   0.30%
+|    OP signextend_w                    1,064          56,392   0.68%
+|    OP muluh                               3             285   0.00%
+|    OP mul                                15           1,425   0.02%
+|    OP dma_memcpy                        329          13,818   0.17%
+|    OP dma_xmemset                        52           2,184   0.03%
+|    OP _dma_pre                          122          10,736   0.13%
+|    OP _dma_post                          77           6,776   0.08%
+|    OP sha256                            266       2,317,392  28.06% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1          57,742 100.00% <stateless_validator_common::new_payload_request::ExecutionPayloadV3 as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+
+DETAIL FUNCTION <revm_precompile::Precompiles>::new
+---------------------------------------------------
+STEPS                             73,760   4.98%
+COST                           6,977,971   1.49%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               204          12,240   0.18%
+|    OP lt                                138           8,280   0.12%
+|    OP eq                              2,413         144,780   2.07% #2
+|    OP add                             9,089         227,225   3.26% #1
+|    OP sub                               535          32,100   0.46%
+|    OP and                             1,885         113,100   1.62% #3
+|    OP or                                848          50,880   0.73%
+|    OP xor                               925          55,500   0.80%
+|    OP sll                               788          41,764   0.60%
+|    OP srl                               445          23,585   0.34%
+|    OP sra                                74           3,922   0.06%
+|    OP signextend_b                       66           3,498   0.05%
+|    OP signextend_w                    1,937         102,661   1.47% #4
+|    OP muluh                             228          21,660   0.31%
+|    OP mul                               491          46,645   0.67%
+|    OP dma_memcpy                        148           6,216   0.09%
+|    OP dma_memcmp                         11             462   0.01%
+|    OP dma_xmemset                         6             252   0.00%
+|    OP _dma_pre                           56           4,928   0.07%
+|    OP _dma_post                          44           3,872   0.06%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  2          73,760 100.00% <reth_evm::execute::BasicBlockExecutor<&reth_evm_ethereum::EthEvmConfig, stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>> as reth_evm::execute::Executor<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>::execute
+
+DETAIL FUNCTION <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::osaka::{closure#0}>::{closure#0}>::{closure#0}>
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             73,738   4.98%
+COST                           6,975,995   1.49%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               204          12,240   0.18%
+|    OP lt                                138           8,280   0.12%
+|    OP eq                              2,412         144,720   2.07% #2
+|    OP add                             9,085         227,125   3.26% #1
+|    OP sub                               535          32,100   0.46%
+|    OP and                             1,881         112,860   1.62% #3
+|    OP or                                848          50,880   0.73%
+|    OP xor                               925          55,500   0.80%
+|    OP sll                               788          41,764   0.60%
+|    OP srl                               445          23,585   0.34%
+|    OP sra                                74           3,922   0.06%
+|    OP signextend_b                       66           3,498   0.05%
+|    OP signextend_w                    1,937         102,661   1.47% #4
+|    OP muluh                             228          21,660   0.31%
+|    OP mul                               491          46,645   0.67%
+|    OP dma_memcpy                        148           6,216   0.09%
+|    OP dma_memcmp                         11             462   0.01%
+|    OP dma_xmemset                         6             252   0.00%
+|    OP _dma_pre                           56           4,928   0.07%
+|    OP _dma_post                          44           3,872   0.06%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1               0   0.00% <revm_precompile::Precompiles>::new
+
+DETAIL FUNCTION <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::prague::{closure#0}>::{closure#0}>::{closure#0}>
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             64,086   4.33%
+COST                           6,045,363   1.29%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               160           9,600   0.16%
+|    OP lt                                132           7,920   0.13%
+|    OP eq                              2,068         124,080   2.05% #2
+|    OP add                             7,750         193,750   3.20% #1
+|    OP sub                               425          25,500   0.42%
+|    OP and                             1,652          99,120   1.64% #3
+|    OP or                                802          48,120   0.80%
+|    OP xor                               869          52,140   0.86%
+|    OP sll                               700          37,100   0.61%
+|    OP srl                               395          20,935   0.35%
+|    OP sra                                70           3,710   0.06%
+|    OP signextend_b                       64           3,392   0.06%
+|    OP signextend_w                    1,601          84,853   1.40% #4
+|    OP muluh                             216          20,520   0.34%
+|    OP mul                               437          41,515   0.69%
+|    OP dma_memcpy                        124           5,208   0.09%
+|    OP dma_memcmp                          9             378   0.01%
+|    OP dma_xmemset                         6             252   0.00%
+|    OP _dma_pre                           44           3,872   0.06%
+|    OP _dma_post                          36           3,168   0.05%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1          64,086 100.00% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::osaka::{closure#0}>::{closure#0}>::{closure#0}>
+
+DETAIL FUNCTION ziskos::zisklib::lib::secp256k1::curve::secp256k1_triple_scalar_mul_with_g
+------------------------------------------------------------------------------------------
+STEPS                             32,444   2.19%
+COST                           5,589,832   1.20%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP eq                              1,168          70,080   1.25%
+|    OP add                             3,800          95,000   1.70%
+|    OP and                             3,354         201,240   3.60% #3
+|    OP or                              1,136          68,160   1.22%
+|    OP add_w                             364          21,840   0.39%
+|    OP srl                             2,304         122,112   2.18% #4
+|    OP dma_memcmp                        691          29,022   0.52%
+|    OP _dma_post                         688          60,544   1.08%
+|    OP secp256k1_add                     685         975,440  17.45% #2
+|    OP secp256k1_dbl                     763       1,086,512  19.44% #1
+|    OP fcall_param                        12               0   0.00%
+|    OP fcall                               3               0   0.00%
+|    OP fcall_get                           6               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  3          32,444 100.00% secp256k1_ecdsa_verify_and_address_recover_c
+
+DETAIL FUNCTION <revm_context_interface::journaled_state::account::JournaledAccount<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>::sload_concrete_error
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             36,443   2.46%
+COST                           4,915,947   1.05%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                57           3,420   0.07%
+|    OP lt                                 86           5,160   0.10%
+|    OP eq                                140           8,400   0.17%
+|    OP add                             2,296          57,400   1.17% #4
+|    OP sub                               142           8,520   0.17%
+|    OP and                             1,474          88,440   1.80% #2
+|    OP or                              1,250          75,000   1.53% #3
+|    OP xor                               857          51,420   1.05%
+|    OP add_w                               1              60   0.00%
+|    OP sll                               489          25,917   0.53%
+|    OP srl                               294          15,582   0.32%
+|    OP sra                                42           2,226   0.05%
+|    OP signextend_b                       46           2,438   0.05%
+|    OP muluh                             210          19,950   0.41%
+|    OP mul                               450          42,750   0.87%
+|    OP dma_memcpy                        101           4,242   0.09%
+|    OP dma_memcmp                         31           1,302   0.03%
+|    OP dma_xmemset                        56           2,352   0.05%
+|    OP _dma_pre                           33           2,904   0.06%
+|    OP _dma_post                          53           4,664   0.09%
+|    OP keccak                             22       1,662,100  33.81% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 11          11,644  31.95% <revm_context_interface::journaled_state::account::JournaledAccount<&mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>::sstore_concrete_error
+|                  8          24,799  68.05% <revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>> as revm_context_interface::host::Host>::sload_skip_cold_load
+
+DETAIL FUNCTION sha256_c
+------------------------
+STEPS                             22,875   1.55%
+COST                           4,800,407   1.03%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP add                             1,625          40,625   0.85%
+|    OP and                             1,000          60,000   1.25% #3
+|    OP or                                375          22,500   0.47%
+|    OP sll                               250          13,250   0.28%
+|    OP srl                             3,500         185,500   3.86% #2
+|    OP srl_w                             125           6,625   0.14%
+|    OP signextend_w                    1,000          53,000   1.10% #4
+|    OP dma_memcpy                        125           5,250   0.11%
+|    OP sha256                            250       2,178,000  45.37% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                115          21,045  92.00% libssz_merkle::merkleize::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  4             732   3.20% <libssz_types::list::SszList<libssz_types::list::SszList<u8, 1073741824>, 1048576> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  3             549   2.40% main
+|                  1             183   0.80% <libssz_types::list::SszList<u8, 32> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  1             183   0.80% <libssz_types::list::SszList<stateless_validator_common::new_payload_request::Withdrawal, 16> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+|                  1             183   0.80% <libssz_types::list::SszList<[u8; 32], 4096> as libssz_merkle::HashTreeRoot>::hash_tree_root::<stateless_validator_reth::guest::zisk::ZiskSha256Hasher>
+
+DETAIL FUNCTION revm_interpreter::instructions::stack::push0::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             46,515   3.14%
+COST                           4,217,571   0.90%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP eq                              3,093         185,580   4.40% #2
+|    OP add                             5,013         125,325   2.97% #3
+|    OP and                             3,099         185,940   4.41% #1
+|    OP sll                             1,914         101,442   2.41% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|              3,093          46,515 100.00% <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+
+DETAIL FUNCTION <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::cancun::{closure#0}>::{closure#0}>::{closure#0}>
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             44,321   2.99%
+COST                           4,198,574   0.90%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               118           7,080   0.17%
+|    OP lt                                 64           3,840   0.09%
+|    OP eq                              1,657          99,420   2.37% #2
+|    OP add                             5,671         141,775   3.38% #1
+|    OP sub                               265          15,900   0.38%
+|    OP and                               978          58,680   1.40% #4
+|    OP or                                414          24,840   0.59%
+|    OP xor                               452          27,120   0.65%
+|    OP sll                               383          20,299   0.48%
+|    OP srl                               212          11,236   0.27%
+|    OP sra                                36           1,908   0.05%
+|    OP signextend_b                       30           1,590   0.04%
+|    OP signextend_w                    1,274          67,522   1.61% #3
+|    OP muluh                             112          10,640   0.25%
+|    OP mul                               244          23,180   0.55%
+|    OP dma_memcpy                         74           3,108   0.07%
+|    OP dma_memcmp                          8             336   0.01%
+|    OP dma_xmemset                         4             168   0.00%
+|    OP _dma_pre                           28           2,464   0.06%
+|    OP _dma_post                          24           2,112   0.05%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1          44,321 100.00% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::prague::{closure#0}>::{closure#0}>::{closure#0}>
+
+DETAIL FUNCTION <revm_precompile::Precompiles as core::clone::Clone>::clone
+---------------------------------------------------------------------------
+STEPS                             41,442   2.80%
+COST                           4,046,505   0.87%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               151           9,060   0.22%
+|    OP eq                              1,932         115,920   2.86% #2
+|    OP add                             6,414         160,350   3.96% #1
+|    OP sub                               348          20,880   0.52%
+|    OP and                               530          31,800   0.79% #4
+|    OP xor                                26           1,560   0.04%
+|    OP sll                               187           9,911   0.24%
+|    OP srl                               114           6,042   0.15%
+|    OP signextend_w                    1,914         101,442   2.51% #3
+|    OP mul                               114          10,830   0.27%
+|    OP dma_memcpy                         69           2,898   0.07%
+|    OP _dma_pre                           32           2,816   0.07%
+|    OP _dma_post                          25           2,200   0.05%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1           7,686  18.55% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::osaka::{closure#0}>::{closure#0}>::{closure#0}>
+|                  1           6,955  16.78% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::prague::{closure#0}>::{closure#0}>::{closure#0}>
+|                  1           6,854  16.54% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::cancun::{closure#0}>::{closure#0}>::{closure#0}>
+|                  1           6,854  16.54% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::berlin::{closure#0}>::{closure#0}>::{closure#0}>
+|                  1           6,753  16.30% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::istanbul::{closure#0}>::{closure#0}>::{closure#0}>
+|                  1           6,340  15.30% <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::init::<<once_cell::race::once_box::OnceBox<_>>::get_or_init::Void, <once_cell::race::once_box::OnceBox<revm_precompile::Precompiles>>::get_or_init<<revm_primitives::once_lock::no_std_impl::OnceLock<revm_precompile::Precompiles>>::get_or_init<<revm_precompile::Precompiles>::byzantium::{closure#0}>::{closure#0}>::{closure#0}>
+
+DETAIL FUNCTION revm_interpreter::instructions::host::sload::<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             28,623   1.93%
+COST                           3,787,690   0.81%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                54           3,240   0.09%
+|    OP lt                                 70           4,200   0.11%
+|    OP eq                                109           6,540   0.17%
+|    OP add                             1,863          46,575   1.23% #4
+|    OP sub                               127           7,620   0.20%
+|    OP and                             1,168          70,080   1.85% #3
+|    OP or                              1,248          74,880   1.98% #2
+|    OP xor                               672          40,320   1.06%
+|    OP add_w                               1              60   0.00%
+|    OP sll                               436          23,108   0.61%
+|    OP srl                               239          12,667   0.33%
+|    OP sra                                36           1,908   0.05%
+|    OP signextend_b                       36           1,908   0.05%
+|    OP muluh                             164          15,580   0.41%
+|    OP mul                               351          33,345   0.88%
+|    OP dma_memcpy                         84           3,528   0.09%
+|    OP dma_memcmp                         25           1,050   0.03%
+|    OP dma_xmemset                        40           1,680   0.04%
+|    OP _dma_pre                           24           2,112   0.06%
+|    OP _dma_post                          53           4,664   0.12%
+|    OP keccak                             16       1,208,800  31.91% #1
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  8          28,623 100.00% <revm_handler::mainnet_handler::MainnetHandler<revm_context::evm::Evm<revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>, revm_inspector::noop::NoOpInspector, revm_handler::instructions::EthInstructions<revm_interpreter::interpreter::EthInterpreter, revm_context::context::Context<revm_context::block::BlockEnv, revm_context::tx::TxEnv, revm_context::cfg::CfgEnv, &mut revm_database::states::state::State<stateless::witness_db::WitnessDatabase<tries::zeth::SparseState>>>>, alloy_evm::precompiles::PrecompilesMap, revm_handler::frame::EthFrame>, revm_context_interface::result::EVMError<revm_database_interface::bal::EvmDatabaseError<tries::error::WitnessDbError>>, revm_handler::frame::EthFrame> as revm_handler::handler::Handler>::execution
+
+MARK_ID                       INDEX      COUNT           STEPS       %      TOTAL COST       %       MAIN COST     OPCODE COST PRECOMPILE COST     MEMORY COST
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+read_input                        0          1             146   0.01%          13,566   0.00%           9,928           2,945               0             693
+deserialize_input                 0          1          30,505   2.06%       2,692,846   0.58%       2,074,340         303,344           8,190         306,972
+new_payload_request_root_calculation          0          1          88,938   6.01%      13,059,330   2.79%       6,047,784       1,560,914       3,834,840       1,615,792
+misc_preparation                  0          1          24,108   1.63%       2,421,665   0.52%       1,639,344         209,822         346,776         225,723
+new_payload_request_to_block          0          1          26,047   1.76%       3,675,320   0.79%       1,771,196         450,983       1,230,356         222,785
+stf                               0          1       1,276,152  86.21%     148,689,733  31.82%      86,778,336      28,163,290      24,608,868       9,139,239
+serialize_output                  0          1             775   0.05%          69,319   0.01%          52,700          10,587             654           5,378
+sha256_output_bytes               0          1           4,596   0.31%         505,523   0.11%         312,528         176,975             432          15,588
+write_output                      0          1             236   0.02%          24,214   0.01%          16,048           6,625               0           1,541
+

@@ -1,0 +1,929 @@
+Loading symbols from ELF file: /data/program.elf
+Loaded 1442 function symbols (0 marked as selected ROI)
+Loaded 9 profile tags
+
+REPORT                                  
+----------------------------------------
+STEPS                          5,066,638
+
+COST DISTRIBUTION                   COST       %
+------------------------------------------------
+BASE                         293,601,280  36.48%
+MAIN                         344,531,384  42.81%
+OPCODES                      112,987,842  14.04%
+PRECOMPILES                    4,046,970   0.50%
+MEMORY                        49,561,845   6.16%
+
+TOTAL                        804,729,321 100.00%
+
+FROPS                         19,237,597   2.39%
+RAM USAGE                      1,948,305   0.37%
+
+COST BY OPCODE                     COUNT       %            COST       % RANK
+-----------------------------------------------------------------------------
+OP ltu                            78,053   1.54%       4,683,180   0.58%
+OP lt                             38,385   0.76%       2,303,100   0.29%
+OP eq                             72,338   1.43%       4,340,280   0.54%
+OP add                           346,832   6.85%       8,670,800   1.08%
+OP sub                             7,909   0.16%         474,540   0.06%
+OP and                           261,824   5.17%      15,709,440   1.95% #2
+OP or                            255,929   5.05%      15,355,740   1.91% #3
+OP xor                           629,705  12.43%      37,782,300   4.70% #1
+OP add_w                             235   0.00%          14,100   0.00%
+OP sll                           221,141   4.36%      11,720,473   1.46% #4
+OP srl                           186,682   3.68%       9,894,146   1.23%
+OP sra                                 1   0.00%              53   0.00%
+OP srl_w                           1,684   0.03%          89,252   0.01%
+OP signextend_b                   25,927   0.51%       1,374,131   0.17%
+OP signextend_h                      137   0.00%           7,261   0.00%
+OP signextend_w                    1,502   0.03%          79,606   0.01%
+OP pubout                             32   0.00%               0   0.00%
+OP muluh                           1,381   0.03%         131,195   0.02%
+OP mul                             3,770   0.07%         358,150   0.04%
+OP divu                                1   0.00%              95   0.00%
+OP dma_memcpy                     13,627   0.27%         572,334   0.07%
+OP dma_memcmp                        722   0.01%          30,324   0.00%
+OP dma_inputcpy                        2   0.00%              84   0.00%
+OP dma_xmemset                       194   0.00%           8,148   0.00%
+OP _dma_pre                          830   0.02%          73,040   0.01%
+OP _dma_post                       4,117   0.08%         362,296   0.05%
+OP arith256_mod                       10   0.00%          14,240   0.00%
+OP secp256k1_add                     221   0.00%         314,704   0.04%
+OP secp256k1_dbl                     255   0.01%         363,120   0.05%
+OP fcall_param                        12   0.00%               0   0.00%
+OP fcall                               5   0.00%               0   0.00%
+OP fcall_get                           2   0.00%               0   0.00%
+OP sha256                            265   0.01%       2,308,680   0.29%
+
+FROPS BY OPCODE                    COUNT    HIT            COST       % RANK
+----------------------------------------------------------------------------
+FROP ltu                          17,868  18.63%       1,072,080   0.13%
+FROP lt                            7,793  16.88%         467,580   0.06%
+FROP eq                          106,388  59.53%       6,383,280   0.79% #1
+FROP add                          43,671  11.18%       1,091,775   0.14% #4
+FROP sub                           2,942  27.11%         176,520   0.02%
+FROP and                          12,295   4.49%         737,700   0.09%
+FROP or                           17,900   6.54%       1,074,000   0.13%
+FROP xor                          34,551   5.20%       2,073,060   0.26% #3
+FROP add_w                           502  68.11%          30,120   0.00%
+FROP sub_w                            86 100.00%           5,160   0.00%
+FROP sll                          98,700  30.86%       5,231,100   0.65% #2
+FROP srl                          13,927   6.94%         738,131   0.09%
+FROP sra                               3  75.00%             159   0.00%
+FROP sll_w                             3 100.00%             159   0.00%
+FROP srl_w                           626  27.10%          33,178   0.00%
+FROP muluh                           605  30.46%          57,475   0.01%
+FROP mul                             696  15.58%          66,120   0.01%
+
+TOP STEP FUNCTIONS (STEPS, % STEPS, CALLS, FUNCTION)
+----------------------------------------------------
+      5,009,091  98.86%          1       5,009,091 <stateless_validator_ethrex::guest::StatelessValidatorEthrexGuest as guest::guest::Guest>::compute::<ere_platform_zisk::ZiskPlatform>
+      4,899,899  96.71%          1       4,899,899 ethrex_guest_program::l1::program::execution_program
+      2,971,993  58.66%          1       2,971,993 <ethrex_vm::backends::Evm>::execute_block
+      2,852,699  56.30%          5         570,539 <ethrex_levm::vm::VM>::execute
+      1,925,326  38.00%      2,802             687 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::logging::OpLogHandler<3>>
+      1,665,360  32.87%        257           6,480 tiny_keccak::keccakf::keccakf
+      1,581,688  31.22%          6         263,614 <ethrex_common::types::account::Code>::from_bytecode
+      1,529,378  30.19%         55          27,806 <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::update
+        360,415   7.11%         55           6,553 <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::finalize
+        327,436   6.46%          4          81,859 ethrex_vm::backends::levm::generic_system_contract_levm
+        209,598   4.14%         10          20,959 <ethrex_trie::Trie>::hash_no_commit
+        201,672   3.98%      2,801              72 <ethrex_levm::memory::Memory>::load_range
+        201,608   3.98%          7          28,801 <std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::initialize::<<std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::get_or_init<<ethrex_trie::node::NodeRef>::compute_hash_no_alloc::{closure#0}>::{closure#0}, !>
+        201,384   3.97%         21           9,589 <ethrex_trie::node::Node>::compute_hash_no_alloc
+        193,522   3.82%      8,414              23 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::dup::OpDupHandler<0>>
+        117,259   2.31%         35           3,350 <ethrex_trie::node::Node>::memoize_hashes
+        110,043   2.17%         11          10,003 <ethrex_levm::db::gen_db::GeneralizedDatabase>::get_value_from_database
+         99,477   1.96%         11           9,043 <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_storage_value
+         99,052   1.95%          8          12,381 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::stack_memory_storage_flow::OpSLoadHandler>
+         99,026   1.95%         11           9,002 <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+         96,083   1.90%         37           2,596 <ethrex_levm::db::gen_db::GeneralizedDatabase>::load_account
+         88,916   1.75%          5          17,783 <ethrex_levm::hooks::default_hook::DefaultHook as ethrex_levm::hooks::hook::Hook>::prepare_execution
+         88,591   1.75%         19           4,662 <ethrex_common::types::block_execution_witness::GuestProgramState>::get_account_state
+         86,831   1.71%      2,801              31 <ethrex_levm::tracing::LevmCallTracer>::log
+         75,610   1.49%          8           9,451 <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_account_state
+
+TOP COST FUNCTIONS (COST, % COST, CALLS, COST/CALL, FUNCTION)
+-------------------------------------------------------------
+    506,000,307  62.88%          1     506,000,307 <stateless_validator_ethrex::guest::StatelessValidatorEthrexGuest as guest::guest::Guest>::compute::<ere_platform_zisk::ZiskPlatform>
+    492,063,263  61.15%          1     492,063,263 ethrex_guest_program::l1::program::execution_program
+    273,502,952  33.99%          1     273,502,952 <ethrex_vm::backends::Evm>::execute_block
+    260,814,559  32.41%          5      52,162,911 <ethrex_levm::vm::VM>::execute
+    194,961,890  24.23%        257         758,606 tiny_keccak::keccakf::keccakf
+    180,907,664  22.48%          6      30,151,277 <ethrex_common::types::account::Code>::from_bytecode
+    174,296,234  21.66%         55       3,169,022 <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::update
+    174,000,313  21.62%      2,802          62,098 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::logging::OpLogHandler<3>>
+     41,977,470   5.22%         55         763,226 <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::finalize
+     32,835,571   4.08%          4       8,208,892 ethrex_vm::backends::levm::generic_system_contract_levm
+     23,485,282   2.92%         10       2,348,528 <ethrex_trie::Trie>::hash_no_commit
+     22,592,138   2.81%          7       3,227,448 <std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::initialize::<<std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::get_or_init<<ethrex_trie::node::NodeRef>::compute_hash_no_alloc::{closure#0}>::{closure#0}, !>
+     22,570,263   2.80%         21       1,074,774 <ethrex_trie::node::Node>::compute_hash_no_alloc
+     17,542,663   2.18%      2,801           6,263 <ethrex_levm::memory::Memory>::load_range
+     17,257,114   2.14%      8,414           2,051 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::dup::OpDupHandler<0>>
+     13,043,338   1.62%         35         372,666 <ethrex_trie::node::Node>::memoize_hashes
+     11,735,041   1.46%         11       1,066,821 <ethrex_levm::db::gen_db::GeneralizedDatabase>::get_value_from_database
+     10,786,974   1.34%         11         980,634 <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_storage_value
+     10,748,452   1.34%         11         977,132 <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+     10,335,888   1.28%         37         279,348 <ethrex_levm::db::gen_db::GeneralizedDatabase>::load_account
+     10,318,050   1.28%          8       1,289,756 <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::stack_memory_storage_flow::OpSLoadHandler>
+      9,305,309   1.16%         19         489,753 <ethrex_common::types::block_execution_witness::GuestProgramState>::get_account_state
+      9,119,243   1.13%          5       1,823,848 <ethrex_levm::hooks::default_hook::DefaultHook as ethrex_levm::hooks::hook::Hook>::prepare_execution
+      8,347,261   1.04%          8       1,043,407 <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_account_state
+      8,109,937   1.01%          3       2,703,312 once_cell::imp::initialize_or_wait
+
+DETAIL FUNCTION <stateless_validator_ethrex::guest::StatelessValidatorEthrexGuest as guest::guest::Guest>::compute::<ere_platform_zisk::ZiskPlatform>
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                          5,009,091  98.86%
+COST                         506,000,307  62.88%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            77,840       4,670,400   0.92%
+|    OP lt                             38,346       2,300,760   0.45%
+|    OP eq                             72,126       4,327,560   0.86%
+|    OP add                           343,060       8,576,500   1.69%
+|    OP sub                             7,725         463,500   0.09%
+|    OP and                           260,508      15,630,480   3.09% #2
+|    OP or                            254,289      15,257,340   3.02% #3
+|    OP xor                           628,780      37,726,800   7.46% #1
+|    OP add_w                             235          14,100   0.00%
+|    OP sll                           220,298      11,675,794   2.31% #4
+|    OP srl                           186,513       9,885,189   1.95%
+|    OP sra                                 1              53   0.00%
+|    OP srl_w                           1,031          54,643   0.01%
+|    OP signextend_b                   25,788       1,366,764   0.27%
+|    OP signextend_h                      137           7,261   0.00%
+|    OP signextend_w                    1,475          78,175   0.02%
+|    OP muluh                           1,381         131,195   0.03%
+|    OP mul                             3,484         330,980   0.07%
+|    OP divu                                1              95   0.00%
+|    OP dma_memcpy                     13,430         564,060   0.11%
+|    OP dma_memcmp                        722          30,324   0.01%
+|    OP dma_inputcpy                        2              84   0.00%
+|    OP dma_xmemset                       186           7,812   0.00%
+|    OP _dma_pre                          718          63,184   0.01%
+|    OP _dma_post                       4,043         355,784   0.07%
+|    OP arith256_mod                       10          14,240   0.00%
+|    OP secp256k1_add                     221         314,704   0.06%
+|    OP secp256k1_dbl                     255         363,120   0.07%
+|    OP fcall_param                        10               0   0.00%
+|    OP fcall                               3               0   0.00%
+|    OP fcall_get                           2               0   0.00%
+|    OP sha256                            265       2,308,680   0.46%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1       5,009,091 100.00% main
+
+DETAIL FUNCTION ethrex_guest_program::l1::program::execution_program
+--------------------------------------------------------------------
+STEPS                          4,899,899  96.71%
+COST                         492,063,263  61.15%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            77,717       4,663,020   0.95%
+|    OP lt                             38,326       2,299,560   0.47%
+|    OP eq                             70,997       4,259,820   0.87%
+|    OP add                           336,848       8,421,200   1.71%
+|    OP sub                             7,645         458,700   0.09%
+|    OP and                           252,795      15,167,700   3.08% #2
+|    OP or                            247,175      14,830,500   3.01% #3
+|    OP xor                           611,653      36,699,180   7.46% #1
+|    OP add_w                             235          14,100   0.00%
+|    OP sll                           214,751      11,381,803   2.31% #4
+|    OP srl                           177,697       9,417,941   1.91%
+|    OP sra                                 1              53   0.00%
+|    OP srl_w                             859          45,527   0.01%
+|    OP signextend_b                   25,773       1,365,969   0.28%
+|    OP signextend_h                      130           6,890   0.00%
+|    OP signextend_w                      395          20,935   0.00%
+|    OP muluh                           1,376         130,720   0.03%
+|    OP mul                             3,273         310,935   0.06%
+|    OP divu                                1              95   0.00%
+|    OP dma_memcpy                     12,805         537,810   0.11%
+|    OP dma_memcmp                        721          30,282   0.01%
+|    OP dma_inputcpy                        2              84   0.00%
+|    OP dma_xmemset                       165           6,930   0.00%
+|    OP _dma_pre                          666          58,608   0.01%
+|    OP _dma_post                       4,000         352,000   0.07%
+|    OP arith256_mod                       10          14,240   0.00%
+|    OP secp256k1_add                     221         314,704   0.06%
+|    OP secp256k1_dbl                     255         363,120   0.07%
+|    OP fcall_param                        10               0   0.00%
+|    OP fcall                               3               0   0.00%
+|    OP fcall_get                           2               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1       4,899,899 100.00% <stateless_validator_ethrex::guest::StatelessValidatorEthrexGuest as guest::guest::Guest>::compute::<ere_platform_zisk::ZiskPlatform>
+
+DETAIL FUNCTION <ethrex_vm::backends::Evm>::execute_block
+---------------------------------------------------------
+STEPS                          2,971,993  58.66%
+COST                         273,502,952  33.99%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            51,578       3,094,680   1.13%
+|    OP lt                             17,598       1,055,880   0.39%
+|    OP eq                             14,371         862,260   0.32%
+|    OP add                           217,673       5,441,825   1.99% #2
+|    OP sub                             6,915         414,900   0.15%
+|    OP and                           110,124       6,607,440   2.42% #1
+|    OP or                             84,660       5,079,600   1.86% #3
+|    OP xor                            57,872       3,472,320   1.27% #4
+|    OP add_w                             220          13,200   0.00%
+|    OP sll                            54,513       2,889,189   1.06%
+|    OP srl                            18,551         983,203   0.36%
+|    OP sra                                 1              53   0.00%
+|    OP srl_w                             128           6,784   0.00%
+|    OP signextend_b                      490          25,970   0.01%
+|    OP signextend_h                      122           6,466   0.00%
+|    OP signextend_w                      365          19,345   0.01%
+|    OP muluh                           1,229         116,755   0.04%
+|    OP mul                             2,928         278,160   0.10%
+|    OP dma_memcpy                     12,214         512,988   0.19%
+|    OP dma_memcmp                        626          26,292   0.01%
+|    OP dma_inputcpy                        2              84   0.00%
+|    OP dma_xmemset                       115           4,830   0.00%
+|    OP _dma_pre                          352          30,976   0.01%
+|    OP _dma_post                       3,687         324,456   0.12%
+|    OP arith256_mod                       10          14,240   0.01%
+|    OP secp256k1_add                     221         314,704   0.12%
+|    OP secp256k1_dbl                     255         363,120   0.13%
+|    OP fcall_param                        10               0   0.00%
+|    OP fcall                               3               0   0.00%
+|    OP fcall_get                           2               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1       2,971,993 100.00% ethrex_guest_program::l1::program::execution_program
+
+DETAIL FUNCTION <ethrex_levm::vm::VM>::execute
+----------------------------------------------
+STEPS                          2,852,699  56.30%
+COST                         260,814,559  32.41%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            51,394       3,083,640   1.18% #4
+|    OP lt                             17,297       1,037,820   0.40%
+|    OP eq                             13,036         782,160   0.30%
+|    OP add                           209,060       5,226,500   2.00% #2
+|    OP sub                             6,266         375,960   0.14%
+|    OP and                           102,057       6,123,420   2.35% #1
+|    OP or                             76,255       4,575,300   1.75% #3
+|    OP xor                            45,808       2,748,480   1.05%
+|    OP add_w                             115           6,900   0.00%
+|    OP sll                            49,122       2,603,466   1.00%
+|    OP srl                            13,717         727,001   0.28%
+|    OP srl_w                             108           5,724   0.00%
+|    OP signextend_b                      239          12,667   0.00%
+|    OP signextend_h                       81           4,293   0.00%
+|    OP signextend_w                      264          13,992   0.01%
+|    OP muluh                             712          67,640   0.03%
+|    OP mul                             1,640         155,800   0.06%
+|    OP dma_memcpy                     11,752         493,584   0.19%
+|    OP dma_memcmp                        372          15,624   0.01%
+|    OP dma_xmemset                        80           3,360   0.00%
+|    OP _dma_pre                          193          16,984   0.01%
+|    OP _dma_post                       3,257         286,616   0.11%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  4         252,006   8.83% ethrex_vm::backends::levm::generic_system_contract_levm
+|                  1       2,600,693  91.17% <ethrex_vm::backends::Evm>::execute_block
+
+DETAIL FUNCTION tiny_keccak::keccakf::keccakf
+---------------------------------------------
+STEPS                          1,665,360  32.87%
+COST                         194,961,890  24.23%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP eq                              6,168         370,080   0.19%
+|    OP add                             1,028          25,700   0.01%
+|    OP and                           154,456       9,267,360   4.75%
+|    OP or                            178,611      10,716,660   5.50% #2
+|    OP xor                           622,063      37,323,780  19.14% #1
+|    OP sll                           178,574       9,464,422   4.85% #3
+|    OP srl                           178,564       9,463,892   4.85% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                202       1,308,960  78.60% <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::update
+|                 55         356,400  21.40% <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::finalize
+
+DETAIL FUNCTION <ethrex_common::types::account::Code>::from_bytecode
+--------------------------------------------------------------------
+STEPS                          1,581,688  31.22%
+COST                         180,907,664  22.48%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            25,662       1,539,720   0.85%
+|    OP lt                             20,571       1,234,260   0.68%
+|    OP eq                             50,862       3,051,720   1.69%
+|    OP add                           102,715       2,567,875   1.42%
+|    OP sub                               376          22,560   0.01%
+|    OP and                           115,716       6,942,960   3.84%
+|    OP or                            133,616       8,016,960   4.43% #2
+|    OP xor                           465,351      27,921,060  15.43% #1
+|    OP sll                           133,619       7,081,807   3.91% #3
+|    OP srl                           133,610       7,081,330   3.91% #4
+|    OP signextend_b                   25,206       1,335,918   0.74%
+|    OP dma_memcpy                         22             924   0.00%
+|    OP dma_xmemset                         6             252   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  6       1,581,688 100.00% ethrex_guest_program::l1::program::execution_program
+
+DETAIL FUNCTION <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::update
+----------------------------------------------------------------------------
+STEPS                          1,529,378  30.19%
+COST                         174,296,234  21.66%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               570          34,200   0.02%
+|    OP eq                             35,419       2,125,140   1.22%
+|    OP add                            62,963       1,574,075   0.90%
+|    OP sub                               385          23,100   0.01%
+|    OP and                           121,659       7,299,540   4.19%
+|    OP or                            140,590       8,435,400   4.84% #2
+|    OP xor                           489,637      29,378,220  16.86% #1
+|    OP sll                           140,590       7,451,270   4.28% #3
+|    OP srl                           140,590       7,451,270   4.28% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 21          43,684   2.86% <ethrex_trie::node::Node>::compute_hash_no_alloc
+|                 11           2,893   0.19% <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+|                  8           1,432   0.09% <ethrex_common::types::block_execution_witness::GuestProgramState>::get_account_state
+|                  6       1,389,148  90.83% <ethrex_common::types::account::Code>::from_bytecode
+|                  2          60,557   3.96% ethrex_guest_program::l1::program::execution_program
+|                  2             526   0.03% <ethrex_vm::witness_db::GuestProgramStateWrapper>::apply_account_updates
+|                  1              46   0.00% <ethrex_common::constants::EMPTY_TRIE_HASH::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+|                  1          30,289   1.98% <once_cell::imp::OnceCell<primitive_types::H256>>::initialize::<<once_cell::sync::OnceCell<primitive_types::H256>>::get_or_init<<ethrex_common::types::block::BlockHeader>::hash::{closure#0}>::{closure#0}, <once_cell::sync::OnceCell<_>>::get_or_init::Void>::{closure#0}
+|                  1             270   0.02% <once_cell::imp::OnceCell<primitive_types::H160>>::initialize::<<ethrex_common::types::transaction::Transaction>::sender::{closure#0}, ethrex_crypto::provider::CryptoError>::{closure#0}
+|                  1              46   0.00% <spin::once::Once<primitive_types::H256>>::try_call_once_slow::<<spin::once::Once<primitive_types::H256>>::call_once<<ethrex_trie::EMPTY_TRIE_HASH as core::ops::deref::Deref>::deref::__static_ref_initialize>::{closure#0}, core::convert::Infallible>
+
+DETAIL FUNCTION <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::logging::OpLogHandler<3>>
+----------------------------------------------------------------------------------------------------------------
+STEPS                          1,925,326  38.00%
+COST                         174,000,313  21.62%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                            22,438       1,346,280   0.77% #4
+|    OP lt                              2,802         168,120   0.10%
+|    OP eq                              8,157         489,420   0.28%
+|    OP add                            83,711       2,092,775   1.20% #3
+|    OP sub                             2,813         168,780   0.10%
+|    OP and                            42,072       2,524,320   1.45% #2
+|    OP or                             53,220       3,193,200   1.84% #1
+|    OP sll                            16,050         850,650   0.49%
+|    OP signextend_h                        3             159   0.00%
+|    OP muluh                               4             380   0.00%
+|    OP mul                                 7             665   0.00%
+|    OP dma_memcpy                     11,214         470,988   0.27%
+|    OP _dma_post                       2,801         246,488   0.14%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|              2,802       1,925,326 100.00% <ethrex_levm::vm::VM>::execute
+
+DETAIL FUNCTION <tiny_keccak::keccak::Keccak as tiny_keccak::Hasher>::finalize
+------------------------------------------------------------------------------
+STEPS                            360,415   7.11%
+COST                          41,977,470   5.22%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP eq                              1,320          79,200   0.19%
+|    OP add                               550          13,750   0.03%
+|    OP and                            33,384       2,003,040   4.77%
+|    OP or                             38,021       2,281,260   5.43% #2
+|    OP xor                           132,426       7,945,560  18.93% #1
+|    OP sll                            37,984       2,013,152   4.80% #3
+|    OP srl                            37,974       2,012,622   4.79% #4
+|    OP dma_memcpy                        110           4,620   0.01%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 21         137,613  38.18% <ethrex_trie::node::Node>::compute_hash_no_alloc
+|                 11          72,083  20.00% <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+|                  8          52,424  14.55% <ethrex_common::types::block_execution_witness::GuestProgramState>::get_account_state
+|                  6          39,318  10.91% <ethrex_common::types::account::Code>::from_bytecode
+|                  2          13,106   3.64% ethrex_guest_program::l1::program::execution_program
+|                  2          13,106   3.64% <ethrex_vm::witness_db::GuestProgramStateWrapper>::apply_account_updates
+|                  1           6,553   1.82% <ethrex_common::constants::EMPTY_TRIE_HASH::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+|                  1           6,553   1.82% <once_cell::imp::OnceCell<primitive_types::H256>>::initialize::<<once_cell::sync::OnceCell<primitive_types::H256>>::get_or_init<<ethrex_common::types::block::BlockHeader>::hash::{closure#0}>::{closure#0}, <once_cell::sync::OnceCell<_>>::get_or_init::Void>::{closure#0}
+|                  1           6,553   1.82% <once_cell::imp::OnceCell<primitive_types::H160>>::initialize::<<ethrex_common::types::transaction::Transaction>::sender::{closure#0}, ethrex_crypto::provider::CryptoError>::{closure#0}
+|                  1           6,553   1.82% <spin::once::Once<primitive_types::H256>>::try_call_once_slow::<<spin::once::Once<primitive_types::H256>>::call_once<<ethrex_trie::EMPTY_TRIE_HASH as core::ops::deref::Deref>::deref::__static_ref_initialize>::{closure#0}, core::convert::Infallible>
+
+DETAIL FUNCTION ethrex_vm::backends::levm::generic_system_contract_levm
+-----------------------------------------------------------------------
+STEPS                            327,436   6.46%
+COST                          32,835,571   4.08%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               929          55,740   0.17%
+|    OP lt                                671          40,260   0.12%
+|    OP eq                              2,420         145,200   0.44%
+|    OP add                            17,190         429,750   1.31%
+|    OP sub                             1,090          65,400   0.20%
+|    OP and                            19,719       1,183,140   3.60% #3
+|    OP or                             24,944       1,496,640   4.56% #2
+|    OP xor                            45,040       2,702,400   8.23% #1
+|    OP add_w                             103           6,180   0.02%
+|    OP sll                            17,144         908,632   2.77% #4
+|    OP srl                            13,808         731,824   2.23%
+|    OP sra                                 1              53   0.00%
+|    OP srl_w                             100           5,300   0.02%
+|    OP signextend_b                      411          21,783   0.07%
+|    OP signextend_h                       97           5,141   0.02%
+|    OP signextend_w                      337          17,861   0.05%
+|    OP muluh                           1,050          99,750   0.30%
+|    OP mul                             2,513         238,735   0.73%
+|    OP dma_memcpy                        753          31,626   0.10%
+|    OP dma_memcmp                        347          14,574   0.04%
+|    OP dma_xmemset                        98           4,116   0.01%
+|    OP _dma_pre                          271          23,848   0.07%
+|    OP _dma_post                         542          47,696   0.15%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  4         327,436 100.00% <ethrex_vm::backends::Evm>::execute_block
+
+DETAIL FUNCTION <ethrex_trie::Trie>::hash_no_commit
+---------------------------------------------------
+STEPS                            209,598   4.14%
+COST                          23,485,282   2.92%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               132           7,920   0.03%
+|    OP lt                                 56           3,360   0.01%
+|    OP eq                              3,842         230,520   0.98%
+|    OP add                             8,334         208,350   0.89%
+|    OP sub                                68           4,080   0.02%
+|    OP and                            17,143       1,028,580   4.38% #3
+|    OP or                             18,457       1,107,420   4.72% #2
+|    OP xor                            62,996       3,779,760  16.09% #1
+|    OP sll                            18,165         962,745   4.10% #4
+|    OP srl                            18,077         958,081   4.08%
+|    OP srl_w                              33           1,749   0.01%
+|    OP signextend_b                        3             159   0.00%
+|    OP signextend_w                        1              53   0.00%
+|    OP dma_memcpy                        236           9,912   0.04%
+|    OP dma_xmemset                        22             924   0.00%
+|    OP _dma_pre                          141          12,408   0.05%
+|    OP _dma_post                         110           9,680   0.04%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  2          16,258   7.76% ethrex_common::types::block::compute_transactions_root
+|                  2           6,747   3.22% ethrex_common::types::block::compute_withdrawals_root
+|                  2          66,002  31.49% <ethrex_vm::witness_db::GuestProgramStateWrapper>::state_trie_root
+|                  2          15,901   7.59% <ethrex_vm::witness_db::GuestProgramStateWrapper>::apply_account_updates
+|                  1          82,351  39.29% ethrex_guest_program::l1::program::execution_program
+|                  1          22,339  10.66% ethrex_common::validation::validate_receipts_root
+
+DETAIL FUNCTION <std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::initialize::<<std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::get_or_init<<ethrex_trie::node::NodeRef>::compute_hash_no_alloc::{closure#0}>::{closure#0}, !>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                            201,608   3.98%
+COST                          22,592,138   2.81%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               124           7,440   0.03%
+|    OP lt                                 56           3,360   0.01%
+|    OP eq                              3,809         228,540   1.01%
+|    OP add                             8,240         206,000   0.91%
+|    OP sub                                68           4,080   0.02%
+|    OP and                            16,482         988,920   4.38% #3
+|    OP or                             17,552       1,053,120   4.66% #2
+|    OP xor                            60,615       3,636,900  16.10% #1
+|    OP sll                            17,454         925,062   4.09% #4
+|    OP srl                            17,398         922,094   4.08%
+|    OP srl_w                              33           1,749   0.01%
+|    OP signextend_b                        1              53   0.00%
+|    OP dma_memcpy                        223           9,366   0.04%
+|    OP dma_xmemset                        21             882   0.00%
+|    OP _dma_pre                          141          12,408   0.05%
+|    OP _dma_post                         110           9,680   0.04%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  7         201,608 100.00% <ethrex_trie::Trie>::hash_no_commit
+
+DETAIL FUNCTION <ethrex_trie::node::Node>::compute_hash_no_alloc
+----------------------------------------------------------------
+STEPS                            201,384   3.97%
+COST                          22,570,263   2.80%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               124           7,440   0.03%
+|    OP lt                                 56           3,360   0.01%
+|    OP eq                              3,809         228,540   1.01%
+|    OP add                             8,198         204,950   0.91%
+|    OP sub                                68           4,080   0.02%
+|    OP and                            16,454         987,240   4.37% #3
+|    OP or                             17,552       1,053,120   4.67% #2
+|    OP xor                            60,615       3,636,900  16.11% #1
+|    OP sll                            17,454         925,062   4.10% #4
+|    OP srl                            17,398         922,094   4.09%
+|    OP srl_w                              33           1,749   0.01%
+|    OP signextend_b                        1              53   0.00%
+|    OP dma_memcpy                        216           9,072   0.04%
+|    OP dma_xmemset                        21             882   0.00%
+|    OP _dma_pre                          134          11,792   0.05%
+|    OP _dma_post                         103           9,064   0.04%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 14         115,696  57.45% <ethrex_trie::node::Node>::memoize_hashes
+|                  7         201,384 100.00% <std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::initialize::<<std::sync::once_lock::OnceLock<ethrex_trie::node_hash::NodeHash>>::get_or_init<<ethrex_trie::node::NodeRef>::compute_hash_no_alloc::{closure#0}>::{closure#0}, !>
+
+DETAIL FUNCTION <ethrex_levm::memory::Memory>::load_range
+---------------------------------------------------------
+STEPS                            201,672   3.98%
+COST                          17,542,663   2.18%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                             8,403         504,180   2.87% #2
+|    OP eq                              2,801         168,060   0.96% #4
+|    OP add                            16,806         420,150   2.40% #3
+|    OP and                            11,204         672,240   3.83% #1
+|    OP or                              2,801         168,060   0.96%
+|    OP dma_memcpy                      2,801         117,642   0.67%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|              2,801         201,672 100.00% <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::logging::OpLogHandler<3>>
+
+DETAIL FUNCTION <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::dup::OpDupHandler<0>>
+------------------------------------------------------------------------------------------------------------
+STEPS                            193,522   3.82%
+COST                          17,257,114   2.14%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                             8,414         504,840   2.93% #1
+|    OP lt                              8,414         504,840   2.93% #2
+|    OP add                            16,828         420,700   2.44%
+|    OP and                             8,414         504,840   2.93% #3
+|    OP sll                             8,414         445,942   2.58% #4
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|              8,414         193,522 100.00% <ethrex_levm::vm::VM>::execute
+
+DETAIL FUNCTION <ethrex_trie::node::Node>::memoize_hashes
+---------------------------------------------------------
+STEPS                            117,259   2.31%
+COST                          13,043,338   1.62%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                86           5,160   0.04%
+|    OP lt                                 49           2,940   0.02%
+|    OP eq                              2,412         144,720   1.11%
+|    OP add                             5,361         134,025   1.03%
+|    OP sub                                42           2,520   0.02%
+|    OP and                             9,443         566,580   4.34% #3
+|    OP or                              9,854         591,240   4.53% #2
+|    OP xor                            33,965       2,037,900  15.62% #1
+|    OP sll                             9,793         519,029   3.98% #4
+|    OP srl                             9,744         516,432   3.96%
+|    OP srl_w                              24           1,272   0.01%
+|    OP dma_memcpy                        152           6,384   0.05%
+|    OP dma_xmemset                        14             588   0.00%
+|    OP _dma_pre                           96           8,448   0.06%
+|    OP _dma_post                          76           6,688   0.05%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 21         117,833 100.49% <ethrex_trie::node::Node>::compute_hash_no_alloc
+|                 14          42,580  36.31% <ethrex_trie::node::Node>::memoize_hashes
+
+DETAIL FUNCTION <ethrex_levm::db::gen_db::GeneralizedDatabase>::get_value_from_database
+---------------------------------------------------------------------------------------
+STEPS                            110,043   2.17%
+COST                          11,735,041   1.46%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               103           6,180   0.05%
+|    OP lt                                 84           5,040   0.04%
+|    OP eq                                829          49,740   0.42%
+|    OP add                             3,532          88,300   0.75%
+|    OP sub                                84           5,040   0.04%
+|    OP and                             8,141         488,460   4.16% #3
+|    OP or                              9,389         563,340   4.80% #2
+|    OP xor                            26,414       1,584,840  13.51% #1
+|    OP add_w                               2             120   0.00%
+|    OP sll                             7,969         422,357   3.60% #4
+|    OP srl                             7,650         405,450   3.46%
+|    OP srl_w                              44           2,332   0.02%
+|    OP signextend_b                       83           4,399   0.04%
+|    OP muluh                              56           5,320   0.05%
+|    OP mul                               142          13,490   0.11%
+|    OP dma_memcpy                        129           5,418   0.05%
+|    OP dma_memcmp                         65           2,730   0.02%
+|    OP dma_xmemset                        17             714   0.01%
+|    OP _dma_pre                           75           6,600   0.06%
+|    OP _dma_post                          88           7,744   0.07%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  8          80,244  72.92% <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::stack_memory_storage_flow::OpSLoadHandler>
+|                  3          29,799  27.08% <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::stack_memory_storage_flow::OpSStoreHandler>
+
+DETAIL FUNCTION <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_storage_value
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             99,477   1.96%
+COST                          10,786,974   1.34%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                78           4,680   0.04%
+|    OP lt                                 67           4,020   0.04%
+|    OP eq                                772          46,320   0.43%
+|    OP add                             2,987          74,675   0.69%
+|    OP sub                                27           1,620   0.02%
+|    OP and                             7,801         468,060   4.34% #3
+|    OP or                              8,733         523,980   4.86% #2
+|    OP xor                            26,164       1,569,840  14.55% #1
+|    OP sll                             7,702         408,206   3.78% #4
+|    OP srl                             7,558         400,574   3.71%
+|    OP srl_w                              44           2,332   0.02%
+|    OP signextend_b                       66           3,498   0.03%
+|    OP dma_memcpy                        123           5,166   0.05%
+|    OP dma_memcmp                         52           2,184   0.02%
+|    OP dma_xmemset                        11             462   0.00%
+|    OP _dma_pre                           75           6,600   0.06%
+|    OP _dma_post                          73           6,424   0.06%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 11          99,477 100.00% <ethrex_levm::db::gen_db::GeneralizedDatabase>::get_value_from_database
+
+DETAIL FUNCTION <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+----------------------------------------------------------------------------------------------------------------
+STEPS                             99,026   1.95%
+COST                          10,748,452   1.34%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                78           4,680   0.04%
+|    OP lt                                 67           4,020   0.04%
+|    OP eq                                772          46,320   0.43%
+|    OP add                             2,943          73,575   0.68%
+|    OP sub                                27           1,620   0.02%
+|    OP and                             7,779         466,740   4.34% #3
+|    OP or                              8,733         523,980   4.87% #2
+|    OP xor                            26,164       1,569,840  14.61% #1
+|    OP sll                             7,702         408,206   3.80% #4
+|    OP srl                             7,558         400,574   3.73%
+|    OP srl_w                              44           2,332   0.02%
+|    OP signextend_b                       66           3,498   0.03%
+|    OP dma_memcpy                        123           5,166   0.05%
+|    OP dma_memcmp                         52           2,184   0.02%
+|    OP dma_xmemset                        11             462   0.00%
+|    OP _dma_pre                           75           6,600   0.06%
+|    OP _dma_post                          73           6,424   0.06%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 11          99,026 100.00% <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_storage_value
+
+DETAIL FUNCTION <ethrex_levm::db::gen_db::GeneralizedDatabase>::load_account
+----------------------------------------------------------------------------
+STEPS                             96,083   1.90%
+COST                          10,335,888   1.28%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                70           4,200   0.04%
+|    OP lt                                 95           5,700   0.06%
+|    OP eq                                586          35,160   0.34%
+|    OP add                             3,504          87,600   0.85%
+|    OP sub                               148           8,880   0.09%
+|    OP and                             7,233         433,980   4.20% #3
+|    OP or                              9,183         550,980   5.33% #2
+|    OP xor                            22,370       1,342,200  12.99% #1
+|    OP add_w                               7             420   0.00%
+|    OP sll                             7,328         388,384   3.76% #4
+|    OP srl                             6,528         345,984   3.35%
+|    OP srl_w                              24           1,272   0.01%
+|    OP signextend_b                       69           3,657   0.04%
+|    OP signextend_h                        3             159   0.00%
+|    OP signextend_w                       12             636   0.01%
+|    OP muluh                             150          14,250   0.14%
+|    OP mul                               368          34,960   0.34%
+|    OP dma_memcpy                        240          10,080   0.10%
+|    OP dma_memcmp                         66           2,772   0.03%
+|    OP dma_xmemset                        15             630   0.01%
+|    OP _dma_pre                           67           5,896   0.06%
+|    OP _dma_post                         108           9,504   0.09%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 12          41,290  42.97% <ethrex_levm::vm::VM>::increase_account_balance
+|                  6           1,494   1.55% <ethrex_levm::vm::VM>::decrease_account_balance
+|                  5           1,245   1.30% <ethrex_levm::vm::VM>::increment_account_nonce
+|                  5           1,245   1.30% ethrex_levm::utils::eip7702_get_code
+|                  5          29,409  30.61% <ethrex_levm::hooks::default_hook::DefaultHook as ethrex_levm::hooks::hook::Hook>::prepare_execution
+|                  2             498   0.52% <ethrex_levm::vm::VM>::update_account_storage
+|                  2          20,902  21.75% ethrex_vm::backends::levm::generic_system_contract_levm
+
+DETAIL FUNCTION <ethrex_levm::opcodes::OpCodeFn>::wrap::<ethrex_levm::opcode_handlers::stack_memory_storage_flow::OpSLoadHandler>
+---------------------------------------------------------------------------------------------------------------------------------
+STEPS                             99,052   1.95%
+COST                          10,318,050   1.28%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               118           7,080   0.07%
+|    OP lt                                100           6,000   0.06%
+|    OP eq                                736          44,160   0.43%
+|    OP add                             3,650          91,250   0.88%
+|    OP sub                               192          11,520   0.11%
+|    OP and                             6,634         398,040   3.86% #3
+|    OP or                              8,155         489,300   4.74% #2
+|    OP xor                            19,906       1,194,360  11.58% #1
+|    OP add_w                              10             600   0.01%
+|    OP sll                             6,452         341,956   3.31% #4
+|    OP srl                             5,808         307,824   2.98%
+|    OP srl_w                              32           1,696   0.02%
+|    OP signextend_b                       92           4,876   0.05%
+|    OP signextend_w                       26           1,378   0.01%
+|    OP muluh                             200          19,000   0.18%
+|    OP mul                               490          46,550   0.45%
+|    OP dma_memcpy                        118           4,956   0.05%
+|    OP dma_memcmp                         86           3,612   0.04%
+|    OP dma_xmemset                        22             924   0.01%
+|    OP _dma_pre                           54           4,752   0.05%
+|    OP _dma_post                          98           8,624   0.08%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  8          99,052 100.00% <ethrex_levm::vm::VM>::execute
+
+DETAIL FUNCTION <ethrex_common::types::block_execution_witness::GuestProgramState>::get_account_state
+-----------------------------------------------------------------------------------------------------
+STEPS                             88,591   1.75%
+COST                           9,305,309   1.16%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               113           6,780   0.07%
+|    OP lt                                123           7,380   0.08%
+|    OP eq                                581          34,860   0.37%
+|    OP add                             3,684          92,100   0.99%
+|    OP sub                                44           2,640   0.03%
+|    OP and                             6,530         391,800   4.21% #3
+|    OP or                              7,047         422,820   4.54% #2
+|    OP xor                            19,347       1,160,820  12.47% #1
+|    OP add_w                               7             420   0.00%
+|    OP sll                             5,845         309,785   3.33% #4
+|    OP srl                             5,688         301,464   3.24%
+|    OP srl_w                              68           3,604   0.04%
+|    OP signextend_b                       85           4,505   0.05%
+|    OP signextend_w                        1              53   0.00%
+|    OP dma_memcpy                        201           8,442   0.09%
+|    OP dma_memcmp                         48           2,016   0.02%
+|    OP dma_xmemset                         8             336   0.00%
+|    OP _dma_pre                          111           9,768   0.10%
+|    OP _dma_post                         103           9,064   0.10%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                 11          20,502  23.14% <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_storage_slot
+|                  8          68,089  76.86% <ethrex_vm::witness_db::GuestProgramStateWrapper as ethrex_vm::db::VmDatabase>::get_account_state
+
+DETAIL FUNCTION <ethrex_levm::hooks::default_hook::DefaultHook as ethrex_levm::hooks::hook::Hook>::prepare_execution
+--------------------------------------------------------------------------------------------------------------------
+STEPS                             88,916   1.75%
+COST                           9,119,243   1.13%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                               260          15,600   0.17%
+|    OP lt                                100           6,000   0.07%
+|    OP eq                                615          36,900   0.40%
+|    OP add                             3,947          98,675   1.08%
+|    OP sub                               162           9,720   0.11%
+|    OP and                             5,667         340,020   3.73% #3
+|    OP or                              7,998         479,880   5.26% #2
+|    OP xor                            15,168         910,080   9.98% #1
+|    OP add_w                               5             300   0.00%
+|    OP sll                             5,394         285,882   3.13% #4
+|    OP srl                             4,457         236,221   2.59%
+|    OP srl_w                              16             848   0.01%
+|    OP signextend_b                       63           3,339   0.04%
+|    OP signextend_h                       18             954   0.01%
+|    OP signextend_w                       29           1,537   0.02%
+|    OP muluh                             206          19,570   0.21%
+|    OP mul                               436          41,420   0.45%
+|    OP dma_memcpy                        222           9,324   0.10%
+|    OP dma_memcmp                         70           2,940   0.03%
+|    OP dma_xmemset                        18             756   0.01%
+|    OP _dma_pre                           75           6,600   0.07%
+|    OP _dma_post                         126          11,088   0.12%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  5          88,916 100.00% <ethrex_levm::vm::VM>::execute
+
+DETAIL FUNCTION <alloc::boxed::Box<dyn ethrex_vm::db::VmDatabase + core::marker::Send + core::marker::Sync> as ethrex_levm::db::Database>::get_account_state
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+STEPS                             75,610   1.49%
+COST                           8,347,261   1.04%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                46           2,760   0.03%
+|    OP lt                                 56           3,360   0.04%
+|    OP eq                                473          28,380   0.34%
+|    OP add                             1,953          48,825   0.58%
+|    OP sub                                17           1,020   0.01%
+|    OP and                             6,295         377,700   4.52% #3
+|    OP or                              6,805         408,300   4.89% #2
+|    OP xor                            21,705       1,302,300  15.60% #1
+|    OP add_w                               7             420   0.01%
+|    OP sll                             6,347         336,391   4.03% #4
+|    OP srl                             6,279         332,787   3.99%
+|    OP srl_w                              24           1,272   0.02%
+|    OP signextend_b                       30           1,590   0.02%
+|    OP signextend_w                        1              53   0.00%
+|    OP dma_memcpy                        147           6,174   0.07%
+|    OP dma_memcmp                         22             924   0.01%
+|    OP dma_xmemset                         9             378   0.00%
+|    OP _dma_pre                           45           3,960   0.05%
+|    OP _dma_post                          54           4,752   0.06%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  8          75,610 100.00% <ethrex_levm::db::gen_db::GeneralizedDatabase>::load_account
+
+DETAIL FUNCTION once_cell::imp::initialize_or_wait
+--------------------------------------------------
+STEPS                             66,208   1.31%
+COST                           8,109,937   1.01%
+
+|    COST BY OPCODE                     COUNT            COST       % RANK
+|    ---------------------------------------------------------------------
+|    OP ltu                                51           3,060   0.04%
+|    OP lt                                  5             300   0.00%
+|    OP eq                              1,272          76,320   0.94%
+|    OP add                             3,059          76,475   0.94%
+|    OP sub                                30           1,800   0.02%
+|    OP and                             5,756         345,360   4.26% #3
+|    OP or                              5,453         327,180   4.03% #4
+|    OP xor                            16,959       1,017,540  12.55% #1
+|    OP add_w                              96           5,760   0.07%
+|    OP sll                             4,929         261,237   3.22%
+|    OP srl                             5,750         304,750   3.76%
+|    OP srl_w                              23           1,219   0.02%
+|    OP signextend_b                        1              53   0.00%
+|    OP muluh                               3             285   0.00%
+|    OP mul                                 5             475   0.01%
+|    OP dma_memcpy                         45           1,890   0.02%
+|    OP dma_memcmp                        226           9,492   0.12%
+|    OP dma_inputcpy                        2              84   0.00%
+|    OP dma_xmemset                         3             126   0.00%
+|    OP _dma_pre                           27           2,376   0.03%
+|    OP _dma_post                         250          22,000   0.27%
+|    OP arith256_mod                       10          14,240   0.18%
+|    OP secp256k1_add                     221         314,704   3.88%
+|    OP secp256k1_dbl                     255         363,120   4.48% #2
+|    OP fcall_param                        10               0   0.00%
+|    OP fcall                               3               0   0.00%
+|    OP fcall_get                           2               0   0.00%
+
+|    TOP STEP CALLERS (calls, steps)
+|    -------------------------------
+|                  1          39,046  58.97% <once_cell::imp::OnceCell<primitive_types::H256>>::initialize::<<once_cell::sync::OnceCell<primitive_types::H256>>::get_or_init<<ethrex_common::types::block::BlockHeader>::hash::{closure#0}>::{closure#0}, <once_cell::sync::OnceCell<_>>::get_or_init::Void>
+|                  1             178   0.27% <once_cell::imp::OnceCell<primitive_types::H256>>::initialize::<<once_cell::sync::OnceCell<primitive_types::H256>>::get_or_init<<once_cell::sync::OnceCell<primitive_types::H256>>::try_insert::{closure#0}>::{closure#0}, <once_cell::sync::OnceCell<_>>::get_or_init::Void>
+|                  1          26,984  40.76% <once_cell::imp::OnceCell<primitive_types::H160>>::initialize::<<ethrex_common::types::transaction::Transaction>::sender::{closure#0}, ethrex_crypto::provider::CryptoError>
+
+MARK_ID                       INDEX      COUNT           STEPS       %      TOTAL COST       %       MAIN COST     OPCODE COST PRECOMPILE COST     MEMORY COST
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+read_input                        0          1             149   0.00%          13,770   0.00%          10,132           2,945               0             693
+deserialize_input                 0          1          30,016   0.59%       2,638,720   0.33%       2,041,088         278,722          24,374         294,536
+new_payload_request_root_calculation          0          1          43,772   0.86%       6,792,068   0.84%       2,976,496         645,487       2,322,614         847,471
+new_payload_request_to_block          0          1          63,885   1.26%       6,997,373   0.87%       4,344,180       2,329,428          20,866         302,899
+misc_preparation                  0          1             187   0.00%          17,815   0.00%          12,716           4,340              84             675
+stf                               0          1       4,899,986  96.71%     492,070,897  61.15%     333,199,048     109,496,138       1,677,778      47,697,933
+serialize_output                  0          1             331   0.01%          30,276   0.00%          22,508           6,236             172           1,360
+sha256_output_bytes               0          1           4,646   0.09%         509,687   0.06%         315,928         177,185             432          16,142
+write_output                      0          1             244   0.00%          24,858   0.00%          16,592           6,725               0           1,541
+
