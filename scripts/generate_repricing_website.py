@@ -18,8 +18,6 @@ from pathlib import Path
 from typing import Any
 
 from _utils import (
-    GAS_VALUE_RE,
-    EEST_GAS_LIMIT_RE,
     _is_flat_eest_layout,
     _discover_gas_values,
     filter_json_by_gas,
@@ -45,152 +43,89 @@ class Category(str, Enum):
     OTHER = "Other"
 
 
-def _compile_patterns(pattern_strings: list[str]) -> list[re.Pattern]:
-    """Compile a list of regex pattern strings."""
-    return [re.compile(p, re.IGNORECASE) for p in pattern_strings]
+def _build_rules(spec: dict[str, list[str]]) -> list[dict[str, Any]]:
+    """Build compiled rule list from a compact {canonical_name: [alias_patterns]} spec.
+
+    Entries with an empty alias list get a single exact-match pattern (^NAME$).
+    Alias strings are compiled as-is (case-insensitive) so they can contain regex.
+    """
+    rules: list[dict[str, Any]] = []
+    for name, aliases in spec.items():
+        if aliases:
+            patterns = [re.compile(p, re.IGNORECASE) for p in aliases]
+        else:
+            patterns = [re.compile(rf"^{re.escape(name)}$", re.IGNORECASE)]
+        rules.append({"name": name, "patterns": patterns})
+    return rules
 
 
-# Canonical precompile mapping rules (addresses from Ethereum Yellow Paper / EIPs)
-# Keep this table maintainable: add new fixture patterns to "patterns" when they appear.
-PRECOMPILE_RULES = [
-    # 0x01
-    {"name": "ECRECOVER", "patterns": _compile_patterns([r"^ECRECOVER$", r"^EC_RECOVER$"])},
-    # 0x02
-    {"name": "SHA256", "patterns": _compile_patterns([r"^SHA256$"])},
-    # 0x03
-    {"name": "RIPEMD160", "patterns": _compile_patterns([r"^RIPEMD160$"])},
-    # 0x04
-    {"name": "IDENTITY", "patterns": _compile_patterns([r"^IDENTITY$"])},
-    # 0x05
-    {"name": "MODEXP", "patterns": _compile_patterns([r"^MODEXP$", r"^MOD ?EXP$"])},
-    # 0x06 EIP-196
-    {"name": "BN128_ADD", "patterns": _compile_patterns([r"^BN128_ADD.*$", r"^ALT_BN128_ADD$", r"^ECADD$"])},
-    # 0x07 EIP-196
-    {"name": "BN128_MUL", "patterns": _compile_patterns([r"^BN128_MUL.*$", r"^ALT_BN128_MUL$", r"^ECMUL$"])},
-    # 0x08 EIP-197
-    {
-        "name": "BN128_PAIRING",
-        "patterns": _compile_patterns([
-            r"^BN128_PAIRING.*$",
-            r"^BN128_PAIRINGS.*$",
-            r"^BN128_.*PAIRING(S)?(_.*)?$",
-            r"^ALT_BN128_PAIRING$",
-            r"^ALT_BN128_.*PAIRING.*$",
-            r"^ALT_BN128_BENCHMARK$",
-            r"^ECPAIRING.*$",
-            r"^EC_PAIRING.*$",
-        ]),
-    },
-    # 0x09 EIP-152
-    {"name": "BLAKE2F", "patterns": _compile_patterns([r"^BLAKE2F.*$"])},
-    # 0x0a EIP-4844
-    {"name": "POINT_EVALUATION", "patterns": _compile_patterns([r"^POINT_EVALUATION$", r"^KZG.*$", r"^EIP4844_.*$"])},
-    # 0x0b EIP-2537
-    {"name": "BLS12_381_G1ADD", "patterns": _compile_patterns([r"^BLS12_381_G1ADD$", r"^BLS12_G1ADD$"])},
-    # 0x0c EIP-2537
-    {"name": "BLS12_381_G1MSM", "patterns": _compile_patterns([r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$", r"^BLS12_G1_MSM$"])},
-    # 0x0d EIP-2537
-    {"name": "BLS12_381_G2ADD", "patterns": _compile_patterns([r"^BLS12_381_G2ADD$", r"^BLS12_G2ADD$"])},
-    # 0x0e EIP-2537
-    {"name": "BLS12_381_G2MSM", "patterns": _compile_patterns([r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$", r"^BLS12_G2_MSM$"])},
-    # 0x0f EIP-2537
-    {"name": "BLS12_381_PAIRING", "patterns": _compile_patterns([r"^BLS12_381_PAIRING$", r"^BLS12_PAIRING$", r"^BLS12_PAIRING_CHECK$"])},
-    # 0x10 EIP-2537
-    {"name": "BLS12_381_MAP_FP_TO_G1", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP_TO_G1$", r"^BLS12_MAP_FP_TO_G1$", r"^BLS12_FP_TO_G1$"])},
-    # 0x11 EIP-2537
-    {"name": "BLS12_381_MAP_FP2_TO_G2", "patterns": _compile_patterns([r"^BLS12_381_MAP_FP2_TO_G2$", r"^BLS12_MAP_FP2_TO_G2$", r"^BLS12_FP_TO_G2$"])},
-    # 0x100 EIP-7212
-    {"name": "P256VERIFY", "patterns": _compile_patterns([r"^P256VERIFY$", r"^P256_VERIFY$"])},
-]
+# Canonical precompile mapping rules (addresses from Ethereum Yellow Paper / EIPs).
+# Key = canonical name, value = alias regex patterns (empty list = exact match only).
+PRECOMPILE_RULES = _build_rules({
+    "ECRECOVER":                [r"^ECRECOVER$", r"^EC_RECOVER$"],                          # 0x01
+    "SHA256":                   [],                                                          # 0x02
+    "RIPEMD160":                [],                                                          # 0x03
+    "IDENTITY":                 [],                                                          # 0x04
+    "MODEXP":                   [r"^MODEXP$", r"^MOD ?EXP$"],                                # 0x05
+    "BN128_ADD":                [r"^BN128_ADD.*$", r"^ALT_BN128_ADD$", r"^ECADD$"],          # 0x06 EIP-196
+    "BN128_MUL":                [r"^BN128_MUL.*$", r"^ALT_BN128_MUL$", r"^ECMUL$"],         # 0x07 EIP-196
+    "BN128_PAIRING":            [                                                            # 0x08 EIP-197
+        r"^BN128_PAIRING.*$", r"^BN128_PAIRINGS.*$", r"^BN128_.*PAIRING(S)?(_.*)?$",
+        r"^ALT_BN128_PAIRING$", r"^ALT_BN128_.*PAIRING.*$", r"^ALT_BN128_BENCHMARK$",
+        r"^ECPAIRING.*$", r"^EC_PAIRING.*$",
+    ],
+    "BLAKE2F":                  [r"^BLAKE2F.*$"],                                            # 0x09 EIP-152
+    "POINT_EVALUATION":         [r"^POINT_EVALUATION$", r"^KZG.*$", r"^EIP4844_.*$"],        # 0x0a EIP-4844
+    "BLS12_381_G1ADD":          [r"^BLS12_381_G1ADD$", r"^BLS12_G1ADD$"],                    # 0x0b EIP-2537
+    "BLS12_381_G1MSM":          [r"^BLS12_381_G1MSM$", r"^BLS12_G1MSM$", r"^BLS12_G1_MSM$"],# 0x0c EIP-2537
+    "BLS12_381_G2ADD":          [r"^BLS12_381_G2ADD$", r"^BLS12_G2ADD$"],                    # 0x0d EIP-2537
+    "BLS12_381_G2MSM":          [r"^BLS12_381_G2MSM$", r"^BLS12_G2MSM$", r"^BLS12_G2_MSM$"],# 0x0e EIP-2537
+    "BLS12_381_PAIRING":        [r"^BLS12_381_PAIRING$", r"^BLS12_PAIRING$", r"^BLS12_PAIRING_CHECK$"],  # 0x0f EIP-2537
+    "BLS12_381_MAP_FP_TO_G1":   [r"^BLS12_381_MAP_FP_TO_G1$", r"^BLS12_MAP_FP_TO_G1$", r"^BLS12_FP_TO_G1$"],   # 0x10 EIP-2537
+    "BLS12_381_MAP_FP2_TO_G2":  [r"^BLS12_381_MAP_FP2_TO_G2$", r"^BLS12_MAP_FP2_TO_G2$", r"^BLS12_FP_TO_G2$"], # 0x11 EIP-2537
+    "P256VERIFY":               [r"^P256VERIFY$", r"^P256_VERIFY$"],                         # 0x100 EIP-7212
+})
 
-# Canonical opcode mapping rules (EVM yellow paper opcodes)
-# Add aliases/fixture spelling variants to patterns to keep UI clean.
-OPCODE_RULES = [
-    {"name": "STOP", "patterns": _compile_patterns([r"^STOP$"])},
-    {"name": "ADD", "patterns": _compile_patterns([r"^ADD$"])},
-    {"name": "MUL", "patterns": _compile_patterns([r"^MUL$"])},
-    {"name": "SUB", "patterns": _compile_patterns([r"^SUB$"])},
-    {"name": "DIV", "patterns": _compile_patterns([r"^DIV$"])},
-    {"name": "SDIV", "patterns": _compile_patterns([r"^SDIV$"])},
-    {"name": "MOD", "patterns": _compile_patterns([r"^MOD$"])},
-    {"name": "SMOD", "patterns": _compile_patterns([r"^SMOD$"])},
-    {"name": "ADDMOD", "patterns": _compile_patterns([r"^ADDMOD$"])},
-    {"name": "MULMOD", "patterns": _compile_patterns([r"^MULMOD$"])},
-    {"name": "EXP", "patterns": _compile_patterns([r"^EXP$"])},
-    {"name": "SIGNEXTEND", "patterns": _compile_patterns([r"^SIGNEXTEND$"])},
-    {"name": "LT", "patterns": _compile_patterns([r"^LT$"])},
-    {"name": "GT", "patterns": _compile_patterns([r"^GT$"])},
-    {"name": "SLT", "patterns": _compile_patterns([r"^SLT$"])},
-    {"name": "SGT", "patterns": _compile_patterns([r"^SGT$"])},
-    {"name": "EQ", "patterns": _compile_patterns([r"^EQ$"])},
-    {"name": "ISZERO", "patterns": _compile_patterns([r"^ISZERO$"])},
-    {"name": "AND", "patterns": _compile_patterns([r"^AND$"])},
-    {"name": "OR", "patterns": _compile_patterns([r"^OR$"])},
-    {"name": "XOR", "patterns": _compile_patterns([r"^XOR$"])},
-    {"name": "NOT", "patterns": _compile_patterns([r"^NOT$"])},
-    {"name": "BYTE", "patterns": _compile_patterns([r"^BYTE$"])},
-    {"name": "SHL", "patterns": _compile_patterns([r"^SHL$"])},
-    {"name": "SHR", "patterns": _compile_patterns([r"^SHR$"])},
-    {"name": "SAR", "patterns": _compile_patterns([r"^SAR$"])},
-    {"name": "CLZ", "patterns": _compile_patterns([r"^CLZ$"])},
-    {"name": "KECCAK256", "patterns": _compile_patterns([r"^KECCAK256$", r"^KECCAK$", r"^SHA3$"])},
-    {"name": "ADDRESS", "patterns": _compile_patterns([r"^ADDRESS$"])},
-    {"name": "BALANCE", "patterns": _compile_patterns([r"^BALANCE$"])},
-    {"name": "ORIGIN", "patterns": _compile_patterns([r"^ORIGIN$"])},
-    {"name": "CALLER", "patterns": _compile_patterns([r"^CALLER$"])},
-    {"name": "CALLVALUE", "patterns": _compile_patterns([r"^CALLVALUE$"])},
-    {"name": "CALLDATALOAD", "patterns": _compile_patterns([r"^CALLDATALOAD$"])},
-    {"name": "CALLDATASIZE", "patterns": _compile_patterns([r"^CALLDATASIZE$"])},
-    {"name": "CALLDATACOPY", "patterns": _compile_patterns([r"^CALLDATACOPY$"])},
-    {"name": "CODESIZE", "patterns": _compile_patterns([r"^CODESIZE$"])},
-    {"name": "CODECOPY", "patterns": _compile_patterns([r"^CODECOPY$"])},
-    {"name": "GASPRICE", "patterns": _compile_patterns([r"^GASPRICE$"])},
-    {"name": "EXTCODESIZE", "patterns": _compile_patterns([r"^EXTCODESIZE$"])},
-    {"name": "EXTCODECOPY", "patterns": _compile_patterns([r"^EXTCODECOPY$"])},
-    {"name": "RETURNDATASIZE", "patterns": _compile_patterns([r"^RETURNDATASIZE$"])},
-    {"name": "RETURNDATACOPY", "patterns": _compile_patterns([r"^RETURNDATACOPY$"])},
-    {"name": "EXTCODEHASH", "patterns": _compile_patterns([r"^EXTCODEHASH$"])},
-    {"name": "BLOCKHASH", "patterns": _compile_patterns([r"^BLOCKHASH$"])},
-    {"name": "COINBASE", "patterns": _compile_patterns([r"^COINBASE$"])},
-    {"name": "TIMESTAMP", "patterns": _compile_patterns([r"^TIMESTAMP$"])},
-    {"name": "NUMBER", "patterns": _compile_patterns([r"^NUMBER$"])},
-    {"name": "PREVRANDAO", "patterns": _compile_patterns([r"^PREVRANDAO$", r"^DIFFICULTY$"])},
-    {"name": "GASLIMIT", "patterns": _compile_patterns([r"^GASLIMIT$"])},
-    {"name": "CHAINID", "patterns": _compile_patterns([r"^CHAINID$"])},
-    {"name": "SELFBALANCE", "patterns": _compile_patterns([r"^SELFBALANCE$"])},
-    {"name": "BASEFEE", "patterns": _compile_patterns([r"^BASEFEE$"])},
-    {"name": "BLOBHASH", "patterns": _compile_patterns([r"^BLOBHASH$"])},
-    {"name": "BLOBBASEFEE", "patterns": _compile_patterns([r"^BLOBBASEFEE$"])},
-    {"name": "POP", "patterns": _compile_patterns([r"^POP$"])},
-    {"name": "MLOAD", "patterns": _compile_patterns([r"^MLOAD$"])},
-    {"name": "MSTORE", "patterns": _compile_patterns([r"^MSTORE$"])},
-    {"name": "MSTORE8", "patterns": _compile_patterns([r"^MSTORE8$"])},
-    {"name": "SLOAD", "patterns": _compile_patterns([r"^SLOAD$", r"^SSLOAD$"])},
-    {"name": "SSTORE", "patterns": _compile_patterns([r"^SSTORE$", r"^SSSTORE$"])},
-    {"name": "JUMP", "patterns": _compile_patterns([r"^JUMP$", r"^JUMPS$"])},
-    {"name": "JUMPI", "patterns": _compile_patterns([r"^JUMPI$", r"^JUMPIS$"])},
-    {"name": "PC", "patterns": _compile_patterns([r"^PC$"])},
-    {"name": "MSIZE", "patterns": _compile_patterns([r"^MSIZE$"])},
-    {"name": "GAS", "patterns": _compile_patterns([r"^GAS$"])},
-    {"name": "JUMPDEST", "patterns": _compile_patterns([r"^JUMPDEST$", r"^JUMPDESTS$"])},
-    {"name": "TLOAD", "patterns": _compile_patterns([r"^TLOAD$"])},
-    {"name": "TSTORE", "patterns": _compile_patterns([r"^TSTORE$"])},
-    {"name": "MCOPY", "patterns": _compile_patterns([r"^MCOPY$"])},
-    {"name": "PUSH", "patterns": _compile_patterns([r"^PUSH$"])},  # grouped via normalize_operation for PUSH0-32
-    {"name": "DUP", "patterns": _compile_patterns([r"^DUP$"])},  # grouped
-    {"name": "SWAP", "patterns": _compile_patterns([r"^SWAP$"])},  # grouped
-    {"name": "LOG", "patterns": _compile_patterns([r"^LOG$"])},  # grouped
-    {"name": "CREATE", "patterns": _compile_patterns([r"^CREATE$"])},
-    {"name": "CALL", "patterns": _compile_patterns([r"^CALL$"])},
-    {"name": "CALLCODE", "patterns": _compile_patterns([r"^CALLCODE$"])},
-    {"name": "RETURN", "patterns": _compile_patterns([r"^RETURN$"])},
-    {"name": "DELEGATECALL", "patterns": _compile_patterns([r"^DELEGATECALL$"])},
-    {"name": "CREATE2", "patterns": _compile_patterns([r"^CREATE2$"])},
-    {"name": "STATICCALL", "patterns": _compile_patterns([r"^STATICCALL$"])},
-    {"name": "REVERT", "patterns": _compile_patterns([r"^REVERT$"])},
-    {"name": "INVALID", "patterns": _compile_patterns([r"^INVALID$"])},
-    {"name": "SELFDESTRUCT", "patterns": _compile_patterns([r"^SELFDESTRUCT.*$", r"^SUICIDE$"])},
-]
+# Canonical opcode mapping rules (EVM Yellow Paper opcodes).
+# Aliases handle fixture spelling variants (e.g., SHA3 -> KECCAK256, DIFFICULTY -> PREVRANDAO).
+# Opcodes with no aliases use exact match (empty list).
+OPCODE_RULES = _build_rules({
+    # Arithmetic
+    "STOP": [], "ADD": [], "MUL": [], "SUB": [], "DIV": [], "SDIV": [],
+    "MOD": [], "SMOD": [], "ADDMOD": [], "MULMOD": [], "EXP": [], "SIGNEXTEND": [],
+    # Comparison & bitwise
+    "LT": [], "GT": [], "SLT": [], "SGT": [], "EQ": [], "ISZERO": [],
+    "AND": [], "OR": [], "XOR": [], "NOT": [], "BYTE": [],
+    "SHL": [], "SHR": [], "SAR": [], "CLZ": [],
+    # Crypto
+    "KECCAK256":      [r"^KECCAK256$", r"^KECCAK$", r"^SHA3$"],
+    # Environment
+    "ADDRESS": [], "BALANCE": [], "ORIGIN": [], "CALLER": [], "CALLVALUE": [],
+    "CALLDATALOAD": [], "CALLDATASIZE": [], "CALLDATACOPY": [],
+    "CODESIZE": [], "CODECOPY": [], "GASPRICE": [],
+    "EXTCODESIZE": [], "EXTCODECOPY": [], "RETURNDATASIZE": [], "RETURNDATACOPY": [],
+    "EXTCODEHASH": [],
+    # Block
+    "BLOCKHASH": [], "COINBASE": [], "TIMESTAMP": [], "NUMBER": [],
+    "PREVRANDAO":     [r"^PREVRANDAO$", r"^DIFFICULTY$"],
+    "GASLIMIT": [], "CHAINID": [], "SELFBALANCE": [], "BASEFEE": [],
+    "BLOBHASH": [], "BLOBBASEFEE": [],
+    # Stack / memory / storage
+    "POP": [], "MLOAD": [], "MSTORE": [], "MSTORE8": [],
+    "SLOAD":          [r"^SLOAD$", r"^SSLOAD$"],
+    "SSTORE":         [r"^SSTORE$", r"^SSSTORE$"],
+    "JUMP":           [r"^JUMP$", r"^JUMPS$"],
+    "JUMPI":          [r"^JUMPI$", r"^JUMPIS$"],
+    "PC": [], "MSIZE": [], "GAS": [],
+    "JUMPDEST":       [r"^JUMPDEST$", r"^JUMPDESTS$"],
+    "TLOAD": [], "TSTORE": [], "MCOPY": [],
+    # Grouped (PUSH0-32 -> PUSH, DUP1-16 -> DUP, etc. via normalize_operation)
+    "PUSH": [], "DUP": [], "SWAP": [], "LOG": [],
+    # Calls & lifecycle
+    "CREATE": [], "CALL": [], "CALLCODE": [], "RETURN": [],
+    "DELEGATECALL": [], "CREATE2": [], "STATICCALL": [], "REVERT": [], "INVALID": [],
+    "SELFDESTRUCT":   [r"^SELFDESTRUCT.*$", r"^SUICIDE$"],
+})
 
 # Group similar opcodes under a single bucket (e.g., PUSH0-32 -> PUSH)
 GROUP_PATTERNS = [
@@ -270,85 +205,89 @@ def match_rule_in_text(text: str, rules: list[dict[str, Any]]) -> str | None:
     return match_operation(text, rules, strategy="tokens")
 
 
+# Known function-name aliases for tests that don't map to an opcode/precompile.
+_FUNC_NAME_ALIASES: dict[str, str] = {
+    "ether_transfers_to_precompile": "Ether Transfers",
+}
+
+# Regex strips applied to the parameter region to prevent false opcode matches.
+_OP_REGION_STRIPS: list[tuple[re.Pattern, str]] = [
+    # "benchmark-gas-value_10M" contains "gas" -> false GAS opcode match
+    (re.compile(r"-?benchmark-gas-value_\d+M$"), ""),
+    # Enum-qualified values (e.g., ReturnDataStyle.IDENTITY) are test params, not ops
+    (re.compile(r"[A-Z][a-zA-Z0-9]*\.[A-Z][A-Z0-9_]+"), ""),
+    # "return_data_style" contains "RETURN" -> false RETURN opcode match
+    (re.compile(r"return[_-]data[_-]style[_-]?", re.IGNORECASE), ""),
+    # "returned_size" contains opcode-like substrings
+    (re.compile(r"returned[_-]size[_-]?\d*", re.IGNORECASE), ""),
+]
+
+
+def _extract_func_name(test_name: str) -> str | None:
+    """Extract the test function name (uppercase) from a test identifier, or None."""
+    m = re.search(r"::test_([a-z0-9_]+)\[", test_name)
+    return m.group(1) if m else None
+
+
+def _extract_op_region(test_name: str) -> str:
+    """Extract the parameter region after 'blockchain_test', stripped of boilerplate."""
+    params_match = re.search(r"\[(.*)\]", test_name)
+    if not params_match:
+        return ""
+    params = params_match.group(1)
+    if "blockchain_test" not in params:
+        return ""
+    region = params.split("blockchain_test", 1)[1].lstrip("-")
+    for pattern, repl in _OP_REGION_STRIPS:
+        region = pattern.sub(repl, region)
+    return region
+
+
 def extract_operation(test_name: str) -> str:
     """
-    Extract the operation name from test parameters.
+    Extract the EVM operation name from a test identifier.
 
-    This function uses a priority-based extraction strategy to identify
-    which EVM operation (opcode or precompile) a test is benchmarking.
-
-    Extraction priority (stops at first match):
-        1. Function name for precompiles (e.g., test_modexp -> MODEXP)
-        2. Parameter region after "blockchain_test" for precompiles
-        3. Parameter region for opcodes
-        4. Function name for opcodes
-        5. Variant info from test name
+    Uses a priority-based strategy (stops at first match):
+        1. Function name matched as precompile  (e.g., test_modexp -> MODEXP)
+        2. Parameter region matched as precompile
+        3. Parameter region matched as opcode
+        4. Function name matched as opcode
+        5. Variant info from test name brackets
         6. Fallback: "Unknown"
 
-    This ordering prioritizes precompile detection to avoid false positives.
-    For example, MODEXP tests have "mod_" in params which could wrongly
-    match the MOD opcode if we checked opcodes first.
-
-    Args:
-        test_name: Full test identifier string (e.g., "test_foo.py::test_bar[...]")
-
-    Returns:
-        Canonical operation name (e.g., "MODEXP", "KECCAK256", "ADD")
+    Precompiles are checked before opcodes to avoid false positives
+    (e.g., MODEXP tests contain "mod_" which would wrongly match MOD).
     """
-    # Step 1: Extract function name (most reliable for precompiles)
-    func_match = re.search(r"::test_([a-z0-9_]+)\[", test_name)
-    if func_match:
-        func_name = func_match.group(1).upper()
-        rule_match = match_rule_in_text(func_name, PRECOMPILE_RULES)
-        if rule_match:
-            return rule_match
+    func_name = _extract_func_name(test_name)
+    op_region = _extract_op_region(test_name)
 
-    # Step 2: Extract parameter region after "blockchain_test"
-    params_match = re.search(r"\[(.*)\]", test_name)
-    op_region = ""
-    if params_match:
-        params = params_match.group(1)
-        if "blockchain_test" in params:
-            op_region = params.split("blockchain_test", 1)[1].lstrip("-")
-            # Strip benchmark boilerplate suffix (e.g., "benchmark-gas-value_10M")
-            # to avoid false matches on the token "gas" -> GAS opcode
-            op_region = re.sub(r"-?benchmark-gas-value_\d+M$", "", op_region)
-            # Strip enum-qualified values (e.g., ReturnDataStyle.IDENTITY) — these are
-            # test parameters, not operation identifiers, and cause false matches.
-            op_region = re.sub(r"[A-Z][a-zA-Z0-9]*\.[A-Z][A-Z0-9_]+", "", op_region)
-            # Strip parameter fields with opcode-like substrings
-            op_region = re.sub(r"return[_-]data[_-]style[_-]?", "", op_region, flags=re.IGNORECASE)
-            op_region = re.sub(r"returned[_-]size[_-]?\d*", "", op_region, flags=re.IGNORECASE)
+    # Priority 1: function name -> precompile
+    if func_name:
+        result = match_rule_in_text(func_name.upper(), PRECOMPILE_RULES)
+        if result:
+            return result
 
-    # Step 3: Check parameter region for precompiles, then opcodes
+    # Priority 2-3: parameter region -> precompile, then opcode
     if op_region:
-        rule_match = match_rule_in_text(op_region, PRECOMPILE_RULES)
-        if rule_match:
-            return rule_match
+        result = match_rule_in_text(op_region, PRECOMPILE_RULES)
+        if result:
+            return result
+        result = match_rule_in_text(op_region, OPCODE_RULES)
+        if result:
+            return result
 
-        rule_match = match_rule_in_text(op_region, OPCODE_RULES)
-        if rule_match:
-            return rule_match
+    # Priority 4: function name -> opcode or human-readable fallback
+    if func_name:
+        result = match_rule_in_text(func_name.upper(), OPCODE_RULES)
+        if result:
+            return result
+        return _FUNC_NAME_ALIASES.get(func_name, func_name.replace("_", " ").title())
 
-    # Step 4: Fall back to function name for opcodes
-    if func_match:
-        func_name = func_match.group(1).upper()
-        rule_match = match_rule_in_text(func_name, OPCODE_RULES)
-        if rule_match:
-            return rule_match
-        # Use function name as-is (title case), with known aliases
-        FUNC_NAME_ALIASES = {
-            "ether_transfers_to_precompile": "Ether Transfers",
-        }
-        raw = func_match.group(1)
-        return FUNC_NAME_ALIASES.get(raw, raw.replace("_", " ").title())
-
-    # Step 5: Try to extract variant info from test name
+    # Priority 5: variant info from bracket region
     variant_match = re.search(r"\[.*?-([\w\s]+)\]\.json$", test_name)
     if variant_match:
         return variant_match.group(1)
 
-    # Step 6: Unknown operation
     return "Unknown"
 
 
@@ -699,6 +638,12 @@ def process_all_results(
     return output
 
 
+def _gas_sort_key(g: str) -> int:
+    """Extract leading integer from a gas-limit string for numeric sorting."""
+    m = re.match(r"(\d+)", g)
+    return int(m.group(1)) if m else 0
+
+
 _NORMALIZE_GAS_RE = re.compile(r"-benchmark(?:-gas-value)?_\d+M")
 
 
@@ -730,11 +675,6 @@ def generate_combined_dataset(per_gas_outputs: list[dict[str, Any]]) -> dict[str
         gl = out.get("gas_limit", out.get("config", "unknown"))
         if gl not in gas_limits:
             gas_limits.append(gl)
-
-    # Sort gas limits numerically
-    def _gas_sort_key(g: str) -> int:
-        m = re.match(r"(\d+)", g)
-        return int(m.group(1)) if m else 0
 
     gas_limits.sort(key=_gas_sort_key)
 
@@ -777,47 +717,194 @@ def generate_combined_dataset(per_gas_outputs: list[dict[str, Any]]) -> dict[str
     }
 
 
+def _dataset_naming(
+    fixture_set: str | None, config_name: str, gas_limit: str
+) -> tuple[str, str, str]:
+    """Return (dataset_id, output_filename, display_name) for a config."""
+    if fixture_set:
+        display_ref = fixture_set.removeprefix("eest-")
+        return (
+            f"{fixture_set}/{config_name}",
+            f"results-{fixture_set}-{config_name}.json",
+            f"EEST {gas_limit} Gas Limit ({display_ref})",
+        )
+    return (
+        config_name,
+        f"results-{config_name}.json",
+        f"EEST {gas_limit} Gas Limit",
+    )
+
+
+def _log_output_summary(output: dict[str, Any], output_file: Path) -> None:
+    """Log a short summary of a generated dataset."""
+    logger.info("Generated %s", output_file)
+    logger.info("  - %d zkVMs", len(output["zkvms"]))
+    logger.info("  - %d operations", len(output["operations"]))
+    logger.info("  - %d tests", len(output["tests"]))
+    for zkvm in output["zkvms"]:
+        success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
+        crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
+        logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
+
+
+def _write_json(path: Path, data: dict[str, Any]) -> None:
+    """Serialize *data* to a JSON file at *path*."""
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def process_hardware(
+    hardware_id: str,
+    proving_base: Path,
+    output_dir: Path,
+) -> dict[str, Any] | None:
+    """Process a single hardware configuration and write its datasets + manifest.
+
+    Returns a global-manifest entry dict, or None if no EEST configs were found.
+    """
+    hardware_base = proving_base / hardware_id
+    logger.info("=" * 60)
+    logger.info("Processing hardware: %s", hardware_id)
+
+    eest_configs = discover_eest_configs(hardware_base)
+    if not eest_configs:
+        logger.warning("No EEST configurations found for %s, skipping", hardware_id)
+        return None
+
+    logger.info("Discovered EEST configurations: %s",
+                 [(fs, cn) for fs, cn, *_ in eest_configs])
+
+    hardware_output_dir = output_dir / hardware_id
+    hardware_output_dir.mkdir(parents=True, exist_ok=True)
+
+    manifest_datasets: list[dict[str, Any]] = []
+    hardware_info_sample: dict[str, Any] = {}
+    outputs_by_fixture_set: dict[str | None, list[dict[str, Any]]] = {}
+
+    # --- per-config processing ---
+    for fixture_set, config_name, config_path, gas_value_filter in eest_configs:
+        logger.info("Processing configuration: %s/%s%s", hardware_id,
+                     f"{fixture_set}/" if fixture_set else "", config_name)
+
+        hardware_file = config_path / "hardware.json"
+        output = process_all_results(config_path, hardware_file, config_name, hardware_id,
+                                     gas_value_filter=gas_value_filter)
+        if fixture_set:
+            output["fixture_set"] = fixture_set
+        if not hardware_info_sample and output.get("hardware_info"):
+            hardware_info_sample = output["hardware_info"]
+
+        dataset_id, output_filename, display_name = _dataset_naming(
+            fixture_set, config_name, output["gas_limit"])
+
+        output_file = hardware_output_dir / output_filename
+        _write_json(output_file, output)
+        _log_output_summary(output, output_file)
+
+        manifest_entry: dict[str, Any] = {
+            "id": dataset_id,
+            "name": display_name,
+            "file": output_filename,
+            "gas_limit": output["gas_limit"],
+            "test_count": len(output["tests"]),
+            "zkvm_count": len(output["zkvms"]),
+        }
+        if fixture_set:
+            manifest_entry["fixture_set"] = fixture_set
+        manifest_datasets.append(manifest_entry)
+
+        outputs_by_fixture_set.setdefault(fixture_set, []).append(output)
+
+    # --- combined datasets (one per fixture set with 2+ gas limits) ---
+    for fs, fs_outputs in outputs_by_fixture_set.items():
+        if len(fs_outputs) < 2:
+            continue
+
+        combined = generate_combined_dataset(fs_outputs)
+        if not combined:
+            continue
+
+        if fs:
+            combined_id = f"{fs}/combined"
+            combined_filename = f"results-{fs}-combined.json"
+            display_ref = fs.removeprefix("eest-")
+            combined_name = f"EEST All Gas Limits ({display_ref})"
+        else:
+            combined_id = "combined"
+            combined_filename = "results-combined.json"
+            combined_name = "EEST All Gas Limits"
+
+        _write_json(hardware_output_dir / combined_filename, combined)
+        logger.info("Generated combined dataset: %s (%d tests, %d gas limits)",
+                     hardware_output_dir / combined_filename,
+                     len(combined["tests"]), len(combined["gas_limits"]))
+
+        combined_entry: dict[str, Any] = {
+            "id": combined_id,
+            "name": combined_name,
+            "file": combined_filename,
+            "gas_limit": "combined",
+            "test_count": len(combined["tests"]),
+            "zkvm_count": len(combined.get("zkvms", [])),
+            "combined": True,
+        }
+        if fs:
+            combined_entry["fixture_set"] = fs
+        manifest_datasets.append(combined_entry)
+
+    # --- hardware manifest ---
+    manifest_datasets.sort(key=lambda d: _gas_sort_key(d["gas_limit"]), reverse=True)
+
+    combined_ds = next((d for d in manifest_datasets if d.get("combined")), None)
+    default_ds_id = combined_ds["id"] if combined_ds else (manifest_datasets[0]["id"] if manifest_datasets else None)
+
+    hardware_manifest = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "hardware_id": hardware_id,
+        "hardware_info": hardware_info_sample,
+        "datasets": manifest_datasets,
+        "default_dataset": default_ds_id,
+    }
+    hardware_manifest_file = hardware_output_dir / "manifest.json"
+    _write_json(hardware_manifest_file, hardware_manifest)
+    logger.info("Generated hardware manifest: %s with %d datasets", hardware_manifest_file, len(manifest_datasets))
+
+    return {
+        "id": hardware_id,
+        "name": get_hardware_friendly_name(hardware_id, hardware_info_sample),
+        "path": hardware_id,
+        "dataset_count": len(manifest_datasets),
+        "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
+    }
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
         description='Generate repricing analysis data for the interactive website.'
     )
     parser.add_argument(
-        '--output',
-        type=str,
-        default=None,
+        '--output', type=str, default=None,
         help='Output directory path (default: dist/repricing/data)'
     )
     parser.add_argument(
-        '--hardware',
-        type=str,
-        default=None,
+        '--hardware', type=str, default=None,
         help='Process specific hardware config only (default: all)'
     )
-
     args = parser.parse_args()
 
     logger.info("Generating repricing analysis data...")
 
-    # Resolve paths relative to repo root
     repo_root = Path(__file__).parent.parent
     proving_base = repo_root / DEFAULT_PROVING_BASE
-
-    if args.output:
-        output_dir = Path(args.output)
-    else:
-        output_dir = repo_root / DEFAULT_OUTPUT_DIR
-
-    # Ensure output directory exists
+    output_dir = Path(args.output) if args.output else repo_root / DEFAULT_OUTPUT_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Discover all hardware configurations
     all_hardware = discover_hardware_configs(proving_base)
     if not all_hardware:
         logger.error("No hardware configurations found in %s", proving_base)
         return
 
-    # Filter to specific hardware if requested
     if args.hardware:
         if args.hardware not in all_hardware:
             logger.error("Hardware '%s' not found. Available: %s", args.hardware, all_hardware)
@@ -826,179 +913,21 @@ def main():
 
     logger.info("Processing hardware configurations: %s", all_hardware)
 
-    # Track all hardware configs for global manifest
     global_hardware_configs = []
-
-    # Process each hardware configuration
     for hardware_id in all_hardware:
-        hardware_base = proving_base / hardware_id
-        logger.info("=" * 60)
-        logger.info("Processing hardware: %s", hardware_id)
+        entry = process_hardware(hardware_id, proving_base, output_dir)
+        if entry:
+            global_hardware_configs.append(entry)
 
-        # Discover EEST configurations for this hardware
-        eest_configs = discover_eest_configs(hardware_base)
-        if not eest_configs:
-            logger.warning("No EEST configurations found for %s, skipping", hardware_id)
-            continue
-
-        logger.info("Discovered EEST configurations: %s",
-                     [(fs, cn) for fs, cn, *_ in eest_configs])
-
-        # Create hardware-specific output directory
-        hardware_output_dir = output_dir / hardware_id
-        hardware_output_dir.mkdir(parents=True, exist_ok=True)
-
-        # Process each configuration for this hardware
-        manifest_datasets = []
-        hardware_info_sample = {}
-        # Collect per-gas-limit outputs grouped by fixture_set for combined generation
-        outputs_by_fixture_set: dict[str | None, list[dict[str, Any]]] = {}
-
-        for fixture_set, config_name, config_path, gas_value_filter in eest_configs:
-            logger.info("Processing configuration: %s/%s%s", hardware_id,
-                        f"{fixture_set}/" if fixture_set else "", config_name)
-
-            hardware_file = config_path / "hardware.json"
-
-            output = process_all_results(config_path, hardware_file, config_name, hardware_id,
-                                         gas_value_filter=gas_value_filter)
-            if fixture_set:
-                output["fixture_set"] = fixture_set
-
-            # Keep a sample of hardware_info for the global manifest
-            if not hardware_info_sample and output.get("hardware_info"):
-                hardware_info_sample = output["hardware_info"]
-
-            # Build dataset ID and output filename
-            if fixture_set:
-                dataset_id = f"{fixture_set}/{config_name}"
-                output_filename = f"results-{fixture_set}-{config_name}.json"
-                display_ref = fixture_set.removeprefix("eest-")
-                display_name = f"EEST {output['gas_limit']} Gas Limit ({display_ref})"
-            else:
-                dataset_id = config_name
-                output_filename = f"results-{config_name}.json"
-                display_name = f"EEST {output['gas_limit']} Gas Limit"
-
-            # Write output file for this configuration
-            output_file = hardware_output_dir / output_filename
-            with open(output_file, "w") as f:
-                json.dump(output, f, indent=2)
-
-            logger.info("Generated %s", output_file)
-            logger.info("  - %d zkVMs", len(output["zkvms"]))
-            logger.info("  - %d operations", len(output["operations"]))
-            logger.info("  - %d tests", len(output["tests"]))
-
-            # Print summary stats
-            for zkvm in output["zkvms"]:
-                success = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "success")
-                crashed = sum(1 for t in output["tests"] if t["results"].get(zkvm, {}).get("status") == "crashed")
-                logger.info("  - %s: %d success, %d crashed", zkvm, success, crashed)
-
-            # Add to per-hardware manifest
-            manifest_entry = {
-                "id": dataset_id,
-                "name": display_name,
-                "file": output_filename,
-                "gas_limit": output["gas_limit"],
-                "test_count": len(output["tests"]),
-                "zkvm_count": len(output["zkvms"]),
-            }
-            if fixture_set:
-                manifest_entry["fixture_set"] = fixture_set
-            manifest_datasets.append(manifest_entry)
-
-            # Collect for combined dataset generation
-            outputs_by_fixture_set.setdefault(fixture_set, []).append(output)
-
-        # Generate combined datasets (one per fixture set)
-        for fs, fs_outputs in outputs_by_fixture_set.items():
-            if len(fs_outputs) < 2:
-                continue  # No point combining a single gas limit
-
-            combined = generate_combined_dataset(fs_outputs)
-            if not combined:
-                continue
-
-            if fs:
-                combined_id = f"{fs}/combined"
-                combined_filename = f"results-{fs}-combined.json"
-                display_ref = fs.removeprefix("eest-")
-                combined_name = f"EEST All Gas Limits ({display_ref})"
-            else:
-                combined_id = "combined"
-                combined_filename = "results-combined.json"
-                combined_name = "EEST All Gas Limits"
-
-            combined_file = hardware_output_dir / combined_filename
-            with open(combined_file, "w") as f:
-                json.dump(combined, f, indent=2)
-
-            logger.info("Generated combined dataset: %s (%d tests, %d gas limits)",
-                        combined_file, len(combined["tests"]), len(combined["gas_limits"]))
-
-            combined_entry = {
-                "id": combined_id,
-                "name": combined_name,
-                "file": combined_filename,
-                "gas_limit": "combined",
-                "test_count": len(combined["tests"]),
-                "zkvm_count": len(combined.get("zkvms", [])),
-                "combined": True,
-            }
-            if fs:
-                combined_entry["fixture_set"] = fs
-            manifest_datasets.append(combined_entry)
-
-        # Sort datasets by gas limit (numeric sort, descending)
-        def sort_key(d):
-            match = re.match(r"(\d+)", d["gas_limit"])
-            return int(match.group(1)) if match else 0
-
-        manifest_datasets.sort(key=sort_key, reverse=True)
-
-        # Determine default dataset: prefer combined, else first by gas limit
-        combined_ds = next((d for d in manifest_datasets if d.get("combined")), None)
-        default_ds_id = combined_ds["id"] if combined_ds else (manifest_datasets[0]["id"] if manifest_datasets else None)
-
-        # Write per-hardware manifest
-        hardware_manifest = {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "hardware_id": hardware_id,
-            "hardware_info": hardware_info_sample,
-            "datasets": manifest_datasets,
-            "default_dataset": default_ds_id,
-        }
-
-        hardware_manifest_file = hardware_output_dir / "manifest.json"
-        with open(hardware_manifest_file, "w") as f:
-            json.dump(hardware_manifest, f, indent=2)
-
-        logger.info("Generated hardware manifest: %s with %d datasets", hardware_manifest_file, len(manifest_datasets))
-
-        # Add to global hardware configs
-        global_hardware_configs.append({
-            "id": hardware_id,
-            "name": get_hardware_friendly_name(hardware_id, hardware_info_sample),
-            "path": hardware_id,
-            "dataset_count": len(manifest_datasets),
-            "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
-        })
-
-    # Write global manifest
     global_manifest = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "hardware_configs": global_hardware_configs,
         "default_hardware": global_hardware_configs[0]["id"] if global_hardware_configs else None,
     }
-
-    global_manifest_file = output_dir / "manifest.json"
-    with open(global_manifest_file, "w") as f:
-        json.dump(global_manifest, f, indent=2)
+    _write_json(output_dir / "manifest.json", global_manifest)
 
     logger.info("=" * 60)
-    logger.info("Generated global manifest: %s", global_manifest_file)
+    logger.info("Generated global manifest: %s", output_dir / "manifest.json")
     logger.info("Hardware configurations: %s", [h["id"] for h in global_hardware_configs])
 
 
