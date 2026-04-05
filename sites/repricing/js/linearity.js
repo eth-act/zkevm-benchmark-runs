@@ -266,13 +266,14 @@ export class LinearityModal {
             if (!reg) {
                 return `<tr>
                     <td>${escapeHtml(series.zkvm)}</td>
-                    <td colspan="4">Insufficient data</td>
+                    <td colspan="5">Insufficient data</td>
                 </tr>`;
             }
 
             const badgeClass = lin ? `linearity-${lin.classification}` : '';
             const badgeText = lin ? `${lin.classification} (exp: ${lin.exponent.toFixed(2)})` : '-';
             const slopeMs = reg.slope * 1e6; // ms per MGas
+            const throughput = slopeMs > 0 ? (1000 / slopeMs) : null;
 
             return `<tr>
                 <td>${escapeHtml(series.zkvm)}</td>
@@ -280,6 +281,7 @@ export class LinearityModal {
                 <td>${slopeMs.toFixed(1)} ms/MGas</td>
                 <td>${(reg.intercept / 1000).toFixed(2)}s</td>
                 <td><span class="linearity-badge ${badgeClass}">${badgeText}</span></td>
+                <td>${throughput !== null ? throughput.toFixed(2) + ' MGas/s' : '-'}</td>
             </tr>`;
         }).join('');
 
@@ -292,6 +294,7 @@ export class LinearityModal {
                         <th>Slope</th>
                         <th>Intercept</th>
                         <th>Scaling</th>
+                        <th>Throughput (slope)</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
