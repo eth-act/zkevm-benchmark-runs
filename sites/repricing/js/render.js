@@ -82,15 +82,15 @@ export class Renderer {
      * Renders a zkVM cell for an individual test.
      */
     renderTestZkvmCell(test, zkvm) {
-        const result = test.results[zkvm];
-        if (!result) {
-            return renderProofCell({ missing: true });
-        }
-        if (result.status !== STATUS.SUCCESS) {
-            return renderProofCell({ crashed: true, crashReason: result.crash_reason });
+        const time = this.dataAccessor.getProvingTime(test, zkvm);
+        if (time === null) {
+            if (this.dataAccessor.isAllMissing(test)) {
+                return renderProofCell({ missing: true });
+            }
+            const crashReason = this.dataAccessor.getAllCrashReasons(test);
+            return renderProofCell({ crashed: true, crashReason });
         }
 
-        const time = result.proving_time_ms;
         const relativeCost = this.dataAccessor.getRelativeCost(test, zkvm);
         return renderProofCell({ time, relativeCost });
     }
@@ -133,10 +133,10 @@ export class Renderer {
         }
         for (const test of filteredTests) {
             for (const zkvm of zkvms) {
-                const result = test.results[zkvm];
-                if (result?.status === STATUS.SUCCESS) {
+                const time = this.dataAccessor.getProvingTime(test, zkvm);
+                if (time !== null) {
                     zkvmStats[zkvm].success++;
-                } else if (result) {
+                } else if (!this.dataAccessor.isAllMissing(test)) {
                     zkvmStats[zkvm].crashed++;
                 }
             }

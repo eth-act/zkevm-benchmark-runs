@@ -781,9 +781,13 @@ td {
 }
 
 .hm-fixture-name {
-    color: var(--text-secondary);
+    color: var(--link, #3b82f6);
     font-size: 0.875rem;
     word-break: break-word;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.15s;
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -913,3 +917,152 @@ td {
     color: var(--text-primary);
     margin: 0;
 }
+
+/* ============================================================================
+   Linearity Analysis Modal
+   ============================================================================ */
+
+.linearity-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.linearity-modal.hidden {
+    display: none;
+}
+
+.linearity-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.linearity-modal-content {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 900px;
+    max-height: 85vh;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.linearity-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.linearity-modal-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.linearity-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 4px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.linearity-modal-close:hover {
+    color: var(--text-primary);
+}
+
+.linearity-modal-body {
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#linearity-chart {
+    width: 100%;
+    height: 400px;
+    min-height: 300px;
+}
+
+/* Stats table */
+.linearity-stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.linearity-stats-table th,
+.linearity-stats-table td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.linearity-stats-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.linearity-stats-table td {
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', monospace;
+}
+
+/* Linearity badges */
+.linearity-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.linearity-linear {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+}
+
+.linearity-sublinear {
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+}
+
+.linearity-superlinear {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+/* Make fixture rows show pointer cursor to indicate clickability */
+.hm-fixture-row {
+    cursor: pointer;
+}
+
+.hm-fixture-row:hover {
+    background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+}
+
+.hm-fixture-row:hover .hm-fixture-name {
+    text-decoration-color: var(--link, #3b82f6);
+}
+

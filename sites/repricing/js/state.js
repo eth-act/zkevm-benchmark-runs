@@ -23,7 +23,6 @@ export const URLState = {
 
         return {
             hardware: params.get(URL_PARAMS.HARDWARE),
-            dataset: params.get(URL_PARAMS.DATASET),
             target: parseFloat(params.get(URL_PARAMS.TARGET)) || null,
             zkvmView: params.get(URL_PARAMS.ZKVM_VIEW),
             search: params.get(URL_PARAMS.SEARCH),
@@ -48,11 +47,6 @@ export const URLState = {
         // Hardware (only if not default)
         if (state.hardware && state.hardware !== defaults.hardware) {
             params.set(URL_PARAMS.HARDWARE, state.hardware);
-        }
-
-        // Dataset (only if not default)
-        if (state.dataset && state.dataset !== defaults.dataset) {
-            params.set(URL_PARAMS.DATASET, state.dataset);
         }
 
         // Target throughput (compare against hardware-specific default)
@@ -118,7 +112,6 @@ export const URLState = {
 export function applyURLStateToApp(urlState, appState) {
     // Apply state that doesn't require data
     if (urlState.hardware) appState.selectedHardware = urlState.hardware;
-    if (urlState.dataset) appState.selectedDataset = urlState.dataset;
     if (urlState.target && urlState.target > 0) appState.targetMGasPerS = urlState.target;
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;
     if (urlState.minRelativeCost) appState.minRelativeCost = urlState.minRelativeCost;

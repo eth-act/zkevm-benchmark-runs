@@ -689,6 +689,84 @@ def process_all_results(
     return output
 
 
+_NORMALIZE_GAS_RE = re.compile(r"-benchmark(?:-gas-value)?_\d+M")
+
+
+def normalize_test_id(test_id: str) -> str:
+    """Strip the gas-value portion from a test ID so the same fixture across gas limits maps to one key.
+
+    Example:
+        "test_codecopy[fork_Osaka-blockchain_test-code_size_0-benchmark-gas-value_5M]"
+        → "test_codecopy[fork_Osaka-blockchain_test-code_size_0]"
+    """
+    return _NORMALIZE_GAS_RE.sub("", test_id)
+
+
+def generate_combined_dataset(per_gas_outputs: list[dict[str, Any]]) -> dict[str, Any]:
+    """Merge per-gas-limit outputs into a single combined dataset.
+
+    Each test gets a ``data_points`` list with one entry per gas limit, keyed
+    by the normalized (gas-stripped) test ID.
+    """
+    if not per_gas_outputs:
+        return {}
+
+    # Use first output as template for shared metadata
+    template = per_gas_outputs[0]
+
+    # Collect ordered gas limits
+    gas_limits: list[str] = []
+    for out in per_gas_outputs:
+        gl = out.get("gas_limit", out.get("config", "unknown"))
+        if gl not in gas_limits:
+            gas_limits.append(gl)
+
+    # Sort gas limits numerically
+    def _gas_sort_key(g: str) -> int:
+        m = re.match(r"(\d+)", g)
+        return int(m.group(1)) if m else 0
+
+    gas_limits.sort(key=_gas_sort_key)
+
+    # Group tests by normalized ID
+    combined_tests: dict[str, dict[str, Any]] = {}
+
+    for out in per_gas_outputs:
+        gl = out.get("gas_limit", out.get("config", "unknown"))
+        for test in out["tests"]:
+            norm_id = normalize_test_id(test["id"])
+            if norm_id not in combined_tests:
+                combined_tests[norm_id] = {
+                    "id": norm_id,
+                    "name": test["name"],
+                    "operation": test["operation"],
+                    "data_points": [],
+                }
+            combined_tests[norm_id]["data_points"].append({
+                "gas_limit": gl,
+                "block_used_gas": test["block_used_gas"],
+                "results": test["results"],
+            })
+
+    # Sort data_points within each test by gas limit
+    for test in combined_tests.values():
+        test["data_points"].sort(key=lambda dp: _gas_sort_key(dp["gas_limit"]))
+
+    tests_list = sorted(combined_tests.values(), key=lambda x: (x["operation"], x["name"]))
+
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "hardware": template["hardware"],
+        "hardware_info": template.get("hardware_info", {}),
+        "gas_limits": gas_limits,
+        "el_clients": template.get("el_clients", []),
+        "zkvms": template.get("zkvms", []),
+        "operations": template.get("operations", []),
+        "operations_by_category": template.get("operations_by_category", {}),
+        "tests": tests_list,
+    }
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -763,6 +841,8 @@ def main():
         # Process each configuration for this hardware
         manifest_datasets = []
         hardware_info_sample = {}
+        # Collect per-gas-limit outputs grouped by fixture_set for combined generation
+        outputs_by_fixture_set: dict[str | None, list[dict[str, Any]]] = {}
 
         for fixture_set, config_name, config_path, gas_value_filter in eest_configs:
             logger.info("Processing configuration: %s/%s%s", hardware_id,
@@ -819,6 +899,48 @@ def main():
                 manifest_entry["fixture_set"] = fixture_set
             manifest_datasets.append(manifest_entry)
 
+            # Collect for combined dataset generation
+            outputs_by_fixture_set.setdefault(fixture_set, []).append(output)
+
+        # Generate combined datasets (one per fixture set)
+        for fs, fs_outputs in outputs_by_fixture_set.items():
+            if len(fs_outputs) < 2:
+                continue  # No point combining a single gas limit
+
+            combined = generate_combined_dataset(fs_outputs)
+            if not combined:
+                continue
+
+            if fs:
+                combined_id = f"{fs}/combined"
+                combined_filename = f"results-{fs}-combined.json"
+                display_ref = fs.removeprefix("eest-")
+                combined_name = f"EEST All Gas Limits ({display_ref})"
+            else:
+                combined_id = "combined"
+                combined_filename = "results-combined.json"
+                combined_name = "EEST All Gas Limits"
+
+            combined_file = hardware_output_dir / combined_filename
+            with open(combined_file, "w") as f:
+                json.dump(combined, f, indent=2)
+
+            logger.info("Generated combined dataset: %s (%d tests, %d gas limits)",
+                        combined_file, len(combined["tests"]), len(combined["gas_limits"]))
+
+            combined_entry = {
+                "id": combined_id,
+                "name": combined_name,
+                "file": combined_filename,
+                "gas_limit": "combined",
+                "test_count": len(combined["tests"]),
+                "zkvm_count": len(combined.get("zkvms", [])),
+                "combined": True,
+            }
+            if fs:
+                combined_entry["fixture_set"] = fs
+            manifest_datasets.append(combined_entry)
+
         # Sort datasets by gas limit (numeric sort, descending)
         def sort_key(d):
             match = re.match(r"(\d+)", d["gas_limit"])
@@ -826,13 +948,17 @@ def main():
 
         manifest_datasets.sort(key=sort_key, reverse=True)
 
+        # Determine default dataset: prefer combined, else first by gas limit
+        combined_ds = next((d for d in manifest_datasets if d.get("combined")), None)
+        default_ds_id = combined_ds["id"] if combined_ds else (manifest_datasets[0]["id"] if manifest_datasets else None)
+
         # Write per-hardware manifest
         hardware_manifest = {
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "hardware_id": hardware_id,
             "hardware_info": hardware_info_sample,
             "datasets": manifest_datasets,
-            "default_dataset": manifest_datasets[0]["id"] if manifest_datasets else None,
+            "default_dataset": default_ds_id,
         }
 
         hardware_manifest_file = hardware_output_dir / "manifest.json"

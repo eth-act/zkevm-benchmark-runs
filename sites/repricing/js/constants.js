@@ -77,7 +77,6 @@ export const THRESHOLDS = Object.freeze({
 
 export const URL_PARAMS = Object.freeze({
     HARDWARE: 'hw',
-    DATASET: 'dataset',
     TARGET: 'target',
     ZKVM_VIEW: 'view',
     SEARCH: 'q',

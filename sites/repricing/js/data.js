@@ -1,6 +1,10 @@
 /**
  * Data access layer for the Repricing Analysis Application.
  * Handles all data retrieval, calculations, and caching.
+ *
+ * Supports two data formats:
+ * - Legacy: each test has flat `results` and `block_used_gas`
+ * - Combined: each test has `data_points[]`, each with `gas_limit`, `block_used_gas`, `results`
  */
 
 import { STATUS, VIEW } from './constants.js';
@@ -27,6 +31,9 @@ export class CacheManager {
 
         // Group worst-case stats (depends on: filteredTests)
         this.groupWorstCase = new Map();
+
+        // Worst data point per test+zkvm+target (depends on: dataset, targetMGasPerS)
+        this.worstDataPoint = new Map();
     }
 
     /**
@@ -37,6 +44,7 @@ export class CacheManager {
         this.worstCaseZkvm.clear();
         this.relativeCost.clear();
         this.groupWorstCase.clear();
+        this.worstDataPoint.clear();
     }
 
     /**
@@ -44,8 +52,8 @@ export class CacheManager {
      */
     clearRelativeCost() {
         this.relativeCost.clear();
-        // Group worst case also depends on relative cost indirectly
         this.groupWorstCase.clear();
+        this.worstDataPoint.clear();
     }
 
     /**
@@ -72,6 +80,8 @@ export class DataAccessor {
         this.data = data;
         this.cache = cache;
         this.targetMGasPerS = 7; // Default, will be updated
+        /** True when the loaded dataset uses the combined (multi-gas) format. */
+        this.isCombined = Array.isArray(data.gas_limits);
     }
 
     /**
@@ -86,16 +96,163 @@ export class DataAccessor {
     }
 
     // ========================================================================
+    // Combined-mode helpers
+    // ========================================================================
+
+    /**
+     * For combined data: finds the data point with the worst (highest) relative
+     * cost for a given test and zkvm. Returns {dp, throughput} or null.
+     * Results are cached per test+zkvm+target.
+     */
+    getWorstDataPoint(test, zkvm) {
+        if (!this.isCombined) return null;
+
+        const cacheKey = `${test.id}-${zkvm}-${this.targetMGasPerS}`;
+        if (this.cache.worstDataPoint.has(cacheKey)) {
+            return this.cache.worstDataPoint.get(cacheKey);
+        }
+
+        let worstDp = null;
+        let worstThroughput = Infinity;
+
+        for (const dp of test.data_points) {
+            const gasUsed = dp.block_used_gas;
+            if (!gasUsed) continue;
+
+            let provingTimeMs;
+            if (zkvm === VIEW.WORST) {
+                // Find slowest successful zkvm in this data point
+                provingTimeMs = null;
+                for (const z of this.data.zkvms) {
+                    const r = dp.results[z];
+                    if (r && r.status === STATUS.SUCCESS) {
+                        if (provingTimeMs === null || r.proving_time_ms > provingTimeMs) {
+                            provingTimeMs = r.proving_time_ms;
+                        }
+                    }
+                }
+            } else {
+                const r = dp.results[zkvm];
+                provingTimeMs = (r && r.status === STATUS.SUCCESS) ? r.proving_time_ms : null;
+            }
+
+            if (provingTimeMs === null || provingTimeMs <= 0) continue;
+
+            const throughput = gasUsed / provingTimeMs / 1000;
+            if (throughput < worstThroughput) {
+                worstThroughput = throughput;
+                worstDp = dp;
+            }
+        }
+
+        const result = worstDp ? { dp: worstDp, throughput: worstThroughput } : null;
+        this.cache.worstDataPoint.set(cacheKey, result);
+        return result;
+    }
+
+    /**
+     * For combined data + VIEW.WORST: finds which zkvm is slowest in the worst data point.
+     * @private
+     */
+    _getWorstZkvmInDp(dp) {
+        let worstZkvm = null;
+        let worstTime = null;
+        for (const z of this.data.zkvms) {
+            const r = dp.results[z];
+            if (r && r.status === STATUS.SUCCESS) {
+                if (worstTime === null || r.proving_time_ms > worstTime) {
+                    worstTime = r.proving_time_ms;
+                    worstZkvm = z;
+                }
+            }
+        }
+        return worstZkvm;
+    }
+
+    /**
+     * For the linearity overlay: returns all successful data points for a test+zkvm.
+     * @param {Object} test - The test object
+     * @param {string} zkvm - The zkVM identifier (not VIEW.WORST)
+     * @returns {Array<{gas_limit: string, gas_used: number, proving_time_ms: number}>}
+     */
+    getDataPoints(test, zkvm) {
+        if (!this.isCombined) {
+            // Legacy: single data point
+            const r = test.results[zkvm];
+            if (!r || r.status !== STATUS.SUCCESS) return [];
+            return [{
+                gas_limit: this.data.gas_limit || 'unknown',
+                gas_used: test.block_used_gas,
+                proving_time_ms: r.proving_time_ms,
+            }];
+        }
+
+        const points = [];
+        for (const dp of test.data_points) {
+            const r = dp.results[zkvm];
+            if (r && r.status === STATUS.SUCCESS && dp.block_used_gas) {
+                points.push({
+                    gas_limit: dp.gas_limit,
+                    gas_used: dp.block_used_gas,
+                    proving_time_ms: r.proving_time_ms,
+                });
+            }
+        }
+        return points;
+    }
+
+    /**
+     * For combined data: returns true if ANY data point crashed for the given zkvm.
+     * For VIEW.WORST: returns true if any data point has all zkvms crashed.
+     */
+    hasAnyCrash(test, zkvm) {
+        if (!this.isCombined) return false;
+
+        for (const dp of test.data_points) {
+            if (zkvm === VIEW.WORST) {
+                // This data point is "crashed" if no zkvm succeeded
+                const anySuccess = this.data.zkvms.some(z => {
+                    const r = dp.results[z];
+                    return r && r.status === STATUS.SUCCESS;
+                });
+                if (!anySuccess) return true;
+            } else {
+                const r = dp.results[zkvm];
+                if (!r || r.status !== STATUS.SUCCESS) return true;
+            }
+        }
+        return false;
+    }
+
+    // ========================================================================
     // Basic Data Access
     // ========================================================================
 
     /**
      * Gets the proving time for a test on a specific zkVM.
-     * @param {Object} test - The test object
-     * @param {string} zkvm - The zkVM identifier
-     * @returns {number|null} Proving time in ms, or null if crashed/missing
+     * In combined mode, returns proving time from the worst (highest cost) data point.
      */
     getProvingTime(test, zkvm) {
+        if (this.isCombined) {
+            const worst = this.getWorstDataPoint(test, zkvm);
+            if (!worst) return null;
+            if (zkvm === VIEW.WORST) {
+                // Return the slowest zkvm's time in the worst data point
+                let maxTime = null;
+                for (const z of this.data.zkvms) {
+                    const r = worst.dp.results[z];
+                    if (r && r.status === STATUS.SUCCESS) {
+                        if (maxTime === null || r.proving_time_ms > maxTime) {
+                            maxTime = r.proving_time_ms;
+                        }
+                    }
+                }
+                return maxTime;
+            }
+            const r = worst.dp.results[zkvm];
+            return (r && r.status === STATUS.SUCCESS) ? r.proving_time_ms : null;
+        }
+
         const result = test.results[zkvm];
         if (!result || result.status !== STATUS.SUCCESS) return null;
         return result.proving_time_ms;
@@ -103,12 +260,26 @@ export class DataAccessor {
 
     /**
      * Checks if all zkVMs crashed for a test.
-     * Returns true only if at least one zkVM actually crashed and none succeeded.
-     * Missing results (no data) are not counted as crashes.
-     * @param {Object} test - The test object
-     * @returns {boolean} True if at least one zkVM crashed and none succeeded
      */
     isAllCrashed(test) {
+        if (this.isCombined) {
+            // All crashed = no successful result in ANY data point for ANY zkvm
+            for (const dp of test.data_points) {
+                for (const zkvm of this.data.zkvms) {
+                    const r = dp.results[zkvm];
+                    if (r && r.status === STATUS.SUCCESS) return false;
+                }
+            }
+            // At least one crash must exist
+            for (const dp of test.data_points) {
+                for (const zkvm of this.data.zkvms) {
+                    const r = dp.results[zkvm];
+                    if (r && r.status === STATUS.CRASHED) return true;
+                }
+            }
+            return false;
+        }
+
         let hasCrash = false;
         for (const zkvm of this.data.zkvms) {
             const result = test.results[zkvm];
@@ -119,25 +290,43 @@ export class DataAccessor {
     }
 
     /**
-     * Checks if all zkVMs are missing data for a test (no results at all).
-     * @param {Object} test - The test object
-     * @returns {boolean} True if no zkVM has any result for this test
+     * Checks if all zkVMs are missing data for a test.
      */
     isAllMissing(test) {
+        if (this.isCombined) {
+            return test.data_points.every(dp =>
+                this.data.zkvms.every(zkvm => !dp.results[zkvm])
+            );
+        }
         return this.data.zkvms.every(zkvm => !test.results[zkvm]);
     }
 
     /**
      * Collects crash reasons from all crashed zkVMs for a test.
-     * @param {Object} test - The test object
-     * @returns {string|null} Aggregated crash reasons, or null if none
      */
     getAllCrashReasons(test) {
         const reasons = [];
-        for (const zkvm of this.data.zkvms) {
-            const result = test.results[zkvm];
-            if (result && result.status !== STATUS.SUCCESS && result.crash_reason) {
-                reasons.push(`${zkvm}: ${result.crash_reason}`);
+        if (this.isCombined) {
+            // Collect unique crash reasons across all data points
+            const seen = new Set();
+            for (const dp of test.data_points) {
+                for (const zkvm of this.data.zkvms) {
+                    const r = dp.results[zkvm];
+                    if (r && r.status !== STATUS.SUCCESS && r.crash_reason) {
+                        const key = `${zkvm}: ${r.crash_reason}`;
+                        if (!seen.has(key)) {
+                            seen.add(key);
+                            reasons.push(key);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (const zkvm of this.data.zkvms) {
+                const result = test.results[zkvm];
+                if (result && result.status !== STATUS.SUCCESS && result.crash_reason) {
+                    reasons.push(`${zkvm}: ${result.crash_reason}`);
+                }
             }
         }
         return reasons.length > 0 ? reasons.join('\n\n') : null;
@@ -145,10 +334,16 @@ export class DataAccessor {
 
     /**
      * Checks if any zkVM succeeded for a test.
-     * @param {Object} test - The test object
-     * @returns {boolean} True if at least one zkVM succeeded
      */
     hasAnySuccess(test) {
+        if (this.isCombined) {
+            return test.data_points.some(dp =>
+                this.data.zkvms.some(zkvm => {
+                    const r = dp.results[zkvm];
+                    return r && r.status === STATUS.SUCCESS;
+                })
+            );
+        }
         return this.data.zkvms.some(zkvm => {
             const result = test.results[zkvm];
             return result && result.status === STATUS.SUCCESS;
@@ -161,14 +356,35 @@ export class DataAccessor {
 
     /**
      * Gets the worst-case (slowest) proving time across all zkVMs.
-     * Results are cached for performance.
-     *
-     * @param {Object} test - The test object
-     * @returns {number|null} Worst-case time in ms, or null if all crashed
+     * In combined mode, uses the worst data point (highest cost).
      */
     getWorstCaseTime(test) {
         if (this.cache.worstCase.has(test.id)) {
             return this.cache.worstCase.get(test.id);
+        }
+
+        if (this.isCombined) {
+            const worst = this.getWorstDataPoint(test, VIEW.WORST);
+            if (!worst) {
+                this.cache.worstCase.set(test.id, null);
+                this.cache.worstCaseZkvm.set(test.id, null);
+                return null;
+            }
+            // Find which zkvm is slowest in that data point
+            let maxTime = null;
+            let worstZkvm = null;
+            for (const z of this.data.zkvms) {
+                const r = worst.dp.results[z];
+                if (r && r.status === STATUS.SUCCESS) {
+                    if (maxTime === null || r.proving_time_ms > maxTime) {
+                        maxTime = r.proving_time_ms;
+                        worstZkvm = z;
+                    }
+                }
+            }
+            this.cache.worstCase.set(test.id, maxTime);
+            this.cache.worstCaseZkvm.set(test.id, worstZkvm);
+            return maxTime;
         }
 
         let maxTime = null;
@@ -189,11 +405,8 @@ export class DataAccessor {
 
     /**
      * Gets which zkVM had the worst-case time for a test.
-     * @param {Object} test - The test object
-     * @returns {string|null} The zkVM identifier, or null if all crashed
      */
     getWorstCaseZkvm(test) {
-        // Ensure worst case is computed (populates both caches)
         if (!this.cache.worstCaseZkvm.has(test.id)) {
             this.getWorstCaseTime(test);
         }
@@ -206,12 +419,14 @@ export class DataAccessor {
 
     /**
      * Gets the actual throughput in MGas/s for a test.
-     *
-     * @param {Object} test - The test object
-     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
-     * @returns {number|null} Throughput in MGas/s, or null if unavailable
+     * In combined mode, returns throughput from the worst data point.
      */
     getActualMGasPerS(test, zkvm) {
+        if (this.isCombined) {
+            const worst = this.getWorstDataPoint(test, zkvm);
+            return worst ? worst.throughput : null;
+        }
+
         const gasUsed = test.block_used_gas;
         if (!gasUsed) return null;
 
@@ -221,19 +436,11 @@ export class DataAccessor {
 
         if (!provingTimeMs) return null;
 
-        // Convert: (gas / time_ms) * 1000 / 1_000_000 = gas / time_ms / 1000
         return gasUsed / provingTimeMs / 1000;
     }
 
     /**
      * Gets the relative cost of a test based on target throughput.
-     *
-     * If target is 7 MGas/s and actual is 1 MGas/s, relative cost = 7x.
-     * This indicates the operation is 7x more expensive than it should be.
-     *
-     * @param {Object} test - The test object
-     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
-     * @returns {number|null} Relative cost multiplier, or null if unavailable
      */
     getRelativeCost(test, zkvm) {
         const cacheKey = `${test.id}-${zkvm}-${this.targetMGasPerS}`;
@@ -241,7 +448,20 @@ export class DataAccessor {
             return this.cache.relativeCost.get(cacheKey);
         }
 
-        // Zero-gas tests (e.g. empty blocks) trivially meet any throughput target
+        if (this.isCombined) {
+            const worst = this.getWorstDataPoint(test, zkvm);
+            if (!worst) return null;
+            // Check for zero-gas edge case
+            if (!worst.dp.block_used_gas) {
+                this.cache.relativeCost.set(cacheKey, 0);
+                return 0;
+            }
+            const cost = this.targetMGasPerS / worst.throughput;
+            this.cache.relativeCost.set(cacheKey, cost);
+            return cost;
+        }
+
+        // Legacy mode
         if (!test.block_used_gas) {
             const hasProvingTime = zkvm === VIEW.WORST
                 ? this.getWorstCaseTime(test) !== null
@@ -267,10 +487,6 @@ export class DataAccessor {
 
     /**
      * Gets the worst-case proving time for a group of tests on a specific zkVM.
-     *
-     * @param {Object} group - The group object with tests array
-     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
-     * @returns {{ time: number|null, test: Object|null, zkvm: string|null }}
      */
     getGroupWorstCase(group, zkvm) {
         const cacheKey = `${group.operation}-${zkvm}`;
@@ -307,10 +523,6 @@ export class DataAccessor {
 
     /**
      * Gets the relative cost for a group based on its worst-case test.
-     *
-     * @param {Object} group - The group object
-     * @param {string} zkvm - The zkVM identifier, or 'worst' for worst-case
-     * @returns {number|null} Relative cost, or null if unavailable
      */
     getGroupRelativeCost(group, zkvm) {
         const worst = this.getGroupWorstCase(group, zkvm);
@@ -327,7 +539,6 @@ export class DataAccessor {
 
     /**
      * Precomputes worst-case times for all tests.
-     * Call this after loading a new dataset for better initial performance.
      */
     precomputeWorstCases() {
         for (const test of this.data.tests) {
@@ -342,8 +553,6 @@ export class DataAccessor {
 
 /**
  * Loads the global manifest file containing available hardware configurations.
- * @returns {Promise<Object>} The global manifest object
- * @throws {Error} If manifest fails to load
  */
 export async function loadGlobalManifest() {
     const response = await fetch('data/manifest.json');
@@ -355,9 +564,6 @@ export async function loadGlobalManifest() {
 
 /**
  * Loads the manifest for a specific hardware configuration.
- * @param {string} hardware - The hardware identifier (e.g., "1xL40s")
- * @returns {Promise<Object>} The hardware manifest object
- * @throws {Error} If manifest fails to load
  */
 export async function loadHardwareManifest(hardware) {
     const response = await fetch(`data/${hardware}/manifest.json`);
@@ -369,10 +575,6 @@ export async function loadHardwareManifest(hardware) {
 
 /**
  * Loads a specific dataset by hardware and filename.
- * @param {string} hardware - The hardware identifier (e.g., "1xL40s")
- * @param {string} filename - The dataset filename (e.g., "results-10M-gas-limit.json")
- * @returns {Promise<Object>} The dataset object
- * @throws {Error} If dataset fails to load
  */
 export async function loadDataset(hardware, filename) {
     const response = await fetch(`data/${hardware}/${filename}`);
