@@ -60,7 +60,7 @@ PRECOMPILE_RULES = [
     # 0x03
     {"name": "RIPEMD160", "patterns": _compile_patterns([r"^RIPEMD160$"])},
     # 0x04
-    {"name": "IDENTITY", "patterns": _compile_patterns([r"^IDENTITY$", r"^ID$"])},
+    {"name": "IDENTITY", "patterns": _compile_patterns([r"^IDENTITY$"])},
     # 0x05
     {"name": "MODEXP", "patterns": _compile_patterns([r"^MODEXP$", r"^MOD ?EXP$"])},
     # 0x06 EIP-196
@@ -313,6 +313,12 @@ def extract_operation(test_name: str) -> str:
             # Strip benchmark boilerplate suffix (e.g., "benchmark-gas-value_10M")
             # to avoid false matches on the token "gas" -> GAS opcode
             op_region = re.sub(r"-?benchmark-gas-value_\d+M$", "", op_region)
+            # Strip enum-qualified values (e.g., ReturnDataStyle.IDENTITY) — these are
+            # test parameters, not operation identifiers, and cause false matches.
+            op_region = re.sub(r"[A-Z][a-zA-Z0-9]*\.[A-Z][A-Z0-9_]+", "", op_region)
+            # Strip parameter fields with opcode-like substrings
+            op_region = re.sub(r"return[_-]data[_-]style[_-]?", "", op_region, flags=re.IGNORECASE)
+            op_region = re.sub(r"returned[_-]size[_-]?\d*", "", op_region, flags=re.IGNORECASE)
 
     # Step 3: Check parameter region for precompiles, then opcodes
     if op_region:
@@ -330,8 +336,12 @@ def extract_operation(test_name: str) -> str:
         rule_match = match_rule_in_text(func_name, OPCODE_RULES)
         if rule_match:
             return rule_match
-        # Use function name as-is (title case)
-        return func_match.group(1).replace("_", " ").title()
+        # Use function name as-is (title case), with known aliases
+        FUNC_NAME_ALIASES = {
+            "ether_transfers_to_precompile": "Ether Transfers",
+        }
+        raw = func_match.group(1)
+        return FUNC_NAME_ALIASES.get(raw, raw.replace("_", " ").title())
 
     # Step 5: Try to extract variant info from test name
     variant_match = re.search(r"\[.*?-([\w\s]+)\]\.json$", test_name)
