@@ -39,6 +39,7 @@ export class HeatmapRenderer {
         let meetsTarget = 0;
         let below = 0;
         let crashed = 0;
+        let total = tests.length;
         let worstCost = null;
         let minThroughput = null;
 
@@ -50,7 +51,8 @@ export class HeatmapRenderer {
 
             const cost = this.dataAccessor.getRelativeCost(test, zkvm);
             if (cost === null) {
-                crashed++;
+                // Non-computable cost (e.g. zero-gas test) — exclude from summary
+                total--;
                 continue;
             }
 
@@ -70,7 +72,7 @@ export class HeatmapRenderer {
             }
         }
 
-        return { meetsTarget, below, crashed, total: tests.length, worstCost, minThroughput };
+        return { meetsTarget, below, crashed, total, worstCost, minThroughput };
     }
 
     // ========================================================================
