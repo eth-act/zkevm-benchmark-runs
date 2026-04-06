@@ -265,6 +265,17 @@ def iter_configs(hardware_path: Path):
                 'fixture_set': None,
                 'gas_value_filter': None,
             }
+        else:
+            # Generic fixture set (e.g., bloatnet) — try flat layout discovery
+            gas_values = _discover_gas_values(entry)
+            for gas_value in gas_values:
+                yield {
+                    'path': entry,
+                    'name': f'{gas_value}-gas-limit',
+                    'dataset_type': 'eest',
+                    'fixture_set': entry.name,
+                    'gas_value_filter': gas_value,
+                }
 
 
 def load_hardware_info(folder: Path) -> Optional[Dict[str, Any]]:
