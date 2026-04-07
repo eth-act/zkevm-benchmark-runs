@@ -220,6 +220,8 @@ _OP_REGION_STRIPS: list[tuple[re.Pattern, str]] = [
     (re.compile(r"return[_-]data[_-]style[_-]?", re.IGNORECASE), ""),
     # "returned_size" contains opcode-like substrings
     (re.compile(r"returned[_-]size[_-]?\d*", re.IGNORECASE), ""),
+    # "contract_balance" contains "balance" -> false BALANCE opcode match (SELFBALANCE tests)
+    (re.compile(r"contract[_-]balance[_-]?", re.IGNORECASE), ""),
 ]
 
 
