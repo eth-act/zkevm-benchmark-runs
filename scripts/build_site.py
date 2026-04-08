@@ -16,6 +16,45 @@ import sys
 from pathlib import Path
 
 
+def start_generator(script_path: Path, output_dir: Path,
+                    scripts_dir: Path) -> subprocess.Popen:
+    """Launch a site data generator as a child process."""
+    return subprocess.Popen(
+        [sys.executable, str(script_path), '--output', str(output_dir)],
+        cwd=str(scripts_dir),
+    )
+
+
+def stop_generators(processes: list[tuple[str, subprocess.Popen]]) -> None:
+    """Terminate any still-running generator processes."""
+    for _, process in processes:
+        if process.poll() is None:
+            process.terminate()
+
+    for _, process in processes:
+        if process.poll() is None:
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+
+    for _, process in processes:
+        if process.poll() is None:
+            process.wait()
+
+
+def wait_for_generators(processes: list[tuple[str, subprocess.Popen]]) -> None:
+    """Wait for generators and fail the build if any exits non-zero."""
+    try:
+        for name, process in processes:
+            returncode = process.wait()
+            if returncode != 0:
+                raise subprocess.CalledProcessError(returncode, process.args)
+    except Exception:
+        stop_generators(processes)
+        raise
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Build the complete zkEVM benchmarks website.'
@@ -58,7 +97,7 @@ def main():
     # =========================================================================
     # 3. Benchmarks site
     # =========================================================================
-    print("Building benchmarks site...")
+    print("Preparing benchmarks site...")
     benchmarks_out = output / 'benchmarks'
     benchmarks_out.mkdir()
 
@@ -66,18 +105,10 @@ def main():
     for filename in ('index.html', 'benchmarks.css', 'app.js'):
         shutil.copy2(sites_dir / 'benchmarks' / filename, benchmarks_out / filename)
 
-    # Generate data.js
-    subprocess.run(
-        [sys.executable, str(scripts_dir / 'generate_benchmarks_website.py'),
-         '--output', str(benchmarks_out)],
-        check=True,
-        cwd=str(scripts_dir),
-    )
-
     # =========================================================================
     # 4. Repricing site
     # =========================================================================
-    print("Building repricing site...")
+    print("Preparing repricing site...")
     repricing_out = output / 'repricing'
     repricing_out.mkdir()
 
@@ -89,31 +120,17 @@ def main():
     # Generate data
     data_out = repricing_out / 'data'
     data_out.mkdir()
-    subprocess.run(
-        [sys.executable, str(scripts_dir / 'generate_repricing_website.py'),
-         '--output', str(data_out)],
-        check=True,
-        cwd=str(scripts_dir),
-    )
 
     # =========================================================================
     # 5. Verification site
     # =========================================================================
-    print("Building verification site...")
+    print("Preparing verification site...")
     verification_out = output / 'verification'
     verification_out.mkdir()
 
     # Copy static files
     for filename in ('index.html', 'verification.css', 'app.js'):
         shutil.copy2(sites_dir / 'verification' / filename, verification_out / filename)
-
-    # Generate data.js
-    subprocess.run(
-        [sys.executable, str(scripts_dir / 'generate_verification_website.py'),
-         '--output', str(verification_out)],
-        check=True,
-        cwd=str(scripts_dir),
-    )
 
     # =========================================================================
     # 6. Proposal page
@@ -180,6 +197,59 @@ def main():
     else:
         print("  Warning: No proposal data at data/repricing-proposal/")
         print("  The proposal page will show a 'not available' message")
+
+    # =========================================================================
+    # 7. Profiles site
+    # =========================================================================
+    print("Preparing profiles site...")
+    profiles_out = output / 'profiles'
+    profiles_out.mkdir()
+
+    # Copy static files
+    shutil.copy2(sites_dir / 'profiles' / 'index.html', profiles_out / 'index.html')
+    shutil.copy2(sites_dir / 'profiles' / 'profiles.css', profiles_out / 'profiles.css')
+    shutil.copytree(sites_dir / 'profiles' / 'js', profiles_out / 'js')
+
+    # Generate data
+    profiles_data_out = profiles_out / 'data'
+    profiles_data_out.mkdir()
+
+    print("Generating site data...")
+    generator_processes = [
+        (
+            'benchmarks',
+            start_generator(
+                scripts_dir / 'generate_benchmarks_website.py',
+                benchmarks_out,
+                scripts_dir,
+            ),
+        ),
+        (
+            'repricing',
+            start_generator(
+                scripts_dir / 'generate_repricing_website.py',
+                data_out,
+                scripts_dir,
+            ),
+        ),
+        (
+            'verification',
+            start_generator(
+                scripts_dir / 'generate_verification_website.py',
+                verification_out,
+                scripts_dir,
+            ),
+        ),
+        (
+            'profiles',
+            start_generator(
+                scripts_dir / 'generate_profiles_website.py',
+                profiles_data_out,
+                scripts_dir,
+            ),
+        ),
+    ]
+    wait_for_generators(generator_processes)
 
     print(f"\nSite built successfully in {output}")
 

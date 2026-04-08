@@ -39,6 +39,7 @@ export class HeatmapRenderer {
         let meetsTarget = 0;
         let below = 0;
         let crashed = 0;
+        let total = tests.length;
         let worstCost = null;
         let minThroughput = null;
 
@@ -50,7 +51,8 @@ export class HeatmapRenderer {
 
             const cost = this.dataAccessor.getRelativeCost(test, zkvm);
             if (cost === null) {
-                crashed++;
+                // Non-computable cost (e.g. zero-gas test) — exclude from summary
+                total--;
                 continue;
             }
 
@@ -70,7 +72,7 @@ export class HeatmapRenderer {
             }
         }
 
-        return { meetsTarget, below, crashed, total: tests.length, worstCost, minThroughput };
+        return { meetsTarget, below, crashed, total, worstCost, minThroughput };
     }
 
     // ========================================================================
@@ -82,12 +84,15 @@ export class HeatmapRenderer {
      * @private
      */
     _isFixtureCrashed(test, zkvm) {
+        // In combined mode: crashed if ANY data point crashed for this zkvm
+        if (this.dataAccessor.isCombined) {
+            return this.dataAccessor.hasAnyCrash(test, zkvm);
+        }
         if (zkvm === VIEW.WORST) {
             return this.dataAccessor.isAllCrashed(test) ||
                 this.dataAccessor.getWorstCaseTime(test) === null;
         }
-        const result = test.results[zkvm];
-        return !result || result.status !== 'success';
+        return this.dataAccessor.getProvingTime(test, zkvm) === null;
     }
 
     // ========================================================================
@@ -101,19 +106,19 @@ export class HeatmapRenderer {
      */
     _getGroupSortScore(group, columns) {
         let maxCost = 0;
-        let anyAllCrashed = false;
+        let anyCrashed = false;
 
         for (const col of columns) {
             const summary = this.computeCellSummary(group.tests, col.id);
-            if (summary.total > 0 && summary.crashed === summary.total) {
-                anyAllCrashed = true;
+            if (summary.crashed > 0) {
+                anyCrashed = true;
             }
             if (summary.worstCost !== null && summary.worstCost > maxCost) {
                 maxCost = summary.worstCost;
             }
         }
 
-        return anyAllCrashed ? 10000 + maxCost : maxCost;
+        return anyCrashed ? 10000 + maxCost : maxCost;
     }
 
     /**
@@ -195,7 +200,7 @@ export class HeatmapRenderer {
         // Annotations below the bar
         const annotations = [];
 
-        if (crashed === total) {
+        if (crashed > 0) {
             annotations.push('<span class="hm-cell-worst hm-worst-crashed">CRASHED</span>');
         } else {
             if (worstCost !== null) {
@@ -204,9 +209,6 @@ export class HeatmapRenderer {
             }
             if (minThroughput !== null) {
                 annotations.push(`<span class="hm-cell-throughput">${this._formatThroughput(minThroughput)}</span>`);
-            }
-            if (crashed > 0) {
-                annotations.push(`<span class="hm-cell-crash-badge">${crashed}/${total} crashed</span>`);
             }
         }
 
@@ -226,6 +228,12 @@ export class HeatmapRenderer {
      * @private
      */
     _renderFixtureCell(test, zkvm) {
+        // In combined mode, if any data point crashed, show CRASHED
+        if (this.dataAccessor.isCombined && this.dataAccessor.hasAnyCrash(test, zkvm)) {
+            const crashReason = this.dataAccessor.getAllCrashReasons(test);
+            return renderProofCell({ allCrashed: true, crashReason });
+        }
+
         if (zkvm === VIEW.WORST) {
             const time = this.dataAccessor.getWorstCaseTime(test);
             if (time === null) {
@@ -241,11 +249,15 @@ export class HeatmapRenderer {
             return renderProofCell({ time, relativeCost, zkvm: worstZkvm, secondaryLabel: throughput });
         }
 
-        const result = test.results[zkvm];
-        if (!result) return renderProofCell({ missing: true });
-        if (result.status !== STATUS.SUCCESS) return renderProofCell({ crashed: true, crashReason: result.crash_reason });
+        const time = this.dataAccessor.getProvingTime(test, zkvm);
+        if (time === null) {
+            if (this.dataAccessor.isAllMissing(test)) {
+                return renderProofCell({ missing: true });
+            }
+            const crashReason = this.dataAccessor.getAllCrashReasons(test);
+            return renderProofCell({ crashed: true, crashReason });
+        }
 
-        const time = result.proving_time_ms;
         const relativeCost = this.dataAccessor.getRelativeCost(test, zkvm);
         const throughput = this._formatThroughput(this.dataAccessor.getActualMGasPerS(test, zkvm));
         return renderProofCell({ time, relativeCost, secondaryLabel: throughput });
@@ -267,7 +279,7 @@ export class HeatmapRenderer {
         const fixtureRows = sorted.map(test => {
             const cells = columns.map(col => this._renderFixtureCell(test, col.id));
 
-            return `<tr class="hm-fixture-row">` +
+            return `<tr class="hm-fixture-row" data-linearity-test="${escapeHtml(test.id)}">` +
                 `<td class="hm-fixture-indent"></td>` +
                 `<td class="hm-fixture-name" title="${escapeHtml(test.id)}">${escapeHtml(test.id)}</td>` +
                 cells.join('') +

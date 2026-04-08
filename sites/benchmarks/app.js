@@ -574,7 +574,7 @@ function generateComparisonTable(allElClients) {
             const zkVMData = allElClients[elClient].zkvm_data[zkvm];
 
             if (zkVMData) {
-                [...zkVMData.successful_runs, ...zkVMData.sdk_crashed_runs, ...zkVMData.prover_crashed_runs].forEach(run => {
+                [...zkVMData.successful_runs, ...zkVMData.sdk_crashed_runs].forEach(run => {
                     allTestCases.add(run.name);
                     results[zkvm][elClient][run.name] = run;
                 });
@@ -651,10 +651,8 @@ function generateComparisonTable(allElClients) {
                     cells.push(`<td>${formatTime(time)}</td>`);
                 } else if (result.status === 'crashed') {
                     hasCrash = true;
-                    cells.push('<td class="crash-sdk">\u274C SDK</td>');
-                } else if (result.status === 'prover_crashed') {
-                    hasCrash = true;
-                    cells.push('<td class="crash-prover">\uD83D\uDCA5 Prover</td>');
+                    const reason = btoa(unescape(encodeURIComponent(result.crash_reason || 'Unknown error')));
+                    cells.push(`<td class="crash-sdk crash-clickable" data-reason="${reason}" title="Click to see details">\u274C SDK</td>`);
                 } else {
                     hasCrash = true;
                     cells.push('<td class="crash-sdk">\u274C Error</td>');
@@ -709,14 +707,6 @@ function generateSummary(allElClients) {
                         <th>Total</th>
                         <th>Successful</th>
                         <th>SDK Crashed</th>
-    `;
-
-    // Only show Prover Crashed column in proving mode
-    if (currentMode === 'proving') {
-        html += '<th>Prover Crashed</th>';
-    }
-
-    html += `
                     </tr>
                 </thead>
                 <tbody>
@@ -732,8 +722,7 @@ function generateSummary(allElClients) {
             if (data) {
                 const successful = data.successful_runs.length;
                 const sdkCrashed = data.sdk_crashed_runs.length;
-                const proverCrashed = data.prover_crashed_runs.length;
-                const total = successful + sdkCrashed + proverCrashed;
+                const total = successful + sdkCrashed;
 
                 html += '<tr>';
 
@@ -749,11 +738,6 @@ function generateSummary(allElClients) {
                         <td>${successful}</td>
                         <td>${sdkCrashed}</td>
                 `;
-
-                // Only show Prover Crashed column in proving mode
-                if (currentMode === 'proving') {
-                    html += `<td>${proverCrashed}</td>`;
-                }
 
                 html += '</tr>';
             } else {
@@ -771,10 +755,6 @@ function generateSummary(allElClients) {
                         <td>\u2014</td>
                         <td>\u2014</td>
                 `;
-
-                if (currentMode === 'proving') {
-                    html += '<td>\u2014</td>';
-                }
 
                 html += '</tr>';
             }
@@ -831,3 +811,35 @@ function updateReproduceSectionVisibility() {
         reproduceSection.classList.add('hidden');
     }
 }
+
+// Crash details modal
+document.addEventListener('click', function(e) {
+    const cell = e.target.closest('.crash-clickable[data-reason]');
+    if (cell) {
+        const reason = decodeURIComponent(escape(atob(cell.dataset.reason)));
+        const modal = document.getElementById('crash-modal');
+        modal.querySelector('.crash-modal-body').textContent = reason;
+        modal.classList.remove('hidden');
+    }
+});
+
+(function() {
+    const modal = document.getElementById('crash-modal');
+    const closeBtn = modal.querySelector('.crash-modal-close');
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+})();

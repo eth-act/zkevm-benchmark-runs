@@ -9,6 +9,7 @@ import { CacheManager, DataAccessor, loadGlobalManifest, loadHardwareManifest, l
 import { URLState, applyURLStateToApp, applyPendingURLState } from './state.js';
 import { Renderer } from './render.js';
 import { HeatmapRenderer } from './heatmap.js';
+import { LinearityModal } from './linearity.js';
 
 // ============================================================================
 // BenchmarkApp Class
@@ -30,7 +31,6 @@ export class BenchmarkApp {
         // Selection State
         // ====================================================================
         this.selectedHardware = null;
-        this.selectedDataset = null;
         this.selectedOperations = new Set();
         this.selectedZkvmView = VIEW.ALL;
         // ====================================================================
@@ -47,7 +47,7 @@ export class BenchmarkApp {
         // ====================================================================
         // Heatmap State
         // ====================================================================
-        this.heatmapSortMode = 'name';
+        this.heatmapSortMode = 'cost';
         this.heatmapExpandedOps = new Set();
 
         // ====================================================================
@@ -57,6 +57,7 @@ export class BenchmarkApp {
         this.dataAccessor = null;
         this.renderer = null;
         this.heatmapRenderer = null;
+        this.linearityModal = null;
 
         // ====================================================================
         // DOM Elements (cached during init)
@@ -90,7 +91,6 @@ export class BenchmarkApp {
             error: document.getElementById('error'),
             app: document.getElementById('app'),
             hardware: document.getElementById('hardware'),
-            dataset: document.getElementById('dataset'),
             target: document.getElementById('target'),
             zkvmView: document.getElementById('zkvm-view'),
             search: document.getElementById('search'),
@@ -139,19 +139,9 @@ export class BenchmarkApp {
             // Initialize hardware selector
             this.initializeHardwareSelector();
 
-            // Load hardware manifest
+            // Load hardware manifest and auto-select combined dataset
             this.manifest = await loadHardwareManifest(this.selectedHardware);
-
-            // Determine which dataset to load
-            if (!this.selectedDataset || !this.manifest.datasets.find(d => d.id === this.selectedDataset)) {
-                this.selectedDataset = this.manifest.default_dataset;
-            }
-
-            // Initialize dataset selector
-            this.initializeDatasetSelector();
-
-            // Load the selected dataset
-            await this.loadDatasetById(this.selectedDataset);
+            await this.loadCombinedDataset();
 
             this.initialized = true;
 
@@ -162,10 +152,18 @@ export class BenchmarkApp {
             this.initializeOperationFilters();
             this.initializeQuickFilters();
             this.initializeHeatmap();
+            this.initializeLinearityModal();
 
             // Apply pending URL state
             applyPendingURLState(this.pendingURLState, this, this.data, this.elements);
             this.pendingURLState = null;
+
+            // Restore heatmap sort button state from URL
+            if (this.heatmapSortMode !== 'cost') {
+                this.elements.heatmapSection?.querySelectorAll('[data-hm-sort]').forEach(b =>
+                    b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
+                );
+            }
 
             // Initial render
             this.refresh({ updateUrl: false });
@@ -183,13 +181,14 @@ export class BenchmarkApp {
     // ========================================================================
 
     /**
-     * Loads a dataset by ID.
-     * @param {string} datasetId - The dataset ID to load
+     * Finds and loads the combined dataset from the current hardware manifest.
      */
-    async loadDatasetById(datasetId) {
-        const datasetInfo = this.manifest.datasets.find(d => d.id === datasetId);
+    async loadCombinedDataset() {
+        // Prefer combined dataset, fall back to default
+        const combined = this.manifest.datasets.find(d => d.combined);
+        const datasetInfo = combined || this.manifest.datasets.find(d => d.id === this.manifest.default_dataset) || this.manifest.datasets[0];
         if (!datasetInfo) {
-            throw new Error(`Dataset not found: ${datasetId}`);
+            throw new Error('No datasets available');
         }
 
         this.data = await loadDataset(this.selectedHardware, datasetInfo.file);
@@ -204,34 +203,14 @@ export class BenchmarkApp {
         this.renderer = new Renderer(this.elements, this.dataAccessor);
         this.heatmapRenderer = new HeatmapRenderer(this.dataAccessor, this.renderer);
 
+        // Update linearity modal reference if it exists
+        if (this.linearityModal) {
+            this.linearityModal.dataAccessor = this.dataAccessor;
+        }
+
         // Update raw data link
         if (this.elements.rawDataLink) {
             this.elements.rawDataLink.href = `data/${this.selectedHardware}/${datasetInfo.file}`;
-        }
-    }
-
-    /**
-     * Handles dataset change.
-     * @param {string} datasetId - The new dataset ID
-     */
-    async handleDatasetChange(datasetId) {
-        if (datasetId === this.selectedDataset) return;
-
-        this.selectedDataset = datasetId;
-
-        // Show loading state
-        this.elements.app.classList.add('hidden');
-        this.elements.loading.classList.remove('hidden');
-        this.elements.loading.textContent = 'Loading dataset...';
-
-        try {
-            await this.loadDatasetById(datasetId);
-            this.reinitializeUI();
-            this.showApp();
-            this.updateURL();
-        } catch (error) {
-            console.error('Error loading dataset:', error);
-            this.showError(`Error loading dataset: ${error.message}`);
         }
     }
 
@@ -253,22 +232,9 @@ export class BenchmarkApp {
         this.elements.loading.textContent = 'Loading hardware configuration...';
 
         try {
-            // Load new hardware manifest
+            // Load new hardware manifest and combined dataset
             this.manifest = await loadHardwareManifest(hardwareId);
-
-            // Update dataset selector with new datasets
-            this.initializeDatasetSelector();
-
-            // Select default dataset for this hardware (or keep if same name exists)
-            const existingDataset = this.manifest.datasets.find(d => d.id === this.selectedDataset);
-            if (existingDataset) {
-                // Keep same dataset name if it exists in new hardware
-                await this.loadDatasetById(this.selectedDataset);
-            } else {
-                // Use default dataset for this hardware
-                this.selectedDataset = this.manifest.default_dataset;
-                await this.loadDatasetById(this.selectedDataset);
-            }
+            await this.loadCombinedDataset();
 
             this.reinitializeUI();
             this.showApp();
@@ -287,7 +253,7 @@ export class BenchmarkApp {
         // Reset filter state
         this.selectedOperations.clear();
         this.heatmapExpandedOps.clear();
-        this.heatmapSortMode = 'name';
+        this.heatmapSortMode = 'cost';
         this.minRelativeCost = null;
 
         // Reset search input
@@ -500,16 +466,6 @@ export class BenchmarkApp {
         select.addEventListener('change', (e) => this.handleHardwareChange(e.target.value));
     }
 
-    initializeDatasetSelector() {
-        const select = this.elements.dataset;
-        // Render directly without renderer (called before data loads)
-        select.innerHTML = this.manifest.datasets.map(dataset => {
-            const selected = dataset.id === this.selectedDataset ? 'selected' : '';
-            return `<option value="${dataset.id}" ${selected}>${dataset.name} (${dataset.test_count} tests)</option>`;
-        }).join('');
-        select.addEventListener('change', (e) => this.handleDatasetChange(e.target.value));
-    }
-
     initializeTargetInput() {
         const input = this.elements.target;
         input.value = this.targetMGasPerS;
@@ -650,8 +606,35 @@ export class BenchmarkApp {
                     b.classList.toggle('active', b.dataset.hmSort === this.heatmapSortMode)
                 );
                 this.renderHeatmap();
+                this.updateURL();
             });
         }
+    }
+
+    /**
+     * Initializes the linearity analysis modal.
+     * Fixture rows (.hm-fixture-row) open the linearity overlay on click.
+     */
+    initializeLinearityModal() {
+        this.linearityModal = new LinearityModal(this.dataAccessor);
+
+        const grid = this.elements.heatmapGrid;
+        if (!grid) return;
+
+        grid.addEventListener('click', (e) => {
+            const fixtureRow = e.target.closest('.hm-fixture-row[data-linearity-test]');
+            if (!fixtureRow) return;
+
+            // Don't open modal when clicking crash cells
+            if (e.target.closest('.status-crashed')) return;
+
+            const testId = fixtureRow.dataset.linearityTest;
+            const test = this.data.tests.find(t => t.id === testId);
+            if (test) {
+                e.stopPropagation();
+                this.linearityModal.open(test, this.data.zkvms);
+            }
+        });
     }
 
     /**
@@ -748,16 +731,15 @@ export class BenchmarkApp {
 
         URLState.serialize({
             hardware: this.selectedHardware,
-            dataset: this.selectedDataset,
             target: this.targetMGasPerS,
             zkvmView: this.selectedZkvmView,
             search: this.elements.search?.value || '',
             hideCrashed: this.elements.hideCrashed?.checked || false,
             minRelativeCost: this.minRelativeCost,
+            heatmapSort: this.heatmapSortMode,
             selectedOperations: this.selectedOperations,
         }, {
             hardware: this.globalManifest?.default_hardware,
-            dataset: this.manifest?.default_dataset,
         }, allOps);
     }
 

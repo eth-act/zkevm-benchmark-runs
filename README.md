@@ -8,8 +8,8 @@ You can see a website rendering of the results [here](https://eth-act.github.io/
 
 | Hardware Setup | Proving Results | Execution Results |
 |----------------|-----------------|-------------------|
-| **1xL40s** | — | [3 gas limits, 1 mainnet range](data/executions/1xL40s/README.md) |
-| **8x5090** | [7 gas limits, 1 mainnet range](data/proving/8x5090/README.md) | — |
+| **1xL40s** | — | [1 mainnet range](data/executions/1xL40s/README.md) |
+| **8x5090** | [8 gas limits, 1 mainnet range](data/proving/8x5090/README.md) | — |
 
 ## Folder Structure
 
@@ -19,10 +19,9 @@ The benchmark results are organized in the following hierarchy:
 data/
 ├── proving/                        # Proving benchmark results
 │   └── [Hardware Setup]/           # e.g., 8x5090
-│       ├── [Fixture Set]/          # e.g., eest-365433e (EEST fixture provenance)
-│       │   └── [Gas Limit]/        # e.g., 10M-gas-limit
-│       │       └── [EL Client]/    # e.g., reth-v1.11.0
-│       │           └── [zkVM]/     # e.g., zisk-v0.15.0
+│       ├── [Fixture Set]/          # e.g., eest-fd1dd63
+│       │   └── [EL Client]/        # e.g., reth-v1.11.0
+│       │       └── [zkVM]/         # e.g., zisk-v0.16.1
 │       └── mainnet-A-B/            # Mainnet block ranges (no fixture set)
 │           └── [EL Client]/
 │               └── [zkVM]/
@@ -34,7 +33,7 @@ data/
 ## Configuration Types
 
 - **eest-\***: EEST fixture sets with provenance (commit or version tag)
-  - **XXM-gas-limit**: Gas limit configurations within a fixture set
+  - Gas limit is encoded in each JSON filename (`benchmark-gas-value_XM`)
 - **mainnet-A-B**: Mainnet block range benchmarks (blocks A through B)
 
 ## Understanding the Results
@@ -46,7 +45,7 @@ data/
 
 ### Individual Configuration READMEs
 
-Each configuration folder (gas limit or mainnet range) contains its own detailed README.md file with specific benchmark results, organized by EL client and zkVM.
+Each hardware folder contains a detailed README.md with benchmark results, organized by EL client and zkVM.
 
 ### Benchmark Workload
 
@@ -54,7 +53,6 @@ EEST benchmark runs include a **Benchmark Workload** link that points to the spe
 
 ### Status Categories
 
-- 💥 **Prover Crashes**: Fixtures that crashed the prover/executor entirely (from _crashes.txt)
 - ❌ **SDK Reported Crashes**: Fixtures that failed during proving/execution (reported by SDK)
 - ✅ **Successful Runs**: Fixtures that completed successfully (sorted slowest to fastest)
 

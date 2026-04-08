@@ -19,7 +19,7 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (execution results) on **
 ### Notes
 
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
-- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
+- **Crash indicators**: ❌ indicates an SDK-reported crash.
 
 | Test Case | risc0-v3.0.3 | sp1-v5.2.1 | Avg |
 |-----------|-----------|-----------|----------|
@@ -530,10 +530,10 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (execution results) on **
 
 ### Results by zkVM
 
-| zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
-|------|-------|---------------|----------------|--------------------|
-| risc0-v3.0.3 | 500 | 500 | 0 | 0 |
-| sp1-v5.2.1 | 500 | 500 | 0 | 0 |
+| zkVM | Total | ✅ Successful | ❌ SDK Crashed |
+|------|-------|---------------|----------------|
+| risc0-v3.0.3 | 500 | 500 | 0 |
+| sp1-v5.2.1 | 500 | 500 | 0 |
 
 ---
 
@@ -545,7 +545,7 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (execution results) on **
 ### Notes
 
 - **Empty results (—)**: When a zkVM shows no result for a test case, it may indicate that the zkVM has not yet run the latest EEST benchmark suite. These gaps are temporary and will be filled as benchmarks are executed.
-- **Crash indicators**: 💥 indicates a prover crash, ❌ indicates an SDK-reported crash.
+- **Crash indicators**: ❌ indicates an SDK-reported crash.
 
 | Test Case | openvm-v1.4.0 | risc0-v3.0.3 | sp1-v5.2.1 | zisk-v0.12.0 | Avg |
 |-----------|-----------|-----------|-----------|-----------|----------|
@@ -1056,12 +1056,12 @@ Mainnet blocks benchmark for mainnet-23533500-23533999 (execution results) on **
 
 ### Results by zkVM
 
-| zkVM | Total | ✅ Successful | ❌ SDK Crashed | 💥 Prover Crashed |
-|------|-------|---------------|----------------|--------------------|
-| openvm-v1.4.0 | 500 | 500 | 0 | 0 |
-| risc0-v3.0.3 | 500 | 500 | 0 | 0 |
-| sp1-v5.2.1 | 500 | 500 | 0 | 0 |
-| zisk-v0.12.0 | 500 | 500 | 0 | 0 |
+| zkVM | Total | ✅ Successful | ❌ SDK Crashed |
+|------|-------|---------------|----------------|
+| openvm-v1.4.0 | 500 | 500 | 0 |
+| risc0-v3.0.3 | 500 | 500 | 0 |
+| sp1-v5.2.1 | 500 | 500 | 0 |
+| zisk-v0.12.0 | 500 | 500 | 0 |
 
 ---
 

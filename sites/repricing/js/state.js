@@ -23,13 +23,13 @@ export const URLState = {
 
         return {
             hardware: params.get(URL_PARAMS.HARDWARE),
-            dataset: params.get(URL_PARAMS.DATASET),
             target: parseFloat(params.get(URL_PARAMS.TARGET)) || null,
             zkvmView: params.get(URL_PARAMS.ZKVM_VIEW),
             search: params.get(URL_PARAMS.SEARCH),
             hideCrashed: params.get(URL_PARAMS.HIDE_CRASHED) === '1',
             operations: params.get(URL_PARAMS.OPERATIONS)?.split(',').filter(Boolean) || null,
             minRelativeCost: parseFloat(params.get(URL_PARAMS.MIN_RELATIVE)) || null,
+            heatmapSort: params.get(URL_PARAMS.HM_SORT),
         };
     },
 
@@ -47,11 +47,6 @@ export const URLState = {
         // Hardware (only if not default)
         if (state.hardware && state.hardware !== defaults.hardware) {
             params.set(URL_PARAMS.HARDWARE, state.hardware);
-        }
-
-        // Dataset (only if not default)
-        if (state.dataset && state.dataset !== defaults.dataset) {
-            params.set(URL_PARAMS.DATASET, state.dataset);
         }
 
         // Target throughput (compare against hardware-specific default)
@@ -78,6 +73,11 @@ export const URLState = {
         // Minimum relative cost filter
         if (state.minRelativeCost !== null) {
             params.set(URL_PARAMS.MIN_RELATIVE, state.minRelativeCost.toString());
+        }
+
+        // Heatmap sort mode (only if not default 'name')
+        if (state.heatmapSort && state.heatmapSort !== 'cost') {
+            params.set(URL_PARAMS.HM_SORT, state.heatmapSort);
         }
 
         // Operations filter (only if not all selected)
@@ -112,10 +112,10 @@ export const URLState = {
 export function applyURLStateToApp(urlState, appState) {
     // Apply state that doesn't require data
     if (urlState.hardware) appState.selectedHardware = urlState.hardware;
-    if (urlState.dataset) appState.selectedDataset = urlState.dataset;
     if (urlState.target && urlState.target > 0) appState.targetMGasPerS = urlState.target;
     if (urlState.zkvmView) appState.selectedZkvmView = urlState.zkvmView;
     if (urlState.minRelativeCost) appState.minRelativeCost = urlState.minRelativeCost;
+    if (urlState.heatmapSort) appState.heatmapSortMode = urlState.heatmapSort;
 
     // Return state that needs to be applied after data loads
     return {

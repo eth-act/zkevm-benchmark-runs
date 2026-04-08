@@ -29,7 +29,7 @@
         <div class="container header-row">
             <div class="header-text">
                 <h1><a href="../" class="header-home-link">&larr; Ethereum Proving Gas Repricing Analysis</a></h1>
-                <p>Analyzing zkVM proving costs to identify operations for gas repricing</p>
+                <p>Analyzing zkVM proving costs to identify operations for gas repricing &mdash; <a href="../profiles/">Zisk cost profiles</a></p>
             </div>
             <button id="theme-toggle" class="btn btn-tertiary" aria-label="Toggle color theme">Dark mode</button>
         </div>
@@ -45,10 +45,6 @@
                     <div class="control-inline">
                         <label for="hardware">Hardware</label>
                         <select id="hardware" aria-label="Hardware configuration"></select>
-                    </div>
-                    <div class="control-inline">
-                        <label for="dataset">Dataset</label>
-                        <select id="dataset" aria-label="Dataset"></select>
                     </div>
                     <div class="control-inline">
                         <label for="target">Target MGas/s</label>
@@ -108,8 +104,8 @@
                     <h2>Measurements <span id="heatmap-count" class="text-secondary"></span></h2>
                     <div class="hm-controls">
                         <span class="filter-label">Sort:</span>
-                        <button class="btn btn-filter" data-hm-sort="cost">By performance</button>
-                        <button class="btn btn-filter active" data-hm-sort="name">By name</button>
+                        <button class="btn btn-filter active" data-hm-sort="cost">By performance</button>
+                        <button class="btn btn-filter" data-hm-sort="name">By name</button>
                     </div>
                 </div>
                 <div class="hm-legend">
@@ -145,6 +141,22 @@
         </div>
     </div>
 
+    <!-- Linearity analysis modal -->
+    <div id="linearity-modal" class="linearity-modal hidden" role="dialog" aria-label="Linearity analysis">
+        <div class="linearity-modal-backdrop"></div>
+        <div class="linearity-modal-content">
+            <div class="linearity-modal-header">
+                <h3 id="linearity-modal-title">Linearity Analysis</h3>
+                <button class="linearity-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="linearity-modal-body">
+                <canvas id="linearity-chart"></canvas>
+                <div id="linearity-stats"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script type="module" src="js/main.js"></script>
 </body>
 

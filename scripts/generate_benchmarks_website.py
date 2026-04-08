@@ -9,24 +9,26 @@ and generates the data.js file consumed by the static benchmarks website.
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from _utils import (
     iter_configs,
     load_workload_info,
-    load_crashes_from_file,
     load_hardware_info,
     process_zkvm_folder,
 )
 
 
-def collect_el_client_data(el_client_folder: Path, mode: str, hardware_info_folder: Path) -> Dict[str, Any]:
+def collect_el_client_data(el_client_folder: Path, mode: str,
+                           hardware_info_folder: Path,
+                           gas_value_filter: Optional[str] = None) -> Dict[str, Any]:
     """Collect zkVM data for an EL client.
 
     Args:
         el_client_folder: Path to the folder containing zkVM data
         mode: Either 'proving' or 'execution'
         hardware_info_folder: Path to the folder containing hardware.json
+        gas_value_filter: If set, only process JSON files matching this gas value
 
     Returns:
         Dictionary organized by zkVM name with their results
@@ -46,20 +48,15 @@ def collect_el_client_data(el_client_folder: Path, mode: str, hardware_info_fold
         workload_file = zkvm_folder / "_zkevm-benchmark-workload.txt"
         workload_url = load_workload_info(workload_file)
 
-        # Load crashed fixtures
-        crashes_file = zkvm_folder / "_crashes.txt"
-        crashed_fixtures = load_crashes_from_file(crashes_file)
-
         # Process results
-        successful_runs, sdk_crashed_runs, prover_crashed_runs = process_zkvm_folder(
-            zkvm_folder, crashed_fixtures, mode=mode
+        successful_runs, sdk_crashed_runs = process_zkvm_folder(
+            zkvm_folder, mode=mode, gas_value_filter=gas_value_filter
         )
 
         zkvm_data[zkvm_name] = {
             'workload_url': workload_url,
             'successful_runs': successful_runs,
             'sdk_crashed_runs': sdk_crashed_runs,
-            'prover_crashed_runs': prover_crashed_runs
         }
 
     return {'hardware_info': hardware_info, 'zkvm_data': zkvm_data}
@@ -85,6 +82,8 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
 
         for cfg in iter_configs(hardware_folder):
             config_folder = cfg['path']
+            gas_value_filter = cfg.get('gas_value_filter')
+
             # Build config key: include fixture-set prefix for EEST
             if cfg['fixture_set']:
                 config_key = f"{cfg['fixture_set']}/{cfg['name']}"
@@ -103,8 +102,10 @@ def collect_mode_data(mode_path: Path, mode: str) -> Dict[str, Any]:
 
             for el_client_folder in el_client_folders:
                 el_client_name = el_client_folder.name
-                # Hardware info is always at config (gas-limit) level
-                el_client_data = collect_el_client_data(el_client_folder, mode, config_folder)
+                el_client_data = collect_el_client_data(
+                    el_client_folder, mode, config_folder,
+                    gas_value_filter=gas_value_filter,
+                )
                 mode_data[hardware_name][config_key]['el_clients'][el_client_name] = el_client_data
 
     return mode_data
