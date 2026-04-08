@@ -33,7 +33,7 @@ with the [Nethermind benchmarking tooling](https://github.com/NethermindEth/gas-
 
 
 The data includes all the tests for operations repriced in EIP-zkevm run
-between 2026-03-15 and 2026-03-21.
+between 2026-03-30 and 2026-04-04.
 
 For each operation and client, an NNLS linear regression model is fitted to estimate the
 operation run time as a function of the operation count and other operation-specific parameters.
@@ -84,7 +84,7 @@ We also plot some diagnostic graphs for each operation and client combination to
 
 # MULMOD
 
-## ethrex-v9.0.0__zisk-v0.15.0
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 ### test_name: test_arithmetic
 
@@ -93,26 +93,26 @@ We also plot some diagnostic graphs for each operation and client combination to
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.994
-Model:                  NNLS                    Adj. R-squared:          0.992
-No. Observations:       6                                 RMSE:         251.31
-Df Residuals:           4                                  MAE:         202.62
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       8                                 RMSE:         454.78
+Df Residuals:           6                                  MAE:         415.99
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2505.8627    367.6073       0.000   1618.4036   2942.9950
-       opcount      0.0052      0.0003       0.000      0.0047      0.0057
+         const   3341.8593    450.3679       0.000   2519.5490   4274.8579
+       opcount      0.0056      0.0003       0.000      0.0052      0.0063
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
 
 
 ### test_name: test_mod_arithmetic
@@ -122,91 +122,29 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.991
-Model:                  NNLS                    Adj. R-squared:          0.990
-No. Observations:       24                                RMSE:        1106.40
-Df Residuals:           22                                 MAE:         820.78
+Dep. Variable:          run_duration_ms              R-squared:          0.910
+Model:                  NNLS                    Adj. R-squared:          0.905
+No. Observations:       24                                RMSE:       34185.89
+Df Residuals:           22                                 MAE:       25995.94
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2013.5348    387.1259       0.000   1276.4052   2782.7570
-       opcount      0.0188      0.0004       0.000      0.0179      0.0195
+         const   5420.6242   8656.8628       0.338      0.0000  28621.2353
+       opcount      0.1712      0.0113       0.000      0.1464      0.1890
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_regression.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_regression" width="600"/>
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_regression.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_regression" width="600"/>
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics" width="600"/>
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_diagnostics.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap.png" alt="MULMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-### test_name: test_arithmetic
+<img src="./figs/MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_bootstrap.png" alt="MULMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_bootstrap" width="600"/>
 
 
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.977
-Model:                  NNLS                    Adj. R-squared:          0.972
-No. Observations:       6                                 RMSE:        1492.82
-Df Residuals:           4                                  MAE:        1335.55
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   3201.6368   2156.1260       0.016    631.9756   9787.4124
-       opcount      0.0161      0.0016       0.000      0.0123      0.0197
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
-
-
-### test_name: test_mod_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.865
-Model:                  NNLS                    Adj. R-squared:          0.854
-No. Observations:       15                                RMSE:        6489.66
-Df Residuals:           13                                 MAE:        5401.02
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   7031.0928   3006.4100       0.017    433.5494  13239.8846
-       opcount      0.0383      0.0038       0.000      0.0328      0.0483
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_regression.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_regression" width="600"/>
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap.png" alt="MULMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap" width="600"/>
-
-
-# ADDMOD
-
-## ethrex-v9.0.0__zisk-v0.15.0
+## reth-v1.11.0__zisk-v0.16.1
 
 ### test_name: test_arithmetic
 
@@ -217,24 +155,24 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.997
 Model:                  NNLS                    Adj. R-squared:          0.996
-No. Observations:       6                                 RMSE:         196.20
-Df Residuals:           4                                  MAE:         179.33
+No. Observations:       8                                 RMSE:         397.96
+Df Residuals:           6                                  MAE:         378.22
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2248.2312    263.0337       0.000   1684.6326   2574.7915
-       opcount      0.0060      0.0002       0.000      0.0056      0.0064
+         const   3118.0592    291.9920       0.000   2562.8804   3726.0737
+       opcount      0.0059      0.0002       0.000      0.0054      0.0061
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
 
 
 ### test_name: test_mod_arithmetic
@@ -244,29 +182,275 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.822
-Model:                  NNLS                    Adj. R-squared:          0.802
-No. Observations:       11                                RMSE:        7485.73
-Df Residuals:           9                                  MAE:        6229.34
+Dep. Variable:          run_duration_ms              R-squared:          0.936
+Model:                  NNLS                    Adj. R-squared:          0.933
+No. Observations:       32                                RMSE:       14417.46
+Df Residuals:           30                                 MAE:       11443.20
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   9188.5122   4638.2223       0.033      0.0000  18931.1094
-       opcount      0.0474      0.0062       0.000      0.0379      0.0635
+         const   1518.3773   3366.1335       0.408      0.0000  10672.7791
+       opcount      0.0476      0.0031       0.000      0.0404      0.0519
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_regression.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_regression" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_regression.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_regression" width="600"/>
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_diagnostics.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap.png" alt="ADDMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap" width="600"/>
+<img src="./figs/MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_bootstrap.png" alt="MULMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
+# ADDMOD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+### test_name: test_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       8                                 RMSE:         425.60
+Df Residuals:           6                                  MAE:         357.32
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2865.0348    350.1718       0.000   2400.0990   3787.1680
+       opcount      0.0058      0.0002       0.000      0.0052      0.0059
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
+
+
+### test_name: test_mod_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.926
+Model:                  NNLS                    Adj. R-squared:          0.923
+No. Observations:       30                                RMSE:       19089.65
+Df Residuals:           28                                 MAE:       13606.38
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   4982.9140   4165.9123       0.208      0.0000  13585.2295
+       opcount      0.0684      0.0036       0.000      0.0622      0.0756
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_regression.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_regression" width="600"/>
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_diagnostics.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_bootstrap.png" alt="ADDMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_arithmetic_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+### test_name: test_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.993
+Model:                  NNLS                    Adj. R-squared:          0.991
+No. Observations:       8                                 RMSE:         481.75
+Df Residuals:           6                                  MAE:         420.63
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   3022.8316    406.5223       0.000   2253.8911   3874.5515
+       opcount      0.0048      0.0002       0.000      0.0042      0.0052
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
+
+
+### test_name: test_mod_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.972
+Model:                  NNLS                    Adj. R-squared:          0.971
+No. Observations:       32                                RMSE:        5765.46
+Df Residuals:           30                                 MAE:        3776.45
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2241.6489   1670.0347       0.132      0.0000   5731.7002
+       opcount      0.0293      0.0014       0.000      0.0266      0.0317
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_regression.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_regression" width="600"/>
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_diagnostics.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_bootstrap.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_arithmetic_bootstrap" width="600"/>
+
+
+# MOD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+### test_name: test_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       8                                 RMSE:         534.30
+Df Residuals:           6                                  MAE:         398.77
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   3016.4957    327.2152       0.000   2481.5163   3865.8278
+       opcount      0.0038      0.0001       0.000      0.0034      0.0039
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
+
+
+### test_name: test_mod
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.801
+Model:                  NNLS                    Adj. R-squared:          0.794
+No. Observations:       31                                RMSE:       31531.19
+Df Residuals:           29                                 MAE:       24562.56
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const  13310.8490   8512.1991       0.095      0.0000  29625.2930
+       opcount      0.0334      0.0037       0.000      0.0272      0.0413
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_regression.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_regression" width="600"/>
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_diagnostics.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_diagnostics" width="600"/>
+
+<img src="./figs/MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_bootstrap.png" alt="MOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+### test_name: test_arithmetic
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.993
+No. Observations:       8                                 RMSE:         447.31
+Df Residuals:           6                                  MAE:         386.10
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   3049.8839    446.3250       0.000   2343.6811   3923.5431
+       opcount      0.0030      0.0001       0.000      0.0026      0.0031
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
+
+
+### test_name: test_mod
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.903
+Model:                  NNLS                    Adj. R-squared:          0.900
+No. Observations:       32                                RMSE:        9830.38
+Df Residuals:           30                                 MAE:        6174.97
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   3107.8365   2717.7412       0.181      0.0000   8880.3959
+       opcount      0.0149      0.0013       0.000      0.0123      0.0172
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_regression.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_regression" width="600"/>
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_diagnostics.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_diagnostics" width="600"/>
+
+<img src="./figs/MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_bootstrap.png" alt="MOD_reth-v1.11.0__zisk-v0.16.1_test_mod_bootstrap" width="600"/>
+
+
+# SMOD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 ### test_name: test_arithmetic
 
@@ -276,87 +460,25 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
                            NNLS Regression Results                            
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.998
-Model:                  NNLS                    Adj. R-squared:          0.997
-No. Observations:       6                                 RMSE:         413.57
-Df Residuals:           4                                  MAE:         357.99
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   3264.4705    639.4887       0.000   2478.4770   5131.0724
-       opcount      0.0136      0.0005       0.000      0.0126      0.0146
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
-
-
-### test_name: test_mod_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.411
-Model:                  NNLS                    Adj. R-squared:          0.385
-No. Observations:       24                                RMSE:       30037.85
-Df Residuals:           22                                 MAE:       12810.09
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000    740.5389       1.000      0.0000   2712.7502
-       opcount      0.0383      0.0062       0.000      0.0296      0.0523
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_regression.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_regression" width="600"/>
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap.png" alt="ADDMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_arithmetic_bootstrap" width="600"/>
-
-
-# MOD
-
-## ethrex-v9.0.0__zisk-v0.15.0
-
-### test_name: test_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.999
 Model:                  NNLS                    Adj. R-squared:          0.998
-No. Observations:       6                                 RMSE:         164.79
-Df Residuals:           4                                  MAE:         136.35
+No. Observations:       8                                 RMSE:         323.78
+Df Residuals:           6                                  MAE:         260.49
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2318.6348    230.7648       0.000   1818.8092   2621.9692
-       opcount      0.0044      0.0001       0.000      0.0041      0.0045
+         const   3419.6819    319.4060       0.000   2826.9154   3996.6838
+       opcount      0.0037      0.0001       0.000      0.0036      0.0040
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
 
 
 ### test_name: test_mod
@@ -366,213 +488,31 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.818
-Model:                  NNLS                    Adj. R-squared:          0.791
-No. Observations:       9                                 RMSE:        6493.63
-Df Residuals:           7                                  MAE:        5351.36
+Dep. Variable:          run_duration_ms              R-squared:          0.806
+Model:                  NNLS                    Adj. R-squared:          0.799
+No. Observations:       31                                RMSE:       30339.72
+Df Residuals:           29                                 MAE:       23705.85
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   9181.8300   5421.7292       0.040      0.0000  20127.2454
-       opcount      0.0280      0.0045       0.001      0.0202      0.0387
+         const  16263.8394   8010.8092       0.040      0.0000  31017.9794
+       opcount      0.0327      0.0034       0.000      0.0277      0.0411
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_regression.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_regression" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_regression.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_regression" width="600"/>
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_diagnostics.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_diagnostics" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_diagnostics.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_diagnostics" width="600"/>
 
-<img src="./figs/MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_bootstrap.png" alt="MOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_bootstrap" width="600"/>
+<img src="./figs/SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_bootstrap.png" alt="SMOD_ethrex-b9d3ef6__zisk-v0.16.1_test_mod_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
+## reth-v1.11.0__zisk-v0.16.1
 
 ### test_name: test_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.988
-Model:                  NNLS                    Adj. R-squared:          0.985
-No. Observations:       6                                 RMSE:        1355.65
-Df Residuals:           4                                  MAE:        1041.93
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   5630.9004   1933.1994       0.001   1233.2754   8999.0426
-       opcount      0.0114      0.0008       0.000      0.0101      0.0128
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
-
-
-### test_name: test_mod
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.211
-Model:                  NNLS                    Adj. R-squared:          0.172
-No. Observations:       22                                RMSE:       33237.86
-Df Residuals:           20                                 MAE:       14551.26
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   5561.9642   4952.8888       0.079      0.0000  17558.2417
-       opcount      0.0166      0.0037       0.001      0.0117      0.0256
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_regression.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_regression" width="600"/>
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_diagnostics.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_diagnostics" width="600"/>
-
-<img src="./figs/MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_bootstrap.png" alt="MOD_reth-v1.11.0__zisk-v0.15.0_test_mod_bootstrap" width="600"/>
-
-
-# SMOD
-
-## ethrex-v9.0.0__zisk-v0.15.0
-
-### test_name: test_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.989
-Model:                  NNLS                    Adj. R-squared:          0.986
-No. Observations:       6                                 RMSE:         377.08
-Df Residuals:           4                                  MAE:         286.13
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   2415.9835    554.6917       0.000   1193.1322   3064.9548
-       opcount      0.0034      0.0002       0.000      0.0032      0.0039
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
-
-
-### test_name: test_mod
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.851
-Model:                  NNLS                    Adj. R-squared:          0.830
-No. Observations:       9                                 RMSE:        5586.24
-Df Residuals:           7                                  MAE:        4698.70
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   9555.8732   5135.8361       0.019    627.2458  20177.5238
-       opcount      0.0273      0.0040       0.001      0.0198      0.0364
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_regression.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_regression" width="600"/>
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_diagnostics.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_diagnostics" width="600"/>
-
-<img src="./figs/SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_bootstrap.png" alt="SMOD_ethrex-v9.0.0__zisk-v0.15.0_test_mod_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-### test_name: test_arithmetic
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.979
-Model:                  NNLS                    Adj. R-squared:          0.974
-No. Observations:       6                                 RMSE:        2387.45
-Df Residuals:           4                                  MAE:        1927.98
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const    802.9971   1790.5670       0.297      0.0000   5605.7235
-       opcount      0.0154      0.0011       0.000      0.0130      0.0164
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_regression" width="600"/>
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_diagnostics" width="600"/>
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_arithmetic_bootstrap" width="600"/>
-
-
-### test_name: test_mod
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:         -0.053
-No. Observations:       21                                RMSE:       61240.70
-Df Residuals:           19                                 MAE:       28443.85
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const  48048.9048  25517.6940       0.002   2192.3480  77816.0131
-       opcount      0.0000      0.0068       1.000      0.0000      0.0161
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_regression.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_regression" width="600"/>
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_diagnostics.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_diagnostics" width="600"/>
-
-<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_bootstrap.png" alt="SMOD_reth-v1.11.0__zisk-v0.15.0_test_mod_bootstrap" width="600"/>
-
-
-# DIV
-
-## ethrex-v9.0.0__zisk-v0.15.0
 
 
 ```python
@@ -580,328 +520,148 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
                            NNLS Regression Results                            
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.997
-Model:                  NNLS                    Adj. R-squared:          0.995
-No. Observations:       4                                 RMSE:         812.12
-Df Residuals:           2                                  MAE:         774.50
+Model:                  NNLS                    Adj. R-squared:          0.997
+No. Observations:       8                                 RMSE:         404.77
+Df Residuals:           6                                  MAE:         309.24
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000    447.1215       1.000      0.0000   1529.7258
-       opcount      0.0449      0.0007       0.000      0.0431      0.0457
+         const   3455.2018    270.4622       0.000   2808.2037   3863.7013
+       opcount      0.0039      0.0001       0.000      0.0037      0.0041
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/DIV_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="DIV_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_regression" width="600"/>
 
-<img src="./figs/DIV_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="DIV_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_diagnostics" width="600"/>
 
-<img src="./figs/DIV_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="DIV_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_arithmetic_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
+### test_name: test_mod
 
 
 ```python
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.996
-Model:                  NNLS                    Adj. R-squared:          0.995
-No. Observations:       11                                RMSE:        1111.79
-Df Residuals:           9                                  MAE:         803.50
+Dep. Variable:          run_duration_ms              R-squared:          0.935
+Model:                  NNLS                    Adj. R-squared:          0.933
+No. Observations:       32                                RMSE:        8276.44
+Df Residuals:           30                                 MAE:        5361.82
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2070.6052    729.2450       0.011    418.8113   3086.6601
-       opcount      0.0166      0.0005       0.000      0.0158      0.0175
+         const   3951.8103   2503.8012       0.096      0.0000   8706.1285
+       opcount      0.0156      0.0011       0.000      0.0135      0.0178
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/DIV_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="DIV_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_regression.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_regression" width="600"/>
 
-<img src="./figs/DIV_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="DIV_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_diagnostics.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_diagnostics" width="600"/>
 
-<img src="./figs/DIV_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="DIV_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
+<img src="./figs/SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_bootstrap.png" alt="SMOD_reth-v1.11.0__zisk-v0.16.1_test_mod_bootstrap" width="600"/>
+
+
+# DIV
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       16                                RMSE:        6879.32
+Df Residuals:           14                                 MAE:        4394.42
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const      0.0000   1546.2773       1.000      0.0000   4309.5700
+       opcount      0.0438      0.0012       0.000      0.0415      0.0453
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/DIV_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="DIV_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/DIV_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="DIV_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/DIV_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="DIV_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.993
+No. Observations:       16                                RMSE:        2410.05
+Df Residuals:           14                                 MAE:        1692.43
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2329.4321   1213.6221       0.028      0.0000   4518.7155
+       opcount      0.0150      0.0005       0.000      0.0142      0.0158
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/DIV_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="DIV_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/DIV_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="DIV_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/DIV_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="DIV_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
 
 
 # SDIV
 
-## ethrex-v9.0.0__zisk-v0.15.0
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 
 ```python
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.991
-Model:                  NNLS                    Adj. R-squared:          0.986
-No. Observations:       4                                 RMSE:        1388.07
-Df Residuals:           2                                  MAE:        1377.50
+Dep. Variable:          run_duration_ms              R-squared:          0.992
+Model:                  NNLS                    Adj. R-squared:          0.991
+No. Observations:       15                                RMSE:        6915.38
+Df Residuals:           13                                 MAE:        5806.93
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   1693.5627   1894.0972       0.364      0.0000   5642.9247
-       opcount      0.0454      0.0022       0.000      0.0410      0.0482
+         const   6473.8485   2746.0848       0.035      0.0000  11286.3389
+       opcount      0.0431      0.0012       0.000      0.0416      0.0464
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/SDIV_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="SDIV_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
+<img src="./figs/SDIV_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="SDIV_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
 
-<img src="./figs/SDIV_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="SDIV_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
+<img src="./figs/SDIV_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="SDIV_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
 
-<img src="./figs/SDIV_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="SDIV_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
+<img src="./figs/SDIV_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="SDIV_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.998
-Model:                  NNLS                    Adj. R-squared:          0.998
-No. Observations:       10                                RMSE:         706.67
-Df Residuals:           8                                  MAE:         499.37
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const    673.3670    313.5346       0.028      0.0000   1251.4673
-       opcount      0.0201      0.0002       0.000      0.0196      0.0205
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="SDIV_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="SDIV_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="SDIV_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-# POINT_EVALUATION
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:          0.000
-No. Observations:       1                                 RMSE:           0.00
-Df Residuals:           -1                                 MAE:           0.00
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount    564.0594      0.0000       0.000    564.0594    564.0594
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/POINT_EVALUATION_regression.png" alt="POINT_EVALUATION_regression" width="600"/>
-
-<img src="./figs/POINT_EVALUATION_diagnostics.png" alt="POINT_EVALUATION_diagnostics" width="600"/>
-
-<img src="./figs/POINT_EVALUATION_bootstrap.png" alt="POINT_EVALUATION_bootstrap" width="600"/>
-
-
-# BLS12_G1ADD
-
-## ethrex-v9.0.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:          0.000
-No. Observations:       1                                 RMSE:           0.00
-Df Residuals:           -1                                 MAE:           0.00
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      5.9631      0.0000       0.000      5.9631      5.9631
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="BLS12_G1ADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.996
-Model:                  NNLS                    Adj. R-squared:          0.995
-No. Observations:       6                                 RMSE:        1276.87
-Df Residuals:           4                                  MAE:        1083.09
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000    672.3722       1.000      0.0000   2070.0451
-       opcount      1.1846      0.0329       0.000      1.0920      1.2084
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-# BLS12_G2ADD
-
-## ethrex-v9.0.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:          0.000
-No. Observations:       1                                 RMSE:           0.00
-Df Residuals:           -1                                 MAE:           0.00
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount      6.5924      0.0000       0.000      6.5924      6.5924
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="BLS12_G2ADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.996
-Model:                  NNLS                    Adj. R-squared:          0.992
-No. Observations:       3                                 RMSE:        1045.38
-Df Residuals:           1                                  MAE:         985.59
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   3111.4099   2323.3789       0.345      0.0000   6056.5017
-       opcount      2.8456      0.2037       0.000      2.5271      3.4015
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-# ECADD
-
-## ethrex-v9.0.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.217
-Model:                  NNLS                    Adj. R-squared:          0.165
-No. Observations:       17                                RMSE:       34136.43
-Df Residuals:           15                                 MAE:       15952.47
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   5517.1575   7282.9093       0.279      0.0000  25617.0580
-       opcount      0.5877      0.1754       0.001      0.2724      0.9848
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ECADD_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="ECADD_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/ECADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="ECADD_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/ECADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="ECADD_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.897
-Model:                  NNLS                    Adj. R-squared:          0.890
-No. Observations:       16                                RMSE:        6257.96
-Df Residuals:           14                                 MAE:        5049.91
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   2562.7864   2126.9736       0.149      0.0000   7631.8895
-       opcount      0.6400      0.0528       0.000      0.5353      0.7324
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="ECADD_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
-
-<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="ECADD_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
-
-<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="ECADD_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
-
-
-# ECRECOVER
-
-## ethrex-v9.0.0__zisk-v0.15.0
+## reth-v1.11.0__zisk-v0.16.1
 
 
 ```python
@@ -910,90 +670,331 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.999
 Model:                  NNLS                    Adj. R-squared:          0.999
-No. Observations:       3                                 RMSE:         118.09
-Df Residuals:           1                                  MAE:         111.33
+No. Observations:       16                                RMSE:        1280.08
+Df Residuals:           14                                 MAE:         964.64
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2878.3127   1001.1565       0.114      0.0000   3545.2195
-       opcount      3.9018      0.3791       0.000      3.7456      5.6518
+         const   2549.2450    676.3362       0.000   1245.7402   3779.3324
+       opcount      0.0177      0.0003       0.000      0.0172      0.0182
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_regression.png" alt="ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_regression" width="600"/>
+<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="SDIV_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
 
-<img src="./figs/ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_diagnostics.png" alt="ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_diagnostics" width="600"/>
+<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="SDIV_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
 
-<img src="./figs/ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_bootstrap.png" alt="ECRECOVER_ethrex-v9.0.0__zisk-v0.15.0_bootstrap" width="600"/>
+<img src="./figs/SDIV_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="SDIV_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
+# POINT_EVALUATION
+
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 
 ```python
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          1.000
-Model:                  NNLS                    Adj. R-squared:          1.000
-No. Observations:       3                                 RMSE:          46.20
-Df Residuals:           1                                  MAE:          43.56
+Dep. Variable:          run_duration_ms              R-squared:          0.998
+Model:                  NNLS                    Adj. R-squared:          0.997
+No. Observations:       7                                 RMSE:        2460.16
+Df Residuals:           5                                  MAE:        1991.68
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   1817.0484    585.7277       0.114      0.0000   1947.2874
-       opcount      4.2450      0.2381       0.000      4.1839      5.4033
+         const      0.0000     36.6683       1.000      0.0000      0.0000
+       opcount    257.9804      2.4371       0.000    251.2356    260.7565
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.15.0_regression.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.15.0_regression" width="600"/>
+<img src="./figs/POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
 
-<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.15.0_diagnostics.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.15.0_diagnostics" width="600"/>
+<img src="./figs/POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
 
-<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.15.0_bootstrap.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.15.0_bootstrap" width="600"/>
+<img src="./figs/POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="POINT_EVALUATION_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.997
+Model:                  NNLS                    Adj. R-squared:          0.996
+No. Observations:       7                                 RMSE:        2902.72
+Df Residuals:           5                                  MAE:        2593.72
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const      0.0000   1181.9784       1.000      0.0000   3834.2969
+       opcount    252.2259      3.2944       0.000    244.9692    256.6028
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="POINT_EVALUATION_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+# BLS12_G1ADD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       8                                 RMSE:         581.90
+Df Residuals:           6                                  MAE:         492.72
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2240.7105    500.9548       0.002    781.7681   2892.8936
+       opcount      0.2403      0.0113       0.000      0.2323      0.2739
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="BLS12_G1ADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.993
+No. Observations:       8                                 RMSE:         722.48
+Df Residuals:           6                                  MAE:         597.43
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   1493.4125    770.7747       0.003    298.0091   3044.0555
+       opcount      0.2879      0.0147       0.000      0.2480      0.3030
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="BLS12_G1ADD_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+# BLS12_G2ADD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       8                                 RMSE:         574.22
+Df Residuals:           6                                  MAE:         473.34
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   1814.9131    402.7905       0.004    862.7247   2598.7295
+       opcount      0.3961      0.0141       0.000      0.3566      0.4195
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="BLS12_G2ADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.995
+No. Observations:       8                                 RMSE:         614.40
+Df Residuals:           6                                  MAE:         473.52
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2410.2214    597.7868       0.002   1295.1108   3412.7781
+       opcount      0.3991      0.0146       0.000      0.3673      0.4278
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="BLS12_G2ADD_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+# ECADD
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.941
+Model:                  NNLS                    Adj. R-squared:          0.939
+No. Observations:       24                                RMSE:        2917.22
+Df Residuals:           22                                 MAE:        2176.49
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2004.9823   1008.0261       0.015    187.0837   3989.9429
+       opcount      0.1937      0.0147       0.000      0.1630      0.2185
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECADD_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="ECADD_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/ECADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="ECADD_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/ECADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="ECADD_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.933
+Model:                  NNLS                    Adj. R-squared:          0.930
+No. Observations:       24                                RMSE:        3208.57
+Df Residuals:           22                                 MAE:        2098.28
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2310.5001   1299.4904       0.017    152.7583   4937.1810
+       opcount      0.1980      0.0197       0.000      0.1579      0.2290
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="ECADD_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="ECADD_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/ECADD_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="ECADD_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+# ECRECOVER
+
+## ethrex-b9d3ef6__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.999
+Model:                  NNLS                    Adj. R-squared:          0.999
+No. Observations:       8                                 RMSE:         573.31
+Df Residuals:           6                                  MAE:         464.04
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2428.0083    406.7000       0.000   1653.4222   3152.1966
+       opcount      3.4698      0.0499       0.000      3.3520      3.5645
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="ECRECOVER_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.999
+Model:                  NNLS                    Adj. R-squared:          0.999
+No. Observations:       8                                 RMSE:         500.37
+Df Residuals:           6                                  MAE:         401.78
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   2948.6600    451.1054       0.000   2072.6488   3842.7016
+       opcount      3.3904      0.0631       0.000      3.1996      3.4618
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
+
+<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
+
+<img src="./figs/ECRECOVER_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="ECRECOVER_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
 
 
 # KECCAK256
 
-## ethrex-v9.0.0__zisk-v0.15.0
+## ethrex-b9d3ef6__zisk-v0.16.1
 
-### test_name: test_keccak_diff_mem_msg_sizes
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.309
-Model:                  NNLS                    Adj. R-squared:          0.294
-No. Observations:       96                                RMSE:       31146.66
-Df Residuals:           93                                 MAE:       12463.77
-Df Model:               2      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const   8110.8306   6988.1479       0.119      0.0000  25628.0952
-       opcount      0.0741      0.0197       0.000      0.0338      0.1123
-      msg_size      0.0005      0.0001       0.000      0.0004      0.0007
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_regression.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_regression" width="600"/>
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_diagnostics.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_diagnostics" width="600"/>
-
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_bootstrap.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_bootstrap" width="600"/>
-
-
-### test_name: test_keccak_max_permutations
+### test_name: test_keccak
 
 
 ```python
@@ -1001,28 +1002,26 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
                            NNLS Regression Results                            
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.988
-Model:                  NNLS                    Adj. R-squared:          0.986
-No. Observations:       6                                 RMSE:        2982.49
-Df Residuals:           4                                  MAE:        2334.84
+Model:                  NNLS                    Adj. R-squared:          0.988
+No. Observations:       143                               RMSE:        2410.09
+Df Residuals:           141                                MAE:        1811.62
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2956.3659   2684.8295       0.120      0.0000   8183.2221
-       opcount     39.7784      2.1407       0.000     36.6956     43.7776
+         const   3881.3502    366.0544       0.000   3170.8875   4579.4949
+       opcount      0.0583      0.0008       0.000      0.0568      0.0600
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_regression.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_regression" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_regression.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_regression" width="600"/>
 
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_diagnostics.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_diagnostics" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diagnostics.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diagnostics" width="600"/>
 
-<img src="./figs/KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_bootstrap.png" alt="KECCAK256_ethrex-v9.0.0__zisk-v0.15.0_test_keccak_max_permutations_bootstrap" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_bootstrap.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_bootstrap" width="600"/>
 
-
-## reth-v1.11.0__zisk-v0.15.0
 
 ### test_name: test_keccak_diff_mem_msg_sizes
 
@@ -1031,27 +1030,27 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.086
-Model:                  NNLS                    Adj. R-squared:          0.067
-No. Observations:       96                                RMSE:       39783.37
-Df Residuals:           93                                 MAE:       15811.03
+Dep. Variable:          run_duration_ms              R-squared:          0.925
+Model:                  NNLS                    Adj. R-squared:          0.923
+No. Observations:       123                               RMSE:        7912.23
+Df Residuals:           120                                MAE:        5756.91
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   9688.8718   6902.8181       0.044      0.0000  26016.3845
-       opcount      0.0463      0.0213       0.008      0.0075      0.0920
-      msg_size      0.0003      0.0001       0.000      0.0002      0.0004
+         const   3250.8734   1253.3169       0.003    967.0439   5741.4247
+       opcount      0.0531      0.0024       0.000      0.0478      0.0573
+      msg_size      0.0004      0.0000       0.000      0.0003      0.0004
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_regression" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_regression.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_regression" width="600"/>
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_diagnostics" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_diagnostics.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_diagnostics" width="600"/>
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_diff_mem_msg_sizes_bootstrap" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_bootstrap.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_bootstrap" width="600"/>
 
 
 ### test_name: test_keccak_max_permutations
@@ -1061,155 +1060,183 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.989
-Model:                  NNLS                    Adj. R-squared:          0.986
-No. Observations:       6                                 RMSE:        2117.56
-Df Residuals:           4                                  MAE:        1899.10
+Dep. Variable:          run_duration_ms              R-squared:          0.997
+Model:                  NNLS                    Adj. R-squared:          0.996
+No. Observations:       8                                 RMSE:        2134.85
+Df Residuals:           6                                  MAE:        2004.92
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2990.6792   1966.7470       0.019    198.5407   8003.7039
-       opcount     28.8863      1.3358       0.000     26.3556     31.5105
+         const   7135.2713   2023.2679       0.000   3504.0665  11347.3905
+       opcount     29.2716      1.0002       0.000     28.0191     31.6492
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_regression" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_regression.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_regression" width="600"/>
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_diagnostics" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_diagnostics.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_diagnostics" width="600"/>
 
-<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.15.0_test_keccak_max_permutations_bootstrap" width="600"/>
+<img src="./figs/KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_bootstrap.png" alt="KECCAK256_ethrex-b9d3ef6__zisk-v0.16.1_test_keccak_max_permutations_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+### test_name: test_keccak
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.382
+Model:                  NNLS                    Adj. R-squared:          0.377
+No. Observations:       144                               RMSE:       14620.40
+Df Residuals:           142                                MAE:       11655.43
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   7975.5066   2321.0418       0.001   3204.0263  12247.5351
+       opcount      0.0305      0.0053       0.000      0.0203      0.0415
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_regression" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diagnostics" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_bootstrap" width="600"/>
+
+
+### test_name: test_keccak_diff_mem_msg_sizes
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.910
+Model:                  NNLS                    Adj. R-squared:          0.908
+No. Observations:       128                               RMSE:        8297.00
+Df Residuals:           125                                MAE:        6451.89
+Df Model:               2      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   3669.0926   1288.5275       0.002   1092.3446   6069.0627
+       opcount      0.0239      0.0038       0.000      0.0166      0.0318
+      msg_size      0.0004      0.0000       0.000      0.0004      0.0005
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_regression" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_diagnostics" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_diff_mem_msg_sizes_bootstrap" width="600"/>
+
+
+### test_name: test_keccak_max_permutations
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.998
+Model:                  NNLS                    Adj. R-squared:          0.997
+No. Observations:       8                                 RMSE:        1936.53
+Df Residuals:           6                                  MAE:        1665.59
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   4280.6018   1247.1719       0.011   1251.3064   6335.8618
+       opcount     30.6493      0.5995       0.000     29.9381     32.3884
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_regression.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_regression" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_diagnostics.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_diagnostics" width="600"/>
+
+<img src="./figs/KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_bootstrap.png" alt="KECCAK256_reth-v1.11.0__zisk-v0.16.1_test_keccak_max_permutations_bootstrap" width="600"/>
 
 
 # BLAKE2F
 
-## ethrex-v9.0.0__zisk-v0.15.0
-
-### test_name: test_blake2f
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 
 ```python
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:          0.000
-No. Observations:       1                                 RMSE:           0.00
-Df Residuals:           -1                                 MAE:           0.00
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount    672.5714      0.0000       0.000    672.5714    672.5714
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_regression.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_regression" width="600"/>
-
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_diagnostics.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_diagnostics" width="600"/>
-
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_bootstrap.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_bootstrap" width="600"/>
-
-
-### test_name: test_blake2f_benchmark
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.304
-Model:                  NNLS                    Adj. R-squared:          0.211
-No. Observations:       18                                RMSE:       33126.32
-Df Residuals:           15                                 MAE:       17945.99
+Dep. Variable:          run_duration_ms              R-squared:          0.993
+Model:                  NNLS                    Adj. R-squared:          0.992
+No. Observations:       13                                RMSE:        3936.35
+Df Residuals:           10                                 MAE:        3065.61
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   7309.3089   9056.3399       0.267      0.0000  32217.5584
-       opcount      0.2139      0.0996       0.071      0.0000      0.3254
-    num_rounds      0.0251      0.0182       0.000      0.0073      0.0669
+         const      0.0000    169.5609       1.000      0.0000    530.6732
+       opcount      0.1516      0.0056       0.000      0.1440      0.1685
+    num_rounds      0.0602      0.0038       0.000      0.0459      0.0622
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_regression.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_regression" width="600"/>
+<img src="./figs/BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_regression.png" alt="BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_regression" width="600"/>
 
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_diagnostics.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_diagnostics" width="600"/>
+<img src="./figs/BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics.png" alt="BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_diagnostics" width="600"/>
 
-<img src="./figs/BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_bootstrap.png" alt="BLAKE2F_ethrex-v9.0.0__zisk-v0.15.0_test_blake2f_benchmark_bootstrap" width="600"/>
+<img src="./figs/BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap.png" alt="BLAKE2F_ethrex-b9d3ef6__zisk-v0.16.1_bootstrap" width="600"/>
 
 
-## reth-v1.11.0__zisk-v0.15.0
-
-### test_name: test_blake2f
+## reth-v1.11.0__zisk-v0.16.1
 
 
 ```python
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:          0.000
-No. Observations:       1                                 RMSE:           0.00
-Df Residuals:           -1                                 MAE:           0.00
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000      0.0000       1.000      0.0000      0.0000
-       opcount    637.2208      0.0000       0.000    637.2208    637.2208
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_regression.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_regression" width="600"/>
-
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_diagnostics.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_diagnostics" width="600"/>
-
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_bootstrap.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_bootstrap" width="600"/>
-
-
-### test_name: test_blake2f_benchmark
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.280
-Model:                  NNLS                    Adj. R-squared:          0.200
-No. Observations:       21                                RMSE:       60010.59
-Df Residuals:           18                                 MAE:       30769.79
+Dep. Variable:          run_duration_ms              R-squared:          0.999
+Model:                  NNLS                    Adj. R-squared:          0.998
+No. Observations:       9                                 RMSE:        1008.78
+Df Residuals:           6                                  MAE:         821.93
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const   2141.9828   5304.9198       0.554      0.0000  18378.2182
-       opcount      0.1320      0.1099       0.216      0.0000      0.2819
-    num_rounds      0.0389      0.0262       0.000      0.0086      0.0918
+         const      0.0000    274.2630       1.000      0.0000    882.1987
+       opcount      0.1627      0.0156       0.000      0.1583      0.2141
+    num_rounds      0.0513      0.0154       0.103      0.0000      0.0520
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_regression.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_regression" width="600"/>
+<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.16.1_regression.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.16.1_regression" width="600"/>
 
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_diagnostics.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_diagnostics" width="600"/>
+<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.16.1_diagnostics.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.16.1_diagnostics" width="600"/>
 
-<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_bootstrap.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.15.0_test_blake2f_benchmark_bootstrap" width="600"/>
+<img src="./figs/BLAKE2F_reth-v1.11.0__zisk-v0.16.1_bootstrap.png" alt="BLAKE2F_reth-v1.11.0__zisk-v0.16.1_bootstrap" width="600"/>
 
 
 # ECPAIRING
 
-## ethrex-v9.0.0__zisk-v0.15.0
+## ethrex-b9d3ef6__zisk-v0.16.1
 
 ### test_name: test_alt_bn128
 
@@ -1218,26 +1245,26 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.002
-Model:                  NNLS                    Adj. R-squared:         -0.016
-No. Observations:       60                                RMSE:       42943.65
-Df Residuals:           58                                 MAE:       24505.72
+Dep. Variable:          run_duration_ms              R-squared:          0.064
+Model:                  NNLS                    Adj. R-squared:          0.052
+No. Observations:       80                                RMSE:       21022.91
+Df Residuals:           78                                 MAE:       16410.49
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const  22663.2480   5938.6036       0.000  12122.8660  35294.5981
-       opcount      9.9910     19.9595       0.269      0.0000     71.9713
+         const  14427.5088   2578.7758       0.000   8423.1966  18909.6464
+       opcount     20.0816     16.4008       0.019      0.7568     63.1103
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_regression.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_regression" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_regression.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_regression" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_diagnostics.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_diagnostics" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_diagnostics.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_diagnostics" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_bootstrap.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_bootstrap" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_bootstrap.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_bootstrap" width="600"/>
 
 
 ### test_name: test_alt_bn128_benchmark
@@ -1247,27 +1274,117 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
                            NNLS Regression Results                            
 ==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.992
-Model:                  NNLS                    Adj. R-squared:          0.992
-No. Observations:       30                                RMSE:        1019.02
-Df Residuals:           27                                 MAE:         864.39
+Dep. Variable:          run_duration_ms              R-squared:          0.994
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       40                                RMSE:        1503.68
+Df Residuals:           37                                 MAE:        1097.31
 Df Model:               2      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const    422.4102    329.7976       0.108      0.0000   1119.2388
-       opcount    116.2339      3.4831       0.000    106.6531    120.2860
-     num_pairs     21.9582      0.7436       0.000     20.5086     23.4134
+         const    513.0972    392.7651       0.184      0.0000   1275.2879
+       opcount    108.1446      3.1489       0.000    105.1357    116.3672
+     num_pairs     22.5243      0.8214       0.000     20.8666     24.0761
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_regression.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_regression" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_regression.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_regression" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_diagnostics.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_diagnostics" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_diagnostics.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_diagnostics" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_bootstrap.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_alt_bn128_benchmark_bootstrap" width="600"/>
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_bootstrap.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_alt_bn128_benchmark_bootstrap" width="600"/>
+
+
+### test_name: test_bn128_pairings_amortized
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.995
+Model:                  NNLS                    Adj. R-squared:          0.994
+No. Observations:       8                                 RMSE:         863.92
+Df Residuals:           6                                  MAE:         682.66
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const      7.2884    408.2134       0.474      0.0000   1312.1780
+       opcount    861.7618     22.2592       0.000    787.9129    876.9576
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_regression.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_regression" width="600"/>
+
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_diagnostics.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_diagnostics" width="600"/>
+
+<img src="./figs/ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_bootstrap.png" alt="ECPAIRING_ethrex-b9d3ef6__zisk-v0.16.1_test_bn128_pairings_amortized_bootstrap" width="600"/>
+
+
+## reth-v1.11.0__zisk-v0.16.1
+
+### test_name: test_alt_bn128
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.068
+Model:                  NNLS                    Adj. R-squared:          0.056
+No. Observations:       80                                RMSE:       20367.63
+Df Residuals:           78                                 MAE:       15636.35
+Df Model:               1      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const  14918.2059   2494.9080       0.000   9085.3263  19270.0966
+       opcount     20.1770     16.2640       0.019      1.1722     62.9323
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_regression" width="600"/>
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_diagnostics" width="600"/>
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_bootstrap" width="600"/>
+
+
+### test_name: test_alt_bn128_benchmark
+
+
+```python
+==============================================================================
+                           NNLS Regression Results                            
+==============================================================================
+Dep. Variable:          run_duration_ms              R-squared:          0.996
+Model:                  NNLS                    Adj. R-squared:          0.996
+No. Observations:       40                                RMSE:        1275.67
+Df Residuals:           37                                 MAE:         973.48
+Df Model:               2      
+==============================================================================
+                      coef     std err     P-value      [0.025      0.975]
+------------------------------------------------------------------------------
+         const   1180.0218    371.1647       0.000    394.5444   1891.9032
+       opcount    109.6459      2.0479       0.000    105.8786    114.4076
+     num_pairs     20.5684      0.6930       0.000     19.4363     22.0945
+==============================================================================
+Notes: Non-negative least squares with bootstrap inference (1000 iterations)
+==============================================================================
+```
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_regression" width="600"/>
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_diagnostics" width="600"/>
+
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_alt_bn128_benchmark_bootstrap" width="600"/>
 
 
 ### test_name: test_bn128_pairings_amortized
@@ -1278,113 +1395,23 @@ Notes: Non-negative least squares with bootstrap inference (1000 iterations)
                            NNLS Regression Results                            
 ==============================================================================
 Dep. Variable:          run_duration_ms              R-squared:          0.993
-Model:                  NNLS                    Adj. R-squared:          0.992
-No. Observations:       6                                 RMSE:         544.79
-Df Residuals:           4                                  MAE:         398.69
+Model:                  NNLS                    Adj. R-squared:          0.991
+No. Observations:       8                                 RMSE:        1051.24
+Df Residuals:           6                                  MAE:         968.78
 Df Model:               1      
 ==============================================================================
                       coef     std err     P-value      [0.025      0.975]
 ------------------------------------------------------------------------------
-         const      0.0000    288.4781       1.000      0.0000   1113.6934
-       opcount    899.4198     31.1609       0.000    794.0548    917.5640
+         const    223.2224    657.4554       0.298      0.0000   2155.0454
+       opcount    852.0980     38.6184       0.000    733.5690    868.4176
 ==============================================================================
 Notes: Non-negative least squares with bootstrap inference (1000 iterations)
 ==============================================================================
 ```
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_regression.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_regression" width="600"/>
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_regression" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_diagnostics.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_diagnostics" width="600"/>
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_diagnostics" width="600"/>
 
-<img src="./figs/ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_bootstrap.png" alt="ECPAIRING_ethrex-v9.0.0__zisk-v0.15.0_test_bn128_pairings_amortized_bootstrap" width="600"/>
-
-
-## reth-v1.11.0__zisk-v0.15.0
-
-### test_name: test_alt_bn128
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.000
-Model:                  NNLS                    Adj. R-squared:         -0.017
-No. Observations:       60                                RMSE:       35492.50
-Df Residuals:           58                                 MAE:       20567.43
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const  21083.3660   5078.5033       0.000  10762.1061  30659.7850
-       opcount      3.6896     13.8609       0.358      0.0000     50.0135
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_regression" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_diagnostics" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_bootstrap" width="600"/>
-
-
-### test_name: test_alt_bn128_benchmark
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.995
-Model:                  NNLS                    Adj. R-squared:          0.995
-No. Observations:       30                                RMSE:         775.79
-Df Residuals:           27                                 MAE:         633.19
-Df Model:               2      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const    989.8875    271.9491       0.001    492.2298   1544.3488
-       opcount    107.4290      1.6881       0.000    105.2240    111.7193
-     num_pairs     21.9121      0.7386       0.000     20.5269     23.4726
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_regression" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_diagnostics" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_alt_bn128_benchmark_bootstrap" width="600"/>
-
-
-### test_name: test_bn128_pairings_amortized
-
-
-```python
-==============================================================================
-                           NNLS Regression Results                            
-==============================================================================
-Dep. Variable:          run_duration_ms              R-squared:          0.997
-Model:                  NNLS                    Adj. R-squared:          0.996
-No. Observations:       6                                 RMSE:         392.51
-Df Residuals:           4                                  MAE:         308.27
-Df Model:               1      
-==============================================================================
-                      coef     std err     P-value      [0.025      0.975]
-------------------------------------------------------------------------------
-         const      0.0000    205.5692       1.000      0.0000    563.9087
-       opcount    926.8232     18.6331       0.000    881.6163    945.3908
-==============================================================================
-Notes: Non-negative least squares with bootstrap inference (1000 iterations)
-==============================================================================
-```
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_regression.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_regression" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_diagnostics.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_diagnostics" width="600"/>
-
-<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.15.0_test_bn128_pairings_amortized_bootstrap" width="600"/>
+<img src="./figs/ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_bootstrap.png" alt="ECPAIRING_reth-v1.11.0__zisk-v0.16.1_test_bn128_pairings_amortized_bootstrap" width="600"/>
 
