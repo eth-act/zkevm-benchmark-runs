@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       fixtures_url:
-        description: 'URL to the fixtures tar.gz archive'
+        description: 'URL to the fixtures archive (.tar.gz or .tar.zst)'
         required: false
         default: 'https://github.com/jsign/artifacts/releases/download/fixtures_fd1dd63_5_10_15_20_25_30_35_6/fixtures_fd1dd63_5_10_15_20_25_30_35_60.tar.zst'
       fixture_set:
@@ -35,7 +35,7 @@ jobs:
         run: |
           git clone https://github.com/jsign/evm-gas-repricings.git \
             --depth 1 \
-            --branch ${{ github.event.inputs.evm_gas_repricings_branch || 'jsign-repricing' }} \
+            --branch ${{ github.event.inputs.evm_gas_repricings_branch || 'jsign-repricing-new-format' }} \
             /tmp/evm-gas-repricings
 
       - name: Setup Python
@@ -46,7 +46,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpq-dev
+          sudo apt-get install -y libpq-dev zstd
 
       - name: Create venv and install dependencies
         working-directory: /tmp/evm-gas-repricings
@@ -57,14 +57,30 @@ jobs:
 
       - name: Download and extract fixtures
         run: |
-          FIXTURES_URL="${{ github.event.inputs.fixtures_url || 'https://github.com/jsign/artifacts/releases/download/fixtures-v0.0.7-5_10_15_20_25_30_60/fixtures-v0.0.7-5_10_15_20_25_30_60.tar.gz' }}"
+          FIXTURES_URL="${{ github.event.inputs.fixtures_url || 'https://github.com/jsign/artifacts/releases/download/fixtures_fd1dd63_5_10_15_20_25_30_35_6/fixtures_fd1dd63_5_10_15_20_25_30_35_60.tar.zst' }}"
+          ARCHIVE_PATH="/tmp/fixtures.archive"
+          ARCHIVE_URL_PATH="${FIXTURES_URL%%\?*}"
 
           echo "Downloading fixtures from: $FIXTURES_URL"
-          curl -L -o /tmp/fixtures.tar.gz "$FIXTURES_URL"
+          curl -L --fail -o "$ARCHIVE_PATH" "$FIXTURES_URL"
 
           echo "Extracting fixtures..."
           mkdir -p /tmp/fixtures-extract
-          tar -xzf /tmp/fixtures.tar.gz -C /tmp/fixtures-extract
+          case "$ARCHIVE_URL_PATH" in
+            *.tar.zst|*.tzst)
+              tar --zstd -xf "$ARCHIVE_PATH" -C /tmp/fixtures-extract
+              ;;
+            *.tar.gz|*.tgz)
+              tar -xzf "$ARCHIVE_PATH" -C /tmp/fixtures-extract
+              ;;
+            *.tar)
+              tar -xf "$ARCHIVE_PATH" -C /tmp/fixtures-extract
+              ;;
+            *)
+              echo "ERROR: Unsupported fixtures archive format: $FIXTURES_URL"
+              exit 1
+              ;;
+          esac
 
           # Find the blockchain_tests directory regardless of archive nesting
           BLOCKCHAIN_TESTS=$(find /tmp/fixtures-extract -type d -name "blockchain_tests" | head -1)
@@ -87,22 +103,48 @@ jobs:
           RUNS_DIR="/tmp/evm-gas-repricings/zkevm/runs"
           mkdir -p "$RUNS_DIR"
 
-          FIXTURE_SET="${{ github.event.inputs.fixture_set || 'eest-365433e' }}"
+          FIXTURE_SET="${{ github.event.inputs.fixture_set || 'eest-fd1dd63' }}"
+          SOURCE_DIR="data/proving/8x5090/${FIXTURE_SET}"
           echo "Using fixture set: $FIXTURE_SET"
 
-          for config_dir in "data/proving/8x5090/${FIXTURE_SET}"/*M-gas-limit; do
-            if [ -d "$config_dir" ]; then
-              config_name=$(basename "$config_dir")
-              echo "Copying $config_name..."
-              cp -r "$config_dir" "$RUNS_DIR/$config_name"
-            fi
-          done
+          if [ ! -d "$SOURCE_DIR" ]; then
+            echo "ERROR: Fixture set directory not found: $SOURCE_DIR"
+            exit 1
+          fi
+
+          copied_files=0
+          while IFS= read -r json_file; do
+            rel_path="${json_file#$SOURCE_DIR/}"
+
+            case "$rel_path" in
+              */*/*.json)
+                prover_dir=$(basename "$(dirname "$json_file")")
+                client_dir=$(basename "$(dirname "$(dirname "$json_file")")")
+                ;;
+              *)
+                continue
+                ;;
+            esac
+
+            dest_dir="$RUNS_DIR/$client_dir/$prover_dir"
+            mkdir -p "$dest_dir"
+            cp "$json_file" "$dest_dir/"
+            copied_files=$((copied_files + 1))
+          done < <(find "$SOURCE_DIR" -type f -name '*.json' ! -name 'hardware.json' | sort)
+
+          if [ "$copied_files" -eq 0 ]; then
+            echo "ERROR: No benchmark JSON files found under $SOURCE_DIR"
+            exit 1
+          fi
+
+          echo "Copied $copied_files benchmark JSON files"
 
           echo "Runs structure:"
-          for dir in "$RUNS_DIR"/*/; do
-            config=$(basename "$dir")
-            file_count=$(find "$dir" -name '*.json' -not -name 'hardware.json' | wc -l)
-            echo "  $config: $file_count JSON result files"
+          find "$RUNS_DIR" -mindepth 2 -maxdepth 2 -type d | sort | while read -r dir; do
+            client=$(basename "$(dirname "$dir")")
+            prover=$(basename "$dir")
+            file_count=$(find "$dir" -maxdepth 1 -name '*.json' | wc -l)
+            echo "  $client/$prover: $file_count JSON result files"
           done
 
       - name: Run repricing analysis
