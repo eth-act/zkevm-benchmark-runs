@@ -2,6 +2,27 @@
 
 This folder contains benchmark results for the **1xL40s** hardware setup.
 
+## EEST Gas Limit Configurations
+
+### Fixture Set: `eest-bloatnet-90M`
+
+| Configuration | Description |
+|---------------|-------------|
+| **90M-gas-limit** | EEST benchmarks with 90M gas limit |
+
+### Fixture Set: `eest-fd1dd63`
+
+| Configuration | Description |
+|---------------|-------------|
+| **5M-gas-limit** | EEST benchmarks with 5M gas limit |
+| **10M-gas-limit** | EEST benchmarks with 10M gas limit |
+| **15M-gas-limit** | EEST benchmarks with 15M gas limit |
+| **20M-gas-limit** | EEST benchmarks with 20M gas limit |
+| **25M-gas-limit** | EEST benchmarks with 25M gas limit |
+| **30M-gas-limit** | EEST benchmarks with 30M gas limit |
+| **35M-gas-limit** | EEST benchmarks with 35M gas limit |
+| **60M-gas-limit** | EEST benchmarks with 60M gas limit |
+
 ## Mainnet Block Range Configurations
 
 | Configuration | Description | Details |
@@ -11,5 +32,5 @@ This folder contains benchmark results for the **1xL40s** hardware setup.
 ## Hardware Information
 
 - **Setup**: 1xL40s
-- **Total Configurations**: 1 (1 mainnet range)
+- **Total Configurations**: 10 (9 gas limit, 1 mainnet range)
 

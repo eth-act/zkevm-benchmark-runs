@@ -23,8 +23,14 @@ This folder contains benchmark results for the **8x5090** hardware setup.
 |---------------|-------------|----------|
 | **mainnet-23533500-23533999** | Mainnet blocks 23533500 to 23533999 | [View Results](mainnet-23533500-23533999/README.md) |
 
+## Other Configurations
+
+| Configuration | Details |
+|---------------|----------|
+| **bloatnet** | [View Results](bloatnet/README.md) |
+
 ## Hardware Information
 
 - **Setup**: 8x5090
-- **Total Configurations**: 9 (8 gas limit, 1 mainnet range)
+- **Total Configurations**: 10 (8 gas limit, 1 mainnet range, 1 other)
 
