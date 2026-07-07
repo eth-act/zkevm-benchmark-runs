@@ -10,6 +10,7 @@ You can see a website rendering of the results [here](https://eth-act.github.io/
 |----------------|-----------------|-------------------|
 | **1xL40s** | — | [9 gas limits, 1 mainnet range](data/executions/1xL40s/README.md) |
 | **8x5090** | [8 gas limits, 1 mainnet range, 1 other](data/proving/8x5090/README.md) | — |
+| **16x5090** | [1 gas limit, 1 mainnet range](data/proving/16x5090/README.md) | — |
 
 ## Folder Structure
 
